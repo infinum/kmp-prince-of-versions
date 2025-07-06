@@ -35,6 +35,8 @@ kotlin {
             implementation(libs.kotlin.test)
         }
     }
+
+    explicitApi()
 }
 
 android {
