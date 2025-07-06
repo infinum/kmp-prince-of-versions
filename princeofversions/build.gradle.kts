@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.detekt)
 }
 
 kotlin {
@@ -13,7 +14,7 @@ kotlin {
             jvmTarget.set(JvmTarget.JVM_17)
         }
     }
-    
+
     listOf(
         iosX64(),
         iosArm64(),
@@ -24,9 +25,9 @@ kotlin {
             isStatic = true
         }
     }
-    
+
     jvm()
-    
+
     sourceSets {
         commonMain.dependencies {
             // put your Multiplatform dependencies here
@@ -49,4 +50,16 @@ android {
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()
     }
+}
+
+detekt {
+    buildUponDefaultConfig = true
+    source.setFrom(
+        files(
+            "src/androidMain/kotlin",
+            "src/commonMain/kotlin",
+            "src/iosMain/kotlin",
+            "src/jvmMain/kotlin"
+        )
+    )
 }
