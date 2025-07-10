@@ -15,8 +15,8 @@ import androidx.compose.ui.Modifier
 import com.infinum.princeofversions.Greeting
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import princeofversions.sampleapp.generated.resources.Res
-import princeofversions.sampleapp.generated.resources.compose_multiplatform
+import kmp_princeofversions.sampleapp.generated.resources.Res
+import kmp_princeofversions.sampleapp.generated.resources.compose_multiplatform
 
 @Composable
 @Preview
