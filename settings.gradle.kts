@@ -1,4 +1,4 @@
-rootProject.name = "PrinceOfVersions"
+rootProject.name = "KMP-PrinceOfVersions"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
