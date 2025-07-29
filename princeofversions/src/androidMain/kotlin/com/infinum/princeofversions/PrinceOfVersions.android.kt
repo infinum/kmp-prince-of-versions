@@ -1,18 +1,11 @@
 package com.infinum.princeofversions
 
 import android.content.Context
-import kotlinx.coroutines.CoroutineDispatcher
 
-// This suppression should be removed once the 'context' property is used in the implementation.
-@Suppress("UnusedPrivateProperty")
-public actual class PrinceOfVersions(context: Context) {
-    public actual fun checkForUpdates(
-        source: ConfigSource, callback: UpdateCallback, dispatcher: CoroutineDispatcher
-    ): Cancelable {
-        TODO("Not yet implemented")
-    }
+public fun PrinceOfVersions(context: Context): PrinceOfVersions = PrinceOfVersionsImpl(context)
 
-    public actual fun newCall(source: ConfigSource): PrinceOfVersionsCall {
+internal actual class PrinceOfVersionsImpl(context: Context) : PrinceOfVersions {
+    actual override suspend fun checkForUpdates(source: Loader): UpdateResult {
         TODO("Not yet implemented")
     }
 }
