@@ -8,9 +8,4 @@ internal interface ApplicationConfiguration {
      * The application's version code.
      */
     val version: String
-
-    /**
-     * The device's SDK version code.
-     */
-    val sdkVersionCode: String
 }
