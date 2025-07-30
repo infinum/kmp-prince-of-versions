@@ -1,5 +1,8 @@
 package com.infinum.princeofversions
 
+import com.infinum.princeofversions.models.Loader
+import com.infinum.princeofversions.models.UpdateResult
+
 public fun PrinceOfVersions(): PrinceOfVersions = PrinceOfVersionsImpl()
 
 internal actual class PrinceOfVersionsImpl : PrinceOfVersions {
