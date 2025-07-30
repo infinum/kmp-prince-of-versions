@@ -1,4 +1,4 @@
-package com.infinum.princeofversions
+package com.infinum.princeofversions.models
 
 /**
  * A callback interface used to deliver the result of an update check.

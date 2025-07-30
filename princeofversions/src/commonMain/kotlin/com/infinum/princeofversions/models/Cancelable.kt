@@ -1,4 +1,4 @@
-package com.infinum.princeofversions
+package com.infinum.princeofversions.models
 
 /**
  * Represents a handle to an ongoing asynchronous operation that can be canceled.
