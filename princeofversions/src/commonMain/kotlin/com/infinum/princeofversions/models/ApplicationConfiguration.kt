@@ -1,7 +1,7 @@
 package com.infinum.princeofversions.models
 
 /**
- * Provides application parameters such as version and SDK level.
+ * Provides application parameters such as the application's version.
  */
 internal interface ApplicationConfiguration {
     /**
