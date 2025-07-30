@@ -17,6 +17,7 @@ public interface UpdateCallback {
      */
 
     public fun onNewUpdate(version: String, isMandatory: Boolean, metadata: Map<String, String>)
+
     /**
      * Called when no new update is available for the user.
      *

@@ -5,7 +5,7 @@ import com.infinum.princeofversions.enums.NotificationType
 /**
  * Represents selected update configuration object based on requirements
  */
-internal data class UpdateInfo (
+internal data class UpdateInfo(
     val requiredVersion: String?,
     val lastVersionAvailable: String?,
     val requirements: Map<String, String>,

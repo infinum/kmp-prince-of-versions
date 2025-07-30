@@ -26,7 +26,7 @@ internal data class CheckResult private constructor(
 
         fun mandatoryUpdate(
             version: String,
-            metadata: Map<String, String?>,
+            metadata: Map<String, String>,
             updateInfo: UpdateInfo
         ): CheckResult = CheckResult(
             status = UpdateStatus.MANDATORY,
@@ -39,7 +39,7 @@ internal data class CheckResult private constructor(
         fun optionalUpdate(
             version: String,
             notificationType: NotificationType,
-            metadata: Map<String, String?>,
+            metadata: Map<String, String>,
             updateInfo: UpdateInfo
         ): CheckResult = CheckResult(
             status = UpdateStatus.OPTIONAL,
@@ -51,7 +51,7 @@ internal data class CheckResult private constructor(
 
         fun noUpdate(
             version: String,
-            metadata: Map<String, String?>,
+            metadata: Map<String, String>,
             updateInfo: UpdateInfo
         ): CheckResult = CheckResult(
             status = UpdateStatus.NO_UPDATE,
