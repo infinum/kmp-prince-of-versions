@@ -49,6 +49,44 @@ struct ContentView: View {
                     print("Error: \(error)")
                 }
             }
+
+            // This will crash if input is blank because IllegalArgumentException in Kotlin maps to an Objective-C exception, not a Swift Error.
+//            Task {
+//                do {
+//                    let result = try await PrinceOfVersions.MyApi().mightFail(input: "")
+//                    print(result)
+//                } catch {
+//                    print("❌ Caught Swift Error:", error)
+//                }
+//            }
+
+
+            // Avoid throwing in suspend fun, use Result instead
+            // prints: ✅ Failure(kotlin.IllegalArgumentException: Input must not be blank)
+            PrinceOfVersions.MyApi().safeMightFail(input: "") { result, error in
+                if let result = result {
+                    print("✅", result)
+                } else if let error = error {
+                    print("❌", error.localizedDescription)
+                }
+            }
+
+            // Use sealed classes like MyResult with Success and Failure subtypes
+            // prints: ❌ Failure: Input must not be blank
+            PrinceOfVersions.MyApi().safeMightFailWithSealedClass(input: "") { result, error in
+                if let result = result {
+                    switch result {
+                    case let success as MyResult.Success:
+                        print("✅ Success:", success.data)
+                    case let failure as MyResult.Failure:
+                        print("❌ Failure:", failure.message)
+                    default:
+                        print("⚠️ Unknown result type")
+                    }
+                } else if let error = error {
+                    print("❗️ Actual error:", error.localizedDescription)
+                }
+            }
         }
     }
 }
