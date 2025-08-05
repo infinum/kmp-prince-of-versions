@@ -38,4 +38,12 @@ public class MyApi {
         }
     }
 
+    public suspend fun fetchSafe(): MyResult {
+        return try {
+            MyResult.Success(riskyCall())
+        } catch (e: Exception) {
+            MyResult.Failure("Caught error: ${e.message}")
+        }
+    }
+
 }

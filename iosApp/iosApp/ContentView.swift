@@ -87,6 +87,21 @@ struct ContentView: View {
                     print("❗️ Actual error:", error.localizedDescription)
                 }
             }
+
+            PrinceOfVersions.MyApi().fetchSafe() { result, error in
+                if let result = result {
+                    switch result {
+                    case let success as MyResult.Success:
+                        print("✅ Success:", success.data)
+                    case let failure as MyResult.Failure:
+                        print("❌ Failure:", failure.message)
+                    default:
+                        print("⚠️ Unknown result type")
+                    }
+                } else if let error = error {
+                    print("❌", error.localizedDescription)
+                }
+            }
         }
     }
 }
