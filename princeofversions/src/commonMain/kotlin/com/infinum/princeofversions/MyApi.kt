@@ -1,5 +1,6 @@
 package com.infinum.princeofversions
 
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 
 public sealed class MyResult {
@@ -13,7 +14,17 @@ public class MyApi {
         return "Hello from KMP"
     }
 
-    public suspend fun mightFail(input: String): String {
+    @Throws(IllegalArgumentException::class)
+    public fun mightFail(input: String): String {
+        if (input.isBlank()) {
+            throw IllegalArgumentException("Input must not be blank")
+        }
+        return "Valid: $input"
+    }
+
+    @Throws(IllegalArgumentException::class, CancellationException::class)
+    public suspend fun mightFailWithDelay(input: String): String {
+        delay(1000) // Simulate async
         if (input.isBlank()) {
             throw IllegalArgumentException("Input must not be blank")
         }

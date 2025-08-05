@@ -50,15 +50,44 @@ struct ContentView: View {
                 }
             }
 
-            // This will crash if input is blank because IllegalArgumentException in Kotlin maps to an Objective-C exception, not a Swift Error.
-//            Task {
-//                do {
-//                    let result = try await PrinceOfVersions.MyApi().mightFail(input: "")
-//                    print(result)
-//                } catch {
-//                    print("❌ Caught Swift Error:", error)
-//                }
-//            }
+           Task {
+               do {
+                   let result = try PrinceOfVersions.MyApi().mightFail(input: "")
+                   print(result)
+               } catch {
+                   print("✅ Caught Swift Error:", error)
+                   if let nsError = error as? NSError {
+                       if let kotlinException = nsError.userInfo["KotlinException"] {
+                           print("Caught a Kotlin Exception: \(kotlinException)")
+                       }
+                   }
+               }
+           }
+
+            Task {
+                PrinceOfVersions.MyApi().mightFailWithDelay(input: ""){ (data, error) in
+                    if let error = error {
+                        // The IllegalArgumentException was caught and converted to an Error
+                        print("✅ Caught a Kotlin exception from suspend function: \(error)")
+                        return
+                    }
+                   print("No error happened")
+                }
+            }
+
+            Task {
+                do {
+                    let result = try await PrinceOfVersions.MyApi().mightFailWithDelay(input: "")
+                    print(result)
+                } catch {
+                print("✅ Caught Swift Error from suspend function:", error)
+                if let nsError = error as? NSError {
+                    if let kotlinException = nsError.userInfo["KotlinException"] {
+                        print("Caught a Kotlin Exception: \(kotlinException)")
+                    }
+                }
+            }
+            }
 
 
             // Avoid throwing in suspend fun, use Result instead
