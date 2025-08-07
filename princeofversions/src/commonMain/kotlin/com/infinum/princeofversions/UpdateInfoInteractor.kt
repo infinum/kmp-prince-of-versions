@@ -35,12 +35,12 @@ internal class UpdateInfoInteractorImpl<T>(
 
         return when {
             // Check for mandatory update first
-            mandatoryVersion != null && versionComparator.isVersionGreaterThan(mandatoryVersion, currentVersion) -> {
+            mandatoryVersion != null && mandatoryVersion.isGreaterThan(currentVersion, versionComparator) -> {
                 // If a mandatory update is available, it takes precedence.
                 // The notified version will be the greater of the optional and mandatory versions.
 
                 val versionToNotify = optionalVersion?.takeIf {
-                    versionComparator.isVersionGreaterThan(it, mandatoryVersion)
+                    it.isGreaterThan(mandatoryVersion, versionComparator)
                 } ?: mandatoryVersion
 
                 CheckResult.mandatoryUpdate(
@@ -50,7 +50,7 @@ internal class UpdateInfoInteractorImpl<T>(
                 )
             }
             // If no mandatory update, check for an optional update
-            optionalVersion != null && versionComparator.isVersionGreaterThan(optionalVersion, currentVersion) -> {
+            optionalVersion != null && optionalVersion.isGreaterThan(currentVersion, versionComparator) -> {
                 CheckResult.optionalUpdate(
                     version = optionalVersion,
                     notificationType = config.optionalNotificationType,

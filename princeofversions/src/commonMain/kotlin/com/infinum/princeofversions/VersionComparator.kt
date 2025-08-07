@@ -13,6 +13,6 @@ public fun interface VersionComparator<T> {
     public fun compare(firstVersion: T, secondVersion: T): Int
 }
 
-internal fun <T> VersionComparator<T>.isVersionGreaterThan(firstVersion: T, secondVersion: T): Boolean {
-    return compare(firstVersion, secondVersion) > 0
+internal fun <T> T.isGreaterThan(secondVersion: T, versionComparator: VersionComparator<T>): Boolean {
+    return versionComparator.compare(this, secondVersion) > 0
 }
