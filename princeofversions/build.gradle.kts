@@ -29,6 +29,9 @@ kotlin {
     jvm()
 
     sourceSets {
+        androidMain.dependencies {
+            implementation(libs.androidx.datastore.preferences)
+        }
         commonMain.dependencies {
             implementation(libs.kotlinx.coroutines.core)
         }
