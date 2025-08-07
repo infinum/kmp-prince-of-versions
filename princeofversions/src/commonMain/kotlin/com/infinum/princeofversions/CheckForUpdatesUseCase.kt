@@ -2,19 +2,20 @@ package com.infinum.princeofversions
 
 import com.infinum.princeofversions.enums.NotificationType
 import com.infinum.princeofversions.enums.UpdateStatus
+import com.infinum.princeofversions.Loader
 import com.infinum.princeofversions.models.Storage
 import com.infinum.princeofversions.models.UpdateResult
 
-internal interface CheckForUpdatesUseCase {
-    suspend fun checkForUpdates(): UpdateResult
+internal interface CheckForUpdatesUseCase<T> {
+    suspend fun checkForUpdates(loader: Loader): UpdateResult<T>
 }
 
-internal class CheckForUpdatesUseCaseImpl(
-    private val updateInfoInteractor: UpdateInfoInteractor,
-    private val storage: Storage
-) : CheckForUpdatesUseCase {
-    override suspend fun checkForUpdates(): UpdateResult {
-        val checkResult = updateInfoInteractor.execute()
+internal class CheckForUpdatesUseCaseImpl<T>(
+    private val updateInfoInteractor: UpdateInfoInteractor<T>,
+    private val storage: Storage<T>
+) : CheckForUpdatesUseCase<T> {
+    override suspend fun checkForUpdates(loader: Loader): UpdateResult<T> {
+        val checkResult = updateInfoInteractor.invoke(loader)
 
         return when (checkResult.status) {
             UpdateStatus.MANDATORY -> {

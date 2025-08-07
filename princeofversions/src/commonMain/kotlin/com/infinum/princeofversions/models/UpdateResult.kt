@@ -15,8 +15,8 @@ import com.infinum.princeofversions.enums.UpdateStatus
  * @property metadata A map of metadata associated with the resolved update configuration. This is provided even
  * if no update is available.
  */
-public data class UpdateResult(
-    public val version: String,
+public data class UpdateResult<T>(
+    public val version: T,
     public val status: UpdateStatus,
     public val metadata: Map<String, String> = emptyMap()
 )

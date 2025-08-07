@@ -1,6 +1,5 @@
 package com.infinum.princeofversions
 
-import com.infinum.princeofversions.models.Loader
 import com.infinum.princeofversions.models.UpdateResult
 
 /**
@@ -9,7 +8,7 @@ import com.infinum.princeofversions.models.UpdateResult
  * This library checks for application updates by fetching a configuration from a given source.
  *
  */
-public fun interface PrinceOfVersions {
+public fun interface PrinceOfVersions<T> {
 
     /**
      * Starts a check for an update.
@@ -20,10 +19,10 @@ public fun interface PrinceOfVersions {
      */
     public suspend fun checkForUpdates(
         source: Loader,
-    ): UpdateResult
+    ): UpdateResult<T>
 
 }
 
-internal expect class PrinceOfVersionsImpl : PrinceOfVersions {
-    override suspend fun checkForUpdates(source: Loader): UpdateResult
+internal expect class PrinceOfVersionsImpl<T> : PrinceOfVersions<T> {
+    override suspend fun checkForUpdates(source: Loader): UpdateResult<T>
 }

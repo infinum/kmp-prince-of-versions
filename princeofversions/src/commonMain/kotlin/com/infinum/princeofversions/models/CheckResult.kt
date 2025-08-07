@@ -14,21 +14,21 @@ import com.infinum.princeofversions.enums.UpdateStatus
  * - General update information ([UpdateInfo])
  */
 @ConsistentCopyVisibility
-internal data class CheckResult private constructor(
+internal data class CheckResult<T> private constructor(
     val status: UpdateStatus,
-    val updateVersion: String,
+    val updateVersion: T,
     val notificationType: NotificationType?,
     val metadata: Map<String, String>,
-    val info: UpdateInfo
+    val info: UpdateInfo<T>
 ) {
 
     companion object {
 
-        fun mandatoryUpdate(
-            version: String,
+        fun <T> mandatoryUpdate(
+            version: T,
             metadata: Map<String, String>,
-            updateInfo: UpdateInfo
-        ): CheckResult = CheckResult(
+            updateInfo: UpdateInfo<T>,
+        ): CheckResult<T> = CheckResult(
             status = UpdateStatus.MANDATORY,
             updateVersion = version,
             notificationType = null,
@@ -36,12 +36,12 @@ internal data class CheckResult private constructor(
             info = updateInfo
         )
 
-        fun optionalUpdate(
-            version: String,
+        fun <T> optionalUpdate(
+            version: T,
             notificationType: NotificationType,
             metadata: Map<String, String>,
-            updateInfo: UpdateInfo
-        ): CheckResult = CheckResult(
+            updateInfo: UpdateInfo<T>,
+        ): CheckResult<T> = CheckResult(
             status = UpdateStatus.OPTIONAL,
             updateVersion = version,
             notificationType = notificationType,
@@ -49,11 +49,11 @@ internal data class CheckResult private constructor(
             info = updateInfo
         )
 
-        fun noUpdate(
-            version: String,
+        fun <T> noUpdate(
+            version: T,
             metadata: Map<String, String>,
-            updateInfo: UpdateInfo
-        ): CheckResult = CheckResult(
+            updateInfo: UpdateInfo<T>,
+        ): CheckResult<T> = CheckResult(
             status = UpdateStatus.NO_UPDATE,
             updateVersion = version,
             notificationType = null,

@@ -2,21 +2,20 @@ package com.infinum.princeofversions
 
 import com.infinum.princeofversions.models.ApplicationConfiguration
 import com.infinum.princeofversions.models.CheckResult
-import com.infinum.princeofversions.models.ConfigurationParser
-import com.infinum.princeofversions.models.Loader
+import com.infinum.princeofversions.Loader
 import com.infinum.princeofversions.models.UpdateInfo
 
-internal interface UpdateInfoInteractor {
-    suspend fun execute(): CheckResult
+internal interface UpdateInfoInteractor<T> {
+    suspend fun invoke(loader: Loader): CheckResult<T>
 }
 
-internal class UpdateInfoInteractorImpl(
-    private val configurationParser: ConfigurationParser,
-    private val appConfig: ApplicationConfiguration,
-    private val loader: Loader,
-) : UpdateInfoInteractor {
+internal class UpdateInfoInteractorImpl<T>(
+    private val configurationParser: ConfigurationParser<T>,
+    private val appConfig: ApplicationConfiguration<T>,
+    private val versionComparator: VersionComparator<T>,
+) : UpdateInfoInteractor<T> {
 
-    override suspend fun execute(): CheckResult {
+    override suspend fun invoke(loader: Loader): CheckResult<T> {
 
         val configJson = loader.load()
         val currentVersion = appConfig.version
@@ -36,12 +35,12 @@ internal class UpdateInfoInteractorImpl(
 
         return when {
             // Check for mandatory update first
-            mandatoryVersion != null && mandatoryVersion.isVersionGreater(currentVersion) -> {
+            mandatoryVersion != null && versionComparator.isVersionGreaterThan(mandatoryVersion, currentVersion) -> {
                 // If a mandatory update is available, it takes precedence.
                 // The notified version will be the greater of the optional and mandatory versions.
 
                 val versionToNotify = optionalVersion?.takeIf {
-                    mandatoryVersion.isVersionGreater(it)
+                    versionComparator.isVersionGreaterThan(it, mandatoryVersion)
                 } ?: mandatoryVersion
 
                 CheckResult.mandatoryUpdate(
@@ -51,7 +50,7 @@ internal class UpdateInfoInteractorImpl(
                 )
             }
             // If no mandatory update, check for an optional update
-            optionalVersion != null && optionalVersion.isVersionGreater(currentVersion) -> {
+            optionalVersion != null && versionComparator.isVersionGreaterThan(optionalVersion, currentVersion) -> {
                 CheckResult.optionalUpdate(
                     version = optionalVersion,
                     notificationType = config.optionalNotificationType,
@@ -60,10 +59,10 @@ internal class UpdateInfoInteractorImpl(
                 )
             }
             else -> {
-                // If neither mandatory nor optional update is available return no update.
                 check(
-                    !(mandatoryVersion == null && optionalVersion == null)
+                    mandatoryVersion == null && optionalVersion == null
                 ) { "Both mandatory and optional version are null." }
+                // If neither mandatory nor optional update is available return no update.
                 CheckResult.noUpdate(currentVersion, config.metadata, updateInfo)
             }
         }

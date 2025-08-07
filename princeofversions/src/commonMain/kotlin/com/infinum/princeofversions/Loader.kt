@@ -1,4 +1,4 @@
-package com.infinum.princeofversions.models
+package com.infinum.princeofversions
 
 /**
  * Represents a source from which the update configuration can be loaded.
