@@ -29,6 +29,9 @@ kotlin {
     jvm()
 
     sourceSets {
+        jvmMain.dependencies {
+            implementation(libs.json)
+        }
         commonMain.dependencies {
             implementation(libs.kotlinx.coroutines.core)
         }
