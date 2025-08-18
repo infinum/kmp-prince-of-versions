@@ -103,27 +103,34 @@ struct ContentView: View {
             // Use sealed classes like MyResult with Success and Failure subtypes
             // prints: ❌ Failure: Input must not be blank
             PrinceOfVersions.MyApi().safeMightFailWithSealedClass(input: "") { result, error in
-                if let result = result {
-                    switch result {
-                    case let success as MyResult.Success:
-                        print("✅ Success:", success.data)
-                    case let failure as MyResult.Failure:
-                        print("❌ Failure:", failure.message)
-                    default:
-                        print("⚠️ Unknown result type")
-                    }
-                } else if let error = error {
+                if let error = error {
                     print("❗️ Actual error:", error.localizedDescription)
+                    return
+                }
+                guard let result = result else {
+                    print("⚠️ No result and no error")
+                    return
+                }
+
+                if let success = result as? PrinceOfVersions.MyResultSuccess<NSString> {
+                    print("✅ Success:", success.value)
+                } else if let failure = result as? PrinceOfVersions.MyResult.Failure {
+                    print("❌ Failure:", failure.reason, "code:", failure.code)
+                    print("details:", failure.details)
+                } else {
+                    print("⚠️ Unknown result type:", String(describing: type(of: result)))
                 }
             }
 
             PrinceOfVersions.MyApi().fetchSafe() { result, error in
                 if let result = result {
                     switch result {
-                    case let success as MyResult.Success:
-                        print("✅ Success:", success.data)
-                    case let failure as MyResult.Failure:
-                        print("❌ Failure:", failure.message)
+                    case let success as PrinceOfVersions.MyResultSuccess<NSString>:
+                        print("✅ Success:", success.value)
+                    case let failure as PrinceOfVersions.MyResult.Failure:
+                        print("❌ Failure:", failure.reason, "code:", failure.code)
+                        // failure.details is a Kotlin Map<String, String>; you can iterate via:
+                        print("details:", failure.details)
                     default:
                         print("⚠️ Unknown result type")
                     }

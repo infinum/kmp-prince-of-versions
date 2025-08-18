@@ -4,8 +4,12 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 
 public sealed class MyResult {
-    public data class Success(val data: String) : MyResult()
-    public data class Failure(val message: String) : MyResult()
+    public data class Success<T>(val value: T) : MyResult()
+    public data class Failure(
+        val code: Int,
+        val reason: String,
+        val details: Map<String, String>
+    ) : MyResult()
 }
 
 public class MyApi {
@@ -26,7 +30,7 @@ public class MyApi {
     public suspend fun mightFailWithDelay(input: String): String {
         delay(1000) // Simulate async
         if (input.isBlank()) {
-            throw IllegalArgumentException("Input must not be blank")
+            throw CancellationException("Input must not be blank")
         }
         return "Valid: $input"
     }
@@ -45,7 +49,7 @@ public class MyApi {
             if (input.isBlank()) throw IllegalArgumentException("Input must not be blank")
             MyResult.Success("Valid: $input")
         } catch (e: Exception) {
-            MyResult.Failure(e.message ?: "Unknown error")
+            MyResult.Failure(422, "Invalid input", mapOf("field" to "input", "hint" to "Provide a non-empty string"))
         }
     }
 
@@ -53,7 +57,7 @@ public class MyApi {
         return try {
             MyResult.Success(riskyCall())
         } catch (e: Exception) {
-            MyResult.Failure("Caught error: ${e.message}")
+            MyResult.Failure(422, "Invalid input", mapOf("field" to "input", "hint" to "Provide a non-empty string"))
         }
     }
 
