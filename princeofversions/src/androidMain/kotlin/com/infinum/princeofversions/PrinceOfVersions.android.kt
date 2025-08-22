@@ -11,4 +11,18 @@ internal actual class PrinceOfVersionsImpl<T>(
 ) : PrinceOfVersions<T> {
     actual override suspend fun checkForUpdates(source: Loader): UpdateResult<T> =
         checkForUpdatesUseCase.checkForUpdates(source)
+
+    actual override suspend fun checkForUpdates(
+        url: String,
+        username: String?,
+        password: String?,
+        networkTimeoutSeconds: Int
+    ): UpdateResult<T> = checkForUpdates(
+        AndroidDefaultLoader(
+            url = url,
+            username = username,
+            password = password,
+            networkTimeoutSeconds = networkTimeoutSeconds
+        )
+    )
 }
