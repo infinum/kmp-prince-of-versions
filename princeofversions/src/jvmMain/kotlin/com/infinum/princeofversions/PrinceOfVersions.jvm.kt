@@ -7,6 +7,14 @@ import com.infinum.princeofversions.models.Storage
 import com.infinum.princeofversions.models.UpdateResult
 
 /**
+ * Represents the main interface for using the library.
+ *
+ * This library checks for application updates by fetching a configuration from a given source.
+ *
+ */
+public typealias PrinceOfVersions = PrinceOfVersionsBase<String>
+
+/**
  * Creates and configures the main [PrinceOfVersions] instance for a JVM environment.
  *
  * This factory function is the primary entry point for using the library on the desktop.
@@ -32,7 +40,7 @@ public fun PrinceOfVersions(
         JvmDefaultRequirementChecker.KEY to JvmDefaultRequirementChecker()
     ),
     storage: Storage<String> = JvmStorage(mainClass),
-): PrinceOfVersions<String> {
+): PrinceOfVersions {
     val requirementsProcessor = RequirementsProcessor(requirementCheckers)
     val configurationParser = JvmConfigurationParser(requirementsProcessor)
 
@@ -55,9 +63,23 @@ public fun PrinceOfVersions(
     return PrinceOfVersionsImpl<String>(checkForUpdatesUseCase = checkForUpdatesUseCase)
 }
 
-internal actual class PrinceOfVersionsImpl<T>(
+internal actual class PrinceOfVersionsBaseImpl<T>(
     private val checkForUpdatesUseCase: CheckForUpdatesUseCase<T>,
-) : PrinceOfVersions<T> {
+) : PrinceOfVersionsBase<T> {
     actual override suspend fun checkForUpdates(source: Loader): UpdateResult<T> =
         checkForUpdatesUseCase.checkForUpdates(source)
+
+    actual override suspend fun checkForUpdates(
+        url: String,
+        username: String?,
+        password: String?,
+        networkTimeoutSeconds: Int
+    ): UpdateResult<T> = checkForUpdates(
+        JvmDefaultLoader(
+            url = url,
+            username = username,
+            password = password,
+            networkTimeoutSeconds = networkTimeoutSeconds
+        )
+    )
 }
