@@ -49,18 +49,18 @@ public fun PrinceOfVersions(
         versionKey = versionKey
     )
 
-    val updateInfoInteractor = UpdateInfoInteractorImpl<String>(
+    val updateInfoInteractor = UpdateInfoInteractorImpl(
         configurationParser = configurationParser,
         appConfig = applicationConfiguration,
         versionComparator = versionComparator,
     )
 
-    val checkForUpdatesUseCase = CheckForUpdatesUseCaseImpl<String>(
+    val checkForUpdatesUseCase = CheckForUpdatesUseCaseImpl(
         updateInfoInteractor = updateInfoInteractor,
         storage = storage,
     )
 
-    return PrinceOfVersionsImpl<String>(checkForUpdatesUseCase = checkForUpdatesUseCase)
+    return PrinceOfVersionsBaseImpl(checkForUpdatesUseCase = checkForUpdatesUseCase)
 }
 
 internal actual class PrinceOfVersionsBaseImpl<T>(
