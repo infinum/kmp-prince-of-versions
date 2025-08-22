@@ -40,7 +40,9 @@ internal class AndroidDefaultLoader(
             // Apply Basic Authentication if credentials are provided
             if (username != null && password != null) {
                 val credentials = "$username:$password"
-                val basicAuth = "Basic ${Base64.encodeToString(credentials.toByteArray(Charsets.UTF_8), Base64.NO_WRAP)}"
+                val basicAuth = "Basic ${
+                    Base64.encodeToString(credentials.toByteArray(Charsets.UTF_8), Base64.NO_WRAP)
+                }"
                 connection.setRequestProperty("Authorization", basicAuth)
             }
 
