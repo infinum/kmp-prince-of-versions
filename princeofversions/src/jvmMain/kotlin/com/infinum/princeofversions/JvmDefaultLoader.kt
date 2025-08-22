@@ -1,5 +1,6 @@
 package com.infinum.princeofversions
 
+@Suppress("unused") // Remove once implementation is provided
 internal class JvmDefaultLoader(
     url: String,
     username: String?,
