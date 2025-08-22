@@ -8,6 +8,14 @@ import com.infinum.princeofversions.models.Storage
 import com.infinum.princeofversions.models.UpdateResult
 
 /**
+ * Represents the main interface for using the library.
+ *
+ * This library checks for application updates by fetching a configuration from a given source.
+ *
+ */
+public typealias PrinceOfVersions = PrinceOfVersionsBase<Int>
+
+/**
  * Creates and configures the main [PrinceOfVersions] instance.
  *
  * This factory function is the primary entry point for using the library on Android.
@@ -34,7 +42,7 @@ public fun PrinceOfVersions(
         DefaultRequirementChecker.KEY to DefaultRequirementChecker()
     ),
     storage: Storage<Int> = AndroidStorage(context),
-): PrinceOfVersions<Int> {
+): PrinceOfVersions {
     val requirementsProcessor = RequirementsProcessor(requirementCheckers)
     val configurationParser = AndroidConfigurationParser(requirementsProcessor)
 
@@ -51,12 +59,26 @@ public fun PrinceOfVersions(
         storage = storage,
     )
 
-    return PrinceOfVersionsImpl(checkForUpdatesUseCase = checkForUpdatesUseCase)
+    return PrinceOfVersionsBaseImpl(checkForUpdatesUseCase = checkForUpdatesUseCase)
 }
 
-internal actual class PrinceOfVersionsImpl<T>(
+internal actual class PrinceOfVersionsBaseImpl<T>(
     private val checkForUpdatesUseCase: CheckForUpdatesUseCase<T>,
-) : PrinceOfVersions<T> {
+) : PrinceOfVersionsBase<T> {
     actual override suspend fun checkForUpdates(source: Loader): UpdateResult<T> =
         checkForUpdatesUseCase.checkForUpdates(source)
+
+    actual override suspend fun checkForUpdates(
+        url: String,
+        username: String?,
+        password: String?,
+        networkTimeoutSeconds: Int
+    ): UpdateResult<T> = checkForUpdates(
+        AndroidDefaultLoader(
+            url = url,
+            username = username,
+            password = password,
+            networkTimeoutSeconds = networkTimeoutSeconds
+        )
+    )
 }
