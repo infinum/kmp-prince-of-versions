@@ -59,9 +59,10 @@ internal class UpdateInfoInteractorImpl<T>(
                 )
             }
             else -> {
-                check(
-                    mandatoryVersion == null && optionalVersion == null
-                ) { "Both mandatory and optional version are null." }
+                if (mandatoryVersion == null && optionalVersion == null) {
+                    // neither mandatory nor optional version is provided
+                    error("Both mandatory and optional version are null.");
+                }
                 // If neither mandatory nor optional update is available return no update.
                 CheckResult.noUpdate(currentVersion, config.metadata, updateInfo)
             }
