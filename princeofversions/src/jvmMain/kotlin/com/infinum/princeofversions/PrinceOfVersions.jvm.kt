@@ -17,11 +17,41 @@ public typealias PrinceOfVersions = PrinceOfVersionsBase<String>
 /**
  * Creates and configures the main [PrinceOfVersions] instance for a JVM environment.
  *
- * This factory function is the primary entry point for using the library on the desktop.
+ * @param mainClass A class reference from your application, used to create a unique storage location.
+ * @param versionComparator An object that compares the app's current version with the
+ * versions from the configuration file. Defaults to [JvmDefaultVersionComparator].
+ * @param versionProvider An object that provides the current version of the application.
+ * @param requirementCheckers A map of custom checkers that can evaluate environment-specific
+ * conditions before an update is considered valid. Defaults to a map containing only
+ * the [JvmDefaultRequirementChecker].
+ * @param storage An object used to persist the last version the user was notified about.
+ * Defaults to [JvmStorage].
+ * @return A fully configured [PrinceOfVersions] instance.
+ */
+public fun PrinceOfVersions(
+    mainClass: Class<*>,
+    versionProvider: ApplicationVersionProvider<String>,
+    versionComparator: VersionComparator<String> = JvmDefaultVersionComparator(),
+    requirementCheckers: Map<String, RequirementChecker> = mapOf(
+        JvmDefaultRequirementChecker.KEY to JvmDefaultRequirementChecker()
+    ),
+    storage: Storage<String> = JvmStorage(mainClass),
+): PrinceOfVersions = createPrinceOfVersions(
+    versionComparator = versionComparator,
+    versionProvider = versionProvider,
+    requirementCheckers = requirementCheckers,
+    storage = storage,
+)
+
+/**
+ * Creates and configures the main [PrinceOfVersions] instance for a JVM environment. Provides
+ * a default [ApplicationVersionProvider] that reads the version from a properties file.
  *
  * @param mainClass A class reference from your application, used to create a unique storage location.
- * @param versionFilePath The path to the properties file containing the app version.
- * @param versionKey The key for the version property within the properties file.
+ * @param versionFilePath The path to the properties file containing the version information.
+ * Defaults to "/version.properties".
+ * @param versionKey The key in the properties file that holds the version string.
+ * Defaults to "application.version".
  * @param versionComparator An object that compares the app's current version with the
  * versions from the configuration file. Defaults to [JvmDefaultVersionComparator].
  * @param requirementCheckers A map of custom checkers that can evaluate environment-specific
@@ -30,6 +60,7 @@ public typealias PrinceOfVersions = PrinceOfVersionsBase<String>
  * @param storage An object used to persist the last version the user was notified about.
  * Defaults to [JvmStorage].
  * @return A fully configured [PrinceOfVersions] instance.
+ *
  */
 public fun PrinceOfVersions(
     mainClass: Class<*>,
@@ -40,14 +71,23 @@ public fun PrinceOfVersions(
         JvmDefaultRequirementChecker.KEY to JvmDefaultRequirementChecker()
     ),
     storage: Storage<String> = JvmStorage(mainClass),
+): PrinceOfVersions = createPrinceOfVersions(
+    versionComparator = versionComparator,
+    versionProvider = JvmApplicationVersionProvider(versionFilePath, versionKey),
+    requirementCheckers = requirementCheckers,
+    storage = storage,
+)
+
+private fun createPrinceOfVersions(
+    versionComparator: VersionComparator<String>,
+    versionProvider: ApplicationVersionProvider<String>,
+    requirementCheckers: Map<String, RequirementChecker>,
+    storage: Storage<String>,
 ): PrinceOfVersions {
     val requirementsProcessor = RequirementsProcessor(requirementCheckers)
     val configurationParser = JvmConfigurationParser(requirementsProcessor)
 
-    val applicationConfiguration = JvmApplicationConfiguration(
-        filePath = versionFilePath,
-        versionKey = versionKey
-    )
+    val applicationConfiguration = JvmApplicationConfiguration(versionProvider)
 
     val updateInfoInteractor = UpdateInfoInteractorImpl(
         configurationParser = configurationParser,
