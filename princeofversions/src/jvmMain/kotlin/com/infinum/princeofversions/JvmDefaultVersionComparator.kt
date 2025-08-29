@@ -9,7 +9,7 @@ package com.infinum.princeofversions
  * you can provide a custom [VersionComparator] implementation. A library like
  * 'jsemver' can be used for full Semantic Versioning 2.0.0 support.
  */
-public class JvmDefaultVersionComparator : VersionComparator<String> {
+internal class JvmDefaultVersionComparator : VersionComparator<String> {
 
     /**
      * Compares two simple dotted numeric version strings.
