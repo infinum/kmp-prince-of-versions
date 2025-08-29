@@ -18,7 +18,7 @@ public typealias PrinceOfVersions = PrinceOfVersionsBase<Int>
 /**
  * Creates and configures the main [PrinceOfVersions] instance.
  *
- * This factory function is the primary entry point for using the library on Android.
+ * Allows customization of the version logic, requirement checkers, and storage mechanism.
  *
  * @param context The application context.
  * @param versionComparator An object that compares the app's current version with the
@@ -38,15 +38,41 @@ public typealias PrinceOfVersions = PrinceOfVersionsBase<Int>
 public fun PrinceOfVersions(
     context: Context,
     versionComparator: VersionComparator<Int> = AndroidDefaultVersionComparator(),
+    versionProvider: ApplicationVersionProvider<Int> = AndroidApplicationVersionProvider(context),
     requirementCheckers: Map<String, RequirementChecker> = mapOf(
         DefaultRequirementChecker.KEY to DefaultRequirementChecker()
     ),
     storage: Storage<Int> = AndroidStorage(context),
+): PrinceOfVersions = createPrinceOfVersions(
+    versionComparator = versionComparator,
+    versionProvider = versionProvider,
+    requirementCheckers = requirementCheckers,
+    storage = storage,
+)
+
+/**
+ * Creates and configures the main [PrinceOfVersions] instance.
+ *
+ * @param context The application context.
+ */
+public fun PrinceOfVersions(context: Context): PrinceOfVersions = createPrinceOfVersions(
+    versionComparator = AndroidDefaultVersionComparator(),
+    versionProvider = AndroidApplicationVersionProvider(context),
+    requirementCheckers = mapOf(
+        DefaultRequirementChecker.KEY to DefaultRequirementChecker()
+    ),
+    storage = AndroidStorage(context),
+)
+
+private fun createPrinceOfVersions(
+    versionComparator: VersionComparator<Int>,
+    versionProvider: ApplicationVersionProvider<Int>,
+    requirementCheckers: Map<String, RequirementChecker>,
+    storage: Storage<Int>,
 ): PrinceOfVersions {
     val requirementsProcessor = RequirementsProcessor(requirementCheckers)
     val configurationParser = AndroidConfigurationParser(requirementsProcessor)
-
-    val applicationConfiguration = AndroidApplicationConfiguration(context)
+    val applicationConfiguration = AndroidApplicationConfiguration(versionProvider = versionProvider)
 
     val updateInfoInteractor = UpdateInfoInteractorImpl(
         configurationParser = configurationParser,

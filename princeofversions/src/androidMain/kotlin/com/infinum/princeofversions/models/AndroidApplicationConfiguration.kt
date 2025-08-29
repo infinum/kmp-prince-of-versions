@@ -1,15 +1,15 @@
 package com.infinum.princeofversions.models
 
-import android.content.Context
-import android.content.pm.PackageManager
-import android.os.Build
+import com.infinum.princeofversions.ApplicationVersionProvider
 
 /**
- * This class provides the application's version.
+ * Provides application parameters such as the application's version.
  *
- * @param context The application context used to retrieve package information.
+ * @param versionProvider A provider to retrieve the application's version code.
  */
-internal class AndroidApplicationConfiguration(context: Context) : ApplicationConfiguration<Int> {
+internal class AndroidApplicationConfiguration(
+    versionProvider: ApplicationVersionProvider<Int>,
+) : ApplicationConfiguration<Int> {
 
     /**
      * The application's version code, retrieved from the package manager.
@@ -17,17 +17,5 @@ internal class AndroidApplicationConfiguration(context: Context) : ApplicationCo
      * @throws IllegalStateException if the application's package name cannot be found,
      * or if the version code is too large to be represented as an Int.
      */
-    override val version: Int = try {
-        val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
-        val longVersionCode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            packageInfo.longVersionCode
-        } else {
-            @Suppress("DEPRECATION")
-            packageInfo.versionCode.toLong()
-        }
-
-        longVersionCode.toInt()
-    } catch (e: PackageManager.NameNotFoundException) {
-        throw kotlin.IllegalStateException("Could not find package name", e)
-    }
+    override val version: Int = versionProvider.getVersion()
 }
