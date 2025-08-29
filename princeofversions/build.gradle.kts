@@ -32,6 +32,9 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.androidx.datastore.preferences)
         }
+        jvmMain.dependencies {
+            implementation(libs.json)
+        }
         commonMain.dependencies {
             implementation(libs.kotlinx.coroutines.core)
         }
