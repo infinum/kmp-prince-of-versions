@@ -1,10 +1,8 @@
 package com.infinum.princeofversions
 
+import PrinceOfVersionsComponents
 import android.content.Context
 import com.infinum.princeofversions.models.AndroidApplicationConfiguration
-import com.infinum.princeofversions.models.AndroidConfigurationParser
-import com.infinum.princeofversions.models.AndroidStorage
-import com.infinum.princeofversions.models.Storage
 import com.infinum.princeofversions.models.UpdateResult
 
 /**
@@ -18,18 +16,10 @@ public typealias PrinceOfVersions = PrinceOfVersionsBase<Int>
 /**
  * Creates and configures the main [PrinceOfVersions] instance.
  *
- * Allows customization of the version logic, requirement checkers, and storage mechanism.
+ * Uses the default components for parsing, requirements checking, version operations, and storage.
  *
- * @param context The application context.
- * @param versionComparator An object that compares the app's current version with the
- * versions from the configuration file. Defaults to [AndroidDefaultVersionComparator],
- * which compares integer version codes.
- * @param requirementCheckers A map of custom checkers that can evaluate device or
- * user-specific conditions before an update is considered valid.
- * Defaults to a map containing only the [DefaultRequirementChecker].
- * @param storage An object used to persist the last version the user was notified about,
- * which controls the notification frequency for optional updates.
- * Defaults to [AndroidStorage], which uses Jetpack DataStore.
+ * @param context The Android context used for accessing application resources.
+ *
  * @return A fully configured [PrinceOfVersions] instance, ready to be used for
  * checking for application updates.
  * @see PrinceOfVersions
@@ -37,56 +27,44 @@ public typealias PrinceOfVersions = PrinceOfVersionsBase<Int>
  */
 public fun PrinceOfVersions(
     context: Context,
-    versionComparator: VersionComparator<Int> = AndroidDefaultVersionComparator(),
-    versionProvider: ApplicationVersionProvider<Int> = AndroidApplicationVersionProvider(context),
-    requirementCheckers: Map<String, RequirementChecker> = mapOf(
-        DefaultRequirementChecker.KEY to DefaultRequirementChecker()
-    ),
-    storage: Storage<Int> = AndroidStorage(context),
 ): PrinceOfVersions = createPrinceOfVersions(
-    versionComparator = versionComparator,
-    versionProvider = versionProvider,
-    requirementCheckers = requirementCheckers,
-    storage = storage,
+    princeOfVersionsComponents = PrinceOfVersionsComponents.default(context = context),
 )
 
 /**
  * Creates and configures the main [PrinceOfVersions] instance.
  *
- * @param context The application context.
+ * Allows for custom components to be provided for parsing, requirements checking, version operations, and storage.
+ *
+ * @return A fully configured [PrinceOfVersions] instance, ready to be used for
+ * checking for application updates.
+ * @see PrinceOfVersions
+ * @see UpdateResult
  */
-public fun PrinceOfVersions(context: Context): PrinceOfVersions = createPrinceOfVersions(
-    versionComparator = AndroidDefaultVersionComparator(),
-    versionProvider = AndroidApplicationVersionProvider(context),
-    requirementCheckers = mapOf(
-        DefaultRequirementChecker.KEY to DefaultRequirementChecker()
-    ),
-    storage = AndroidStorage(context),
+public fun PrinceOfVersions(
+    princeOfVersionsComponents: PrinceOfVersionsComponents,
+): PrinceOfVersions = createPrinceOfVersions(
+    princeOfVersionsComponents = princeOfVersionsComponents,
 )
 
 private fun createPrinceOfVersions(
-    versionComparator: VersionComparator<Int>,
-    versionProvider: ApplicationVersionProvider<Int>,
-    requirementCheckers: Map<String, RequirementChecker>,
-    storage: Storage<Int>,
-): PrinceOfVersions {
-    val requirementsProcessor = RequirementsProcessor(requirementCheckers)
-    val configurationParser = AndroidConfigurationParser(requirementsProcessor)
-    val applicationConfiguration = AndroidApplicationConfiguration(versionProvider = versionProvider)
+    princeOfVersionsComponents: PrinceOfVersionsComponents,
+): PrinceOfVersions =
+    with(princeOfVersionsComponents) {
+        val applicationConfiguration = AndroidApplicationConfiguration(versionProvider = versionProvider)
 
-    val updateInfoInteractor = UpdateInfoInteractorImpl(
-        configurationParser = configurationParser,
-        appConfig = applicationConfiguration,
-        versionComparator = versionComparator,
-    )
+        val updateInfoInteractor = UpdateInfoInteractorImpl(
+            configurationParser = configurationParser,
+            appConfig = applicationConfiguration,
+            versionComparator = versionComparator,
+        )
 
-    val checkForUpdatesUseCase = CheckForUpdatesUseCaseImpl(
-        updateInfoInteractor = updateInfoInteractor,
-        storage = storage,
-    )
-
-    return PrinceOfVersionsBaseImpl(checkForUpdatesUseCase = checkForUpdatesUseCase)
-}
+        val checkForUpdatesUseCase = CheckForUpdatesUseCaseImpl(
+            updateInfoInteractor = updateInfoInteractor,
+            storage = storage,
+        )
+        return PrinceOfVersionsBaseImpl(checkForUpdatesUseCase = checkForUpdatesUseCase)
+    }
 
 internal actual class PrinceOfVersionsBaseImpl<T>(
     private val checkForUpdatesUseCase: CheckForUpdatesUseCase<T>,
