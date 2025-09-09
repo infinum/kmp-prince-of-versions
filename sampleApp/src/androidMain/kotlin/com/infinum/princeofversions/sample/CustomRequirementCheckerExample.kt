@@ -61,7 +61,11 @@ class CustomRequirementCheckerExample : ComponentActivity() {
         WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = true
 
         val checkers = mapOf("requiredNumberOfLetters" to ExampleRequirementsChecker())
-        princeOfVersions = PrinceOfVersions(this, requirementCheckers = checkers)
+        princeOfVersions = PrinceOfVersions(
+            princeOfVersionsComponents = PrinceOfVersionsComponents.default(this).copy(
+                requirementCheckers = checkers,
+            ),
+        )
 
         setContent {
             CustomRequirementCheckerScreen(
