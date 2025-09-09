@@ -6,7 +6,7 @@ import com.infinum.princeofversions.enums.NotificationType
  * This class holds loaded data from a configuration resource.
  *
  */
-internal data class PrinceOfVersionsConfig<T>(
+public data class PrinceOfVersionsConfig<T>(
     val mandatoryVersion: T?,
     val optionalVersion: T?,
     val optionalNotificationType: NotificationType,

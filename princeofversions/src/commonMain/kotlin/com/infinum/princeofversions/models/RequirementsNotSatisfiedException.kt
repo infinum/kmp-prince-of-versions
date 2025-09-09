@@ -6,12 +6,12 @@ package com.infinum.princeofversions.models
  * @param sourceMetadata The default metadata from the root object in the configuration file.
  * A defensive copy is made to ensure immutability.
  */
-internal class RequirementsNotSatisfiedException(sourceMetadata: Map<String, String?>) : IllegalStateException() {
+public class RequirementsNotSatisfiedException(sourceMetadata: Map<String, String?>) : IllegalStateException() {
 
     /**
      * A copy of the metadata from the update configuration.
      */
-    val metadata: Map<String, String?> = HashMap(sourceMetadata)
+    public val metadata: Map<String, String?> = HashMap(sourceMetadata)
 
     override fun toString(): String {
         return "RequirementsNotSatisfiedException(metadata=$metadata)"
