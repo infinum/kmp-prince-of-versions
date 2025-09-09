@@ -17,13 +17,24 @@ public typealias PrinceOfVersions = PrinceOfVersionsBase<String>
  * Creates and configures the main [PrinceOfVersions] instance for a JVM environment.
  *
  * @param mainClass A class reference from your application, used to create a unique storage location.
- * @param princeOfVersionsComponents An customizable config data class that holds all the components
  * needed for the library to work.
  * @return A fully configured [PrinceOfVersions] instance.
  */
 public fun PrinceOfVersions(
     mainClass: Class<*>,
-    princeOfVersionsComponents: PrinceOfVersionsComponents = PrinceOfVersionsComponents(mainClass = mainClass),
+): PrinceOfVersions = createPrinceOfVersions(
+    princeOfVersionsComponents = PrinceOfVersionsComponents.default(mainClass = mainClass),
+)
+
+/**
+ * Creates and configures the main [PrinceOfVersions] instance for a JVM environment.
+ *
+ *  @param princeOfVersionsComponents A customizable config data class that holds all the components
+ *
+ * @return A fully configured [PrinceOfVersions] instance.
+ */
+public fun PrinceOfVersions(
+    princeOfVersionsComponents: PrinceOfVersionsComponents,
 ): PrinceOfVersions = createPrinceOfVersions(
     princeOfVersionsComponents = princeOfVersionsComponents,
 )
