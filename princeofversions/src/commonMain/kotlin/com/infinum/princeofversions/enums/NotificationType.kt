@@ -3,7 +3,7 @@ package com.infinum.princeofversions.enums
 /**
  * Type of notification used to determine if already notified updates should be notified again for optional version.
  */
-internal enum class NotificationType {
+public enum class NotificationType {
     /**
      * Describes that update should be notified only first time
      */
