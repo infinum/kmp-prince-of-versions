@@ -29,7 +29,7 @@ public fun PrinceOfVersions(
 /**
  * Creates and configures the main [PrinceOfVersions] instance for a JVM environment.
  *
- *  @param princeOfVersionsComponents A customizable config data class that holds all the components
+ * @param princeOfVersionsComponents A customizable config data class that holds all the components
  *
  * @return A fully configured [PrinceOfVersions] instance.
  */
