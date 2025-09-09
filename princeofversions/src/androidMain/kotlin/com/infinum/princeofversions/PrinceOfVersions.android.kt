@@ -16,10 +16,10 @@ public typealias PrinceOfVersions = PrinceOfVersionsBase<Int>
 /**
  * Creates and configures the main [PrinceOfVersions] instance.
  *
- * Allows customization of the version logic, requirement checkers, and storage mechanism.
+ * Uses the default components for parsing, requirements checking, version operations, and storage.
  *
  * @param context The Android context used for accessing application resources.
- * @param princeOfVersionsComponents Optional custom components for configuring the library.
+ *
  * @return A fully configured [PrinceOfVersions] instance, ready to be used for
  * checking for application updates.
  * @see PrinceOfVersions
@@ -27,8 +27,25 @@ public typealias PrinceOfVersions = PrinceOfVersionsBase<Int>
  */
 public fun PrinceOfVersions(
     context: Context,
-    princeOfVersionsComponents: PrinceOfVersionsComponents = PrinceOfVersionsComponents(context = context),
-): PrinceOfVersions = createPrinceOfVersions(princeOfVersionsComponents)
+): PrinceOfVersions = createPrinceOfVersions(
+    princeOfVersionsComponents = PrinceOfVersionsComponents.default(context = context),
+)
+
+/**
+ * Creates and configures the main [PrinceOfVersions] instance.
+ *
+ * Allows for custom components to be provided for parsing, requirements checking, version operations, and storage.
+ *
+ * @return A fully configured [PrinceOfVersions] instance, ready to be used for
+ * checking for application updates.
+ * @see PrinceOfVersions
+ * @see UpdateResult
+ */
+public fun PrinceOfVersions(
+    princeOfVersionsComponents: PrinceOfVersionsComponents,
+): PrinceOfVersions = createPrinceOfVersions(
+    princeOfVersionsComponents = princeOfVersionsComponents,
+)
 
 private fun createPrinceOfVersions(
     princeOfVersionsComponents: PrinceOfVersionsComponents,
