@@ -15,7 +15,7 @@ internal class JvmApplicationVersionProvider(
     private val versionKey: String = "application.version"
 ) : ApplicationVersionProvider<String> {
 
-    private val version: String by lazy {
+    private val applicationVersion: String by lazy {
         val inputStream = javaClass.getResourceAsStream(versionFilePath)
             ?: error("Resource file not found: $versionFilePath. Make sure it's in your resources folder.")
 
@@ -30,5 +30,5 @@ internal class JvmApplicationVersionProvider(
         }
     }
 
-    override fun getVersion(): String = version
+    override fun getVersion(): String = applicationVersion
 }
