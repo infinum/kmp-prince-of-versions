@@ -3,7 +3,7 @@ package com.infinum.princeofversions
 /**
  * The default JVM [RequirementChecker] implementation.
  */
-internal class JvmDefaultRequirementChecker : RequirementChecker {
+internal actual class DefaultRequirementChecker : RequirementChecker {
 
     /**
      * Checks if the current JVM version meets the required minimum version.
@@ -13,7 +13,7 @@ internal class JvmDefaultRequirementChecker : RequirementChecker {
      * @throws IllegalArgumentException if the required version from the JSON is not a valid integer,
      * or if the system's JVM version string is malformed.
      */
-    override fun checkRequirements(value: String): Boolean {
+    actual override fun checkRequirements(value: String): Boolean {
         val requiredVersion = value.toIntOrNull()
             ?: throw IllegalArgumentException("Required JVM version '$value' is not a valid integer.")
 
