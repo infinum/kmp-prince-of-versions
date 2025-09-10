@@ -23,7 +23,7 @@ public typealias PrinceOfVersions = PrinceOfVersionsBase<String>
 public fun PrinceOfVersions(
     mainClass: Class<*>,
 ): PrinceOfVersions = createPrinceOfVersions(
-    princeOfVersionsComponents = PrinceOfVersionsComponents.default(mainClass = mainClass),
+    princeOfVersionsComponents = PrinceOfVersionsComponents.Builder(mainClass).build(),
 )
 
 /**
