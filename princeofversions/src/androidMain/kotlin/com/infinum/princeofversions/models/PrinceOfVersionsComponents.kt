@@ -31,30 +31,6 @@ public data class PrinceOfVersionsComponents internal constructor(
     val requirementCheckers: Map<String, RequirementChecker>,
     val storage: Storage<Int>,
 ) {
-    internal companion object {
-        /**
-         * Creates a [PrinceOfVersionsComponents] instance with default implementations for Android.
-         *
-         * Defaults:
-         * - [versionComparator]: [AndroidDefaultVersionComparator], which compares integer version codes.
-         * - [versionProvider]: [AndroidApplicationVersionProvider], which retrieves the app's version code
-         * from the application's package manager.
-         * - [requirementCheckers]: A map containing only [DefaultRequirementChecker].
-         * - [configurationParser]: [AndroidConfigurationParser], initialized with [RequirementsProcessor].
-         * - [storage]: [AndroidStorage], which uses Jetpack DataStore for persistence.
-         */
-        internal fun default(context: Context): PrinceOfVersionsComponents {
-            val defaultCheckers = mapOf(DefaultRequirementChecker.KEY to DefaultRequirementChecker())
-
-            return PrinceOfVersionsComponents(
-                versionComparator = AndroidDefaultVersionComparator(),
-                versionProvider = AndroidApplicationVersionProvider(context),
-                requirementCheckers = defaultCheckers,
-                configurationParser = AndroidConfigurationParser(RequirementsProcessor(defaultCheckers)),
-                storage = AndroidStorage(context)
-            )
-        }
-    }
 
     /**
      * A builder for creating a `PrinceOfVersionsComponents` instance.

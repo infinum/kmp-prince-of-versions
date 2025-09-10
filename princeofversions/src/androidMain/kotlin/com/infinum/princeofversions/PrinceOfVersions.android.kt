@@ -28,7 +28,7 @@ public typealias PrinceOfVersions = PrinceOfVersionsBase<Int>
 public fun PrinceOfVersions(
     context: Context,
 ): PrinceOfVersions = createPrinceOfVersions(
-    princeOfVersionsComponents = PrinceOfVersionsComponents.default(context = context),
+    princeOfVersionsComponents = PrinceOfVersionsComponents.Builder(context).build(),
 )
 
 /**
