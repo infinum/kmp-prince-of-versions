@@ -3,7 +3,6 @@ package com.infinum.princeofversions.sample
 import App
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -22,6 +21,8 @@ class MainActivity : ComponentActivity() {
                 onCustomParserClick = ::onCustomParserClick,
                 onStreamLoaderClick = ::onStreamLoaderClick,
                 onCustomCheckerClick = ::onCustomCheckerClick,
+                onCustomStorageClick = ::onCustomStorageClick,
+                onCustomVersionLogicClick = ::onCustomVersionLogicClick,
             )
         }
     }
@@ -31,7 +32,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun onCustomParserClick() {
-        Toast.makeText(this, "Functionality not yet implemented", Toast.LENGTH_SHORT).show()
+        startActivity(Intent(this, CustomConfigurationParserExample::class.java))
     }
 
     private fun onStreamLoaderClick() {
@@ -40,5 +41,13 @@ class MainActivity : ComponentActivity() {
 
     private fun onCustomCheckerClick() {
         startActivity(Intent(this, CustomRequirementCheckerExample::class.java))
+    }
+
+    private fun onCustomStorageClick() {
+        startActivity(Intent(this, CustomStorageExample::class.java))
+    }
+
+    private fun onCustomVersionLogicClick() {
+        startActivity(Intent(this, CustomVersionLogicExample::class.java))
     }
 }

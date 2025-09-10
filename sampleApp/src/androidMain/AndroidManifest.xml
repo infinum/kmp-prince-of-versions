@@ -22,6 +22,9 @@
         <activity android:name=".CommonUsageExample"/>
         <activity android:name=".StreamLoaderExample"/>
         <activity android:name=".CustomRequirementCheckerExample"/>
+        <activity android:name=".CustomConfigurationParserExample"/>
+        <activity android:name=".CustomStorageExample"/>
+        <activity android:name=".CustomVersionLogicExample"/>
     </application>
 
 </manifest>

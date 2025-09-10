@@ -25,9 +25,8 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import com.infinum.princeofversions.Loader
 import com.infinum.princeofversions.PrinceOfVersions
-import com.infinum.princeofversions.RequirementChecker
 import com.infinum.princeofversions.enums.UpdateStatus
-import com.infinum.princeofversions.models.RequirementsNotSatisfiedException
+import com.infinum.princeofversions.models.Storage
 import com.infinum.princeofversions.models.UpdateResult
 import java.net.URL
 import kotlinx.coroutines.CancellationException
@@ -38,18 +37,30 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-private const val THRESHOLD = 5
-
-class CustomRequirementCheckerExample : ComponentActivity() {
+class CustomStorageExample : ComponentActivity() {
 
     private lateinit var princeOfVersions: PrinceOfVersions
     private var updateCheckJob: Job? = null
-    private val updateUrl = "https://pastebin.com/raw/VMgd71VH"
 
-    class ExampleRequirementsChecker : RequirementChecker {
-        override fun checkRequirements(value: String): Boolean {
-            val numberFromConfig = value.toIntOrNull() ?: 0
-            return numberFromConfig >= THRESHOLD
+    private val updateUrl = "https://pastebin.com/raw/KPzkwNuP"
+
+    /**
+     * A simple custom storage implementation that stores the last notified
+     * version in memory. The value is lost when the app is closed.
+     */
+    class InMemoryStorage : Storage<Int> {
+        private var lastSavedVersion: Int? = null
+
+        override suspend fun getLastSavedVersion(): Int? {
+            // Add a small delay to simulate real storage access
+            delay(100)
+            return lastSavedVersion
+        }
+
+        override suspend fun saveVersion(version: Int) {
+            // Add a small delay to simulate real storage access
+            delay(100)
+            lastSavedVersion = version
         }
     }
 
@@ -58,17 +69,15 @@ class CustomRequirementCheckerExample : ComponentActivity() {
         super.onCreate(savedInstanceState)
         WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = true
 
-        val checkers = mutableMapOf("requiredNumberOfLetters" to ExampleRequirementsChecker())
-
         princeOfVersions = PrinceOfVersions(
             princeOfVersionsComponents = PrinceOfVersionsComponents
                 .Builder(this)
-                .withRequirementCheckers(checkers)
+                .withStorage(InMemoryStorage())
                 .build()
         )
 
         setContent {
-            CustomRequirementCheckerScreen(
+            CustomStorageScreen(
                 onCheckClick = { checkForUpdates(isSlow = false) },
                 onCancelTestClick = { checkForUpdates(isSlow = true) },
                 onCancelClick = ::cancelUpdateCheck,
@@ -99,17 +108,6 @@ class CustomRequirementCheckerExample : ComponentActivity() {
                 withContext(NonCancellable) {
                     withContext(Dispatchers.Main) {
                         showToast(getString(R.string.update_check_cancelled))
-                    }
-                }
-            } catch (e: RequirementsNotSatisfiedException) {
-                withContext(NonCancellable) {
-                    withContext(Dispatchers.Main) {
-                        // Show the toast exactly as you suggested.
-                        showToast(
-                            getString(
-                                R.string.requirements_not_met_detailed,
-                            )
-                        )
                     }
                 }
             } catch (e: Throwable) {
@@ -149,12 +147,12 @@ class CustomRequirementCheckerExample : ComponentActivity() {
     }
 
     companion object {
-        private const val DELAY_TIME = 5000L
+        private const val DELAY_TIME = 10000L
     }
 }
 
 @Composable
-private fun CustomRequirementCheckerScreen(
+private fun CustomStorageScreen(
     onCheckClick: () -> Unit,
     onCancelTestClick: () -> Unit,
     onCancelClick: () -> Unit
@@ -184,6 +182,7 @@ private fun CustomRequirementCheckerScreen(
 
 @Preview(showBackground = true)
 @Composable
-private fun CustomRequirementCheckerScreenPreview() {
-    CustomRequirementCheckerScreen({}, {}, {})
+private fun CustomStorageScreenPreview() {
+    CustomStorageScreen({}, {}, {})
 }
+

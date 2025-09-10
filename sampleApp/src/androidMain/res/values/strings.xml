@@ -27,5 +27,5 @@
     <string name="google_in_app_updates">Google in-app updates</string>
     <string name="custom_requirements_checker_example">Custom requirements checker example</string>
     <string name="update_check_cancelled">Update check canceled</string>
-    <string name="requirements_not_met_detailed">Check failed (%1$s). Metadata: %2$s</string>
+    <string name="requirements_not_met_detailed">Requirement check failed</string>
 </resources>

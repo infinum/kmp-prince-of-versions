@@ -23,11 +23,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
+import com.infinum.princeofversions.ConfigurationParser
 import com.infinum.princeofversions.Loader
 import com.infinum.princeofversions.PrinceOfVersions
-import com.infinum.princeofversions.RequirementChecker
+import com.infinum.princeofversions.enums.NotificationType
 import com.infinum.princeofversions.enums.UpdateStatus
-import com.infinum.princeofversions.models.RequirementsNotSatisfiedException
+import com.infinum.princeofversions.models.PrinceOfVersionsConfig
 import com.infinum.princeofversions.models.UpdateResult
 import java.net.URL
 import kotlinx.coroutines.CancellationException
@@ -37,19 +38,33 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.json.JSONObject
 
-private const val THRESHOLD = 5
-
-class CustomRequirementCheckerExample : ComponentActivity() {
+class CustomConfigurationParserExample : ComponentActivity() {
 
     private lateinit var princeOfVersions: PrinceOfVersions
     private var updateCheckJob: Job? = null
-    private val updateUrl = "https://pastebin.com/raw/VMgd71VH"
 
-    class ExampleRequirementsChecker : RequirementChecker {
-        override fun checkRequirements(value: String): Boolean {
-            val numberFromConfig = value.toIntOrNull() ?: 0
-            return numberFromConfig >= THRESHOLD
+    private val updateUrl = "https://pastebin.com/raw/9CfSVzz4"
+
+    /**
+     * Custom parser factory, used for parsing in special format.
+     * Custom parser is defined for JSON object containing only one key: minimum_version.
+     */
+    private class CustomParser : ConfigurationParser<Int> {
+        companion object {
+            private const val MINIMUM_VERSION = "minimum_version"
+        }
+
+        override fun parse(value: String): PrinceOfVersionsConfig<Int> {
+            val mandatoryVersion = JSONObject(value).getInt(MINIMUM_VERSION)
+            return PrinceOfVersionsConfig(
+                mandatoryVersion = mandatoryVersion,
+                optionalVersion = null,
+                optionalNotificationType = NotificationType.ALWAYS,
+                metadata = emptyMap(),
+                requirements = emptyMap()
+            )
         }
     }
 
@@ -58,17 +73,15 @@ class CustomRequirementCheckerExample : ComponentActivity() {
         super.onCreate(savedInstanceState)
         WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = true
 
-        val checkers = mutableMapOf("requiredNumberOfLetters" to ExampleRequirementsChecker())
-
         princeOfVersions = PrinceOfVersions(
             princeOfVersionsComponents = PrinceOfVersionsComponents
                 .Builder(this)
-                .withRequirementCheckers(checkers)
+                .withConfigurationParser(CustomParser())
                 .build()
         )
 
         setContent {
-            CustomRequirementCheckerScreen(
+            CustomParserScreen(
                 onCheckClick = { checkForUpdates(isSlow = false) },
                 onCancelTestClick = { checkForUpdates(isSlow = true) },
                 onCancelClick = ::cancelUpdateCheck,
@@ -99,17 +112,6 @@ class CustomRequirementCheckerExample : ComponentActivity() {
                 withContext(NonCancellable) {
                     withContext(Dispatchers.Main) {
                         showToast(getString(R.string.update_check_cancelled))
-                    }
-                }
-            } catch (e: RequirementsNotSatisfiedException) {
-                withContext(NonCancellable) {
-                    withContext(Dispatchers.Main) {
-                        // Show the toast exactly as you suggested.
-                        showToast(
-                            getString(
-                                R.string.requirements_not_met_detailed,
-                            )
-                        )
                     }
                 }
             } catch (e: Throwable) {
@@ -154,7 +156,7 @@ class CustomRequirementCheckerExample : ComponentActivity() {
 }
 
 @Composable
-private fun CustomRequirementCheckerScreen(
+private fun CustomParserScreen(
     onCheckClick: () -> Unit,
     onCancelTestClick: () -> Unit,
     onCancelClick: () -> Unit
@@ -184,6 +186,6 @@ private fun CustomRequirementCheckerScreen(
 
 @Preview(showBackground = true)
 @Composable
-private fun CustomRequirementCheckerScreenPreview() {
-    CustomRequirementCheckerScreen({}, {}, {})
+private fun CustomParserScreenPreview() {
+    CustomParserScreen({}, {}, {})
 }

@@ -17,7 +17,9 @@ fun App(
     onCommonUsageClick: () -> Unit = {},
     onCustomParserClick: () -> Unit = {},
     onStreamLoaderClick: () -> Unit = {},
-    onCustomCheckerClick: () -> Unit = {}
+    onCustomCheckerClick: () -> Unit = {},
+    onCustomStorageClick: () -> Unit = {},
+    onCustomVersionLogicClick: () -> Unit = {},
 ) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background
@@ -34,6 +36,8 @@ fun App(
             AppButton("Custom Parser", onClick = onCustomParserClick)
             AppButton("Stream Loader", onClick = onStreamLoaderClick)
             AppButton("Custom Checker", onClick = onCustomCheckerClick)
+            AppButton("Custom Storage", onClick = onCustomStorageClick)
+            AppButton("Custom Version Logic", onClick = onCustomVersionLogicClick)
         }
     }
 }

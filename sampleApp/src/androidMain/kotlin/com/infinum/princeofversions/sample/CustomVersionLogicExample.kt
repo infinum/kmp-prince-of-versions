@@ -19,15 +19,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
+import com.infinum.princeofversions.ApplicationVersionProvider
 import com.infinum.princeofversions.Loader
 import com.infinum.princeofversions.PrinceOfVersions
-import com.infinum.princeofversions.RequirementChecker
+import com.infinum.princeofversions.VersionComparator
 import com.infinum.princeofversions.enums.UpdateStatus
-import com.infinum.princeofversions.models.RequirementsNotSatisfiedException
 import com.infinum.princeofversions.models.UpdateResult
 import java.net.URL
 import kotlinx.coroutines.CancellationException
@@ -37,19 +36,41 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
-private const val THRESHOLD = 5
-
-class CustomRequirementCheckerExample : ComponentActivity() {
+class CustomVersionLogicExample : ComponentActivity() {
 
     private lateinit var princeOfVersions: PrinceOfVersions
     private var updateCheckJob: Job? = null
-    private val updateUrl = "https://pastebin.com/raw/VMgd71VH"
 
-    class ExampleRequirementsChecker : RequirementChecker {
-        override fun checkRequirements(value: String): Boolean {
-            val numberFromConfig = value.toIntOrNull() ?: 0
-            return numberFromConfig >= THRESHOLD
+    // Using a URL with a standard integer-based configuration
+    private val updateUrl = "https://pastebin.com/raw/KPzkwNuP"
+
+    /**
+     * A custom version provider that returns a hardcoded integer version.
+     * In a real app, this could come from a local file, database, or build flavor config.
+     */
+    class HardcodedVersionProvider : ApplicationVersionProvider<Int> {
+        private val currentAppVersion = 26
+        override fun getVersion(): Int {
+            return currentAppVersion
+        }
+    }
+
+    /**
+     * A custom comparator with a special rule for developer builds.
+     */
+    class DeveloperBuildVersionComparator : VersionComparator<Int> {
+        /**
+         * Compares versions, but treats any remote version ending in '0' as a
+         * developer build that should not trigger an update.
+         */
+        override fun compare(firstVersion: Int, secondVersion: Int): Int {
+            // Custom rule: never show an update for developer builds (versions ending in 0)
+            if (secondVersion % 10 == 0) {
+                return -1 // Treat as "no update available"
+            }
+            return secondVersion.compareTo(firstVersion)
         }
     }
 
@@ -58,17 +79,16 @@ class CustomRequirementCheckerExample : ComponentActivity() {
         super.onCreate(savedInstanceState)
         WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = true
 
-        val checkers = mutableMapOf("requiredNumberOfLetters" to ExampleRequirementsChecker())
-
         princeOfVersions = PrinceOfVersions(
             princeOfVersionsComponents = PrinceOfVersionsComponents
                 .Builder(this)
-                .withRequirementCheckers(checkers)
+                .withVersionProvider(HardcodedVersionProvider())
+                .withVersionComparator(DeveloperBuildVersionComparator())
                 .build()
         )
 
         setContent {
-            CustomRequirementCheckerScreen(
+            CustomVersionLogicScreen(
                 onCheckClick = { checkForUpdates(isSlow = false) },
                 onCancelTestClick = { checkForUpdates(isSlow = true) },
                 onCancelClick = ::cancelUpdateCheck,
@@ -99,17 +119,6 @@ class CustomRequirementCheckerExample : ComponentActivity() {
                 withContext(NonCancellable) {
                     withContext(Dispatchers.Main) {
                         showToast(getString(R.string.update_check_cancelled))
-                    }
-                }
-            } catch (e: RequirementsNotSatisfiedException) {
-                withContext(NonCancellable) {
-                    withContext(Dispatchers.Main) {
-                        // Show the toast exactly as you suggested.
-                        showToast(
-                            getString(
-                                R.string.requirements_not_met_detailed,
-                            )
-                        )
                     }
                 }
             } catch (e: Throwable) {
@@ -149,12 +158,12 @@ class CustomRequirementCheckerExample : ComponentActivity() {
     }
 
     companion object {
-        private const val DELAY_TIME = 5000L
+        private const val DELAY_TIME = 10000L
     }
 }
 
 @Composable
-private fun CustomRequirementCheckerScreen(
+private fun CustomVersionLogicScreen(
     onCheckClick: () -> Unit,
     onCancelTestClick: () -> Unit,
     onCancelClick: () -> Unit
@@ -182,8 +191,9 @@ private fun CustomRequirementCheckerScreen(
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
-private fun CustomRequirementCheckerScreenPreview() {
-    CustomRequirementCheckerScreen({}, {}, {})
+private fun CustomVersionLogicScreenPreview() {
+    CustomVersionLogicScreen({}, {}, {})
 }
+
