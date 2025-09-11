@@ -68,7 +68,8 @@ class CustomRequirementCheckerExample : ComponentActivity() {
         )
 
         setContent {
-            CustomRequirementCheckerScreen(
+            ExampleScreen(
+                modifier = Modifier.fillMaxSize(),
                 onCheckClick = { checkForUpdates(isSlow = false) },
                 onCancelTestClick = { checkForUpdates(isSlow = true) },
                 onCancelClick = ::cancelUpdateCheck,
@@ -153,37 +154,8 @@ class CustomRequirementCheckerExample : ComponentActivity() {
     }
 }
 
-@Composable
-private fun CustomRequirementCheckerScreen(
-    onCheckClick: () -> Unit,
-    onCancelTestClick: () -> Unit,
-    onCancelClick: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Button(onClick = onCheckClick) {
-            Text(text = stringResource(id = R.string.btn_new_update))
-        }
-
-        Row(modifier = Modifier.padding(vertical = 8.dp)) {
-            Button(onClick = onCancelTestClick) {
-                Text(text = stringResource(id = R.string.btn_cancel_test))
-            }
-            Spacer(modifier = Modifier.width(16.dp))
-            Button(onClick = onCancelClick) {
-                Text(text = stringResource(id = R.string.btn_cancel))
-            }
-        }
-    }
-}
-
 @Preview(showBackground = true)
 @Composable
 private fun CustomRequirementCheckerScreenPreview() {
-    CustomRequirementCheckerScreen({}, {}, {})
+    ExampleScreen(onCheckClick = {}, onCancelClick = {}, onCancelTestClick = {})
 }

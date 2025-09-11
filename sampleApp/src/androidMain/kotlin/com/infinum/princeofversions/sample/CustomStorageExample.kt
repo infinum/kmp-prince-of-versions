@@ -6,21 +6,10 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import com.infinum.princeofversions.Loader
@@ -77,7 +66,8 @@ class CustomStorageExample : ComponentActivity() {
         )
 
         setContent {
-            CustomStorageScreen(
+            ExampleScreen(
+                modifier = Modifier.fillMaxSize(),
                 onCheckClick = { checkForUpdates(isSlow = false) },
                 onCancelTestClick = { checkForUpdates(isSlow = true) },
                 onCancelClick = ::cancelUpdateCheck,
@@ -151,38 +141,9 @@ class CustomStorageExample : ComponentActivity() {
     }
 }
 
-@Composable
-private fun CustomStorageScreen(
-    onCheckClick: () -> Unit,
-    onCancelTestClick: () -> Unit,
-    onCancelClick: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Button(onClick = onCheckClick) {
-            Text(text = stringResource(id = R.string.btn_new_update))
-        }
-
-        Row(modifier = Modifier.padding(vertical = 8.dp)) {
-            Button(onClick = onCancelTestClick) {
-                Text(text = stringResource(id = R.string.btn_cancel_test))
-            }
-            Spacer(modifier = Modifier.width(16.dp))
-            Button(onClick = onCancelClick) {
-                Text(text = stringResource(id = R.string.btn_cancel))
-            }
-        }
-    }
-}
-
 @Preview(showBackground = true)
 @Composable
 private fun CustomStorageScreenPreview() {
-    CustomStorageScreen({}, {}, {})
+    ExampleScreen(onCheckClick = {}, onCancelClick = {}, onCancelTestClick = {})
 }
 
