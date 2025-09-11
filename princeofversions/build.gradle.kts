@@ -31,6 +31,15 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
+            implementation("io.ktor:ktor-client-core:2.3.4")
+            implementation("io.ktor:ktor-client-content-negotiation:2.3.4")
+            implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.4")
+        }
+        androidMain.dependencies {
+            implementation("io.ktor:ktor-client-okhttp:2.3.4")
+        }
+        iosMain.dependencies {
+            implementation("io.ktor:ktor-client-darwin:2.3.4")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
