@@ -42,6 +42,7 @@ kotlin {
             implementation(libs.kotlin.test)
         }
         desktopMain.dependencies {
+            implementation(libs.json)
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
         }

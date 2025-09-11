@@ -1,0 +1,12 @@
+{
+  "android": {
+    "required_version": 32,
+    "last_version_available": 40,
+    "notify_last_version_frequency": "ONCE"
+  },
+  "jvm": {
+    "required_version": "1.10.1",
+    "last_version_available": "1.12.0",
+    "notify_last_version_frequency": "ALWAYS"
+  }
+}
