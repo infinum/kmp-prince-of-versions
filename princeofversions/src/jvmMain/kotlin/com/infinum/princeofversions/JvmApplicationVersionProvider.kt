@@ -23,7 +23,7 @@ internal class JvmApplicationVersionProvider(
             val properties = Properties()
             inputStream.use { properties.load(it) }
             properties.getProperty(versionKey)
-                ?: error("Key '$versionFilePath' not found in $versionFilePath.")
+                ?: error("Key '$versionKey' not found in $versionFilePath.")
         } catch (e: IOException) {
             // Catch specific I/O errors during the loading process.
             throw IOException("Could not read properties from $versionFilePath.", e)
