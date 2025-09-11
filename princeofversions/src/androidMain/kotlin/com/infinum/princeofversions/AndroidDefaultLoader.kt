@@ -4,7 +4,6 @@ import android.util.Base64
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
-import kotlin.io.readText
 
 /**
  * Represents a concrete loader that loads a resource from the network using a provided URL.
