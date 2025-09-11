@@ -42,9 +42,6 @@ public fun PrinceOfVersions(
 private fun createPrinceOfVersions(
     princeOfVersionsComponents: PrinceOfVersionsComponents,
 ): PrinceOfVersions = with(princeOfVersionsComponents) {
-    val requirementsProcessor = RequirementsProcessor(requirementCheckers)
-    val configurationParser = JvmConfigurationParser(requirementsProcessor)
-
     val applicationConfiguration = JvmApplicationConfiguration(versionProvider)
 
     val updateInfoInteractor = UpdateInfoInteractorImpl(
