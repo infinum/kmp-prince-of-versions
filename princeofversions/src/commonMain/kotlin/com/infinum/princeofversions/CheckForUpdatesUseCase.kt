@@ -1,20 +1,20 @@
 package com.infinum.princeofversions
 
 internal interface CheckForUpdatesUseCase<T> {
-    suspend fun checkForUpdates(loader: Loader): UpdateResult<T>
+    suspend fun checkForUpdates(loader: Loader): BaseUpdateResult<T>
 }
 
 internal class CheckForUpdatesUseCaseImpl<T>(
     private val updateInfoInteractor: UpdateInfoInteractor<T>,
-    private val storage: Storage<T>
+    private val storage: BaseStorage<T>
 ) : CheckForUpdatesUseCase<T> {
-    override suspend fun checkForUpdates(loader: Loader): UpdateResult<T> {
+    override suspend fun checkForUpdates(loader: Loader): BaseUpdateResult<T> {
         val checkResult = updateInfoInteractor.invoke(loader)
 
         return when (checkResult.status) {
             UpdateStatus.MANDATORY -> {
                 storage.saveVersion(checkResult.updateVersion)
-                UpdateResult(
+                BaseUpdateResult(
                     version = checkResult.updateVersion,
                     status = UpdateStatus.MANDATORY,
                     metadata = checkResult.metadata,
@@ -32,14 +32,14 @@ internal class CheckForUpdatesUseCaseImpl<T>(
                     UpdateStatus.NO_UPDATE
                 }
 
-                UpdateResult(
+                BaseUpdateResult(
                     version = checkResult.updateVersion,
                     status = finalStatus,
                     metadata = checkResult.metadata,
                 )
             }
             else -> {
-                UpdateResult(
+                BaseUpdateResult(
                     version = checkResult.updateVersion,
                     status = UpdateStatus.NO_UPDATE,
                     metadata = checkResult.metadata,

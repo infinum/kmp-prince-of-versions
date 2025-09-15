@@ -1,16 +1,16 @@
 package com.infinum.princeofversions
 
 /**
- * This class parses update resource text into [PrinceOfVersionsConfig].
+ * This class parses update resource text into [BasePrinceOfVersionsConfig].
  */
-public interface ConfigurationParser<T> {
+public interface BaseConfigurationParser<T> {
     /**
-     * Parses update resource into [PrinceOfVersionsConfig].
+     * Parses update resource into [BasePrinceOfVersionsConfig].
      *
      * @param value text representation of update resource.
      * @return Class which holds all relevant data.
      * @throws Throwable if error happens during parsing.
      */
     @Throws(Throwable::class)
-    public fun parse(value: String): PrinceOfVersionsConfig<T>
+    public fun parse(value: String): BasePrinceOfVersionsConfig<T>
 }

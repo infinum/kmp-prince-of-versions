@@ -17,11 +17,11 @@ public interface PrinceOfVersionsBase<T> {
      *
      * @param source The source from which to load the update configuration.
      *
-     * @return An [UpdateResult] instance that contains the result of the update check.
+     * @return An [BaseUpdateResult] instance that contains the result of the update check.
      */
     public suspend fun checkForUpdates(
         source: Loader,
-    ): UpdateResult<T>
+    ): BaseUpdateResult<T>
 
     public companion object {
         public val DEFAULT_NETWORK_TIMEOUT: Duration = 60.seconds
@@ -37,15 +37,15 @@ public interface PrinceOfVersionsBase<T> {
  * @param password Optional password for basic authentication.
  * @param networkTimeout Network timeout. Default is 60 seconds.
  *
- * @return An [UpdateResult] instance that contains the result of the update check.
+ * @return An [BaseUpdateResult] instance that contains the result of the update check.
  */
 public expect suspend fun <T> PrinceOfVersionsBase<T>.checkForUpdates(
     url: String,
     username: String? = null,
     password: String? = null,
     networkTimeout: Duration = DEFAULT_NETWORK_TIMEOUT,
-): UpdateResult<T>
+): BaseUpdateResult<T>
 
 internal expect class PrinceOfVersionsBaseImpl<T> : PrinceOfVersionsBase<T> {
-    override suspend fun checkForUpdates(source: Loader): UpdateResult<T>
+    override suspend fun checkForUpdates(source: Loader): BaseUpdateResult<T>
 }

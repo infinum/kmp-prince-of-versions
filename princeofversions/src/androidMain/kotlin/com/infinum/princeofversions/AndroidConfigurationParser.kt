@@ -1,7 +1,17 @@
 package com.infinum.princeofversions
 
-internal class AndroidConfigurationParser : ConfigurationParser<Int> {
-    override fun parse(value: String): PrinceOfVersionsConfig<Int> {
+/**
+ * This class parses update resource text into [PrinceOfVersionsConfig].
+ */
+public typealias ConfigurationParser = BaseConfigurationParser<Int>
+
+/**
+ * This class holds loaded data from a configuration resource.
+ */
+public typealias PrinceOfVersionsConfig = BasePrinceOfVersionsConfig<Int>
+
+internal class AndroidConfigurationParser : ConfigurationParser {
+    override fun parse(value: String): PrinceOfVersionsConfig {
         TODO("Not yet implemented")
     }
 }

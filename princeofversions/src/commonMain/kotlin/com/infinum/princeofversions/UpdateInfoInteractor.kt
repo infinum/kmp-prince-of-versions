@@ -5,9 +5,9 @@ internal interface UpdateInfoInteractor<T> {
 }
 
 internal class UpdateInfoInteractorImpl<T>(
-    private val configurationParser: ConfigurationParser<T>,
+    private val configurationParser: BaseConfigurationParser<T>,
     private val appConfig: ApplicationConfiguration<T>,
-    private val versionComparator: VersionComparator<T>,
+    private val versionComparator: BaseVersionComparator<T>,
 ) : UpdateInfoInteractor<T> {
 
     override suspend fun invoke(loader: Loader): CheckResult<T> {

@@ -17,7 +17,7 @@ public fun PrinceOfVersions(context: Context): PrinceOfVersions = TODO("Not yet 
 internal actual class PrinceOfVersionsBaseImpl<T>(
     private val checkForUpdatesUseCase: CheckForUpdatesUseCase<T>,
 ) : PrinceOfVersionsBase<T> {
-    actual override suspend fun checkForUpdates(source: Loader): UpdateResult<T> =
+    actual override suspend fun checkForUpdates(source: Loader): BaseUpdateResult<T> =
         checkForUpdatesUseCase.checkForUpdates(source)
 }
 
@@ -26,7 +26,7 @@ public actual suspend fun <T> PrinceOfVersionsBase<T>.checkForUpdates(
     username: String?,
     password: String?,
     networkTimeout: Duration,
-): UpdateResult<T> = checkForUpdates(
+): BaseUpdateResult<T> = checkForUpdates(
     source = AndroidDefaultLoader(
         url = url,
         username = username,

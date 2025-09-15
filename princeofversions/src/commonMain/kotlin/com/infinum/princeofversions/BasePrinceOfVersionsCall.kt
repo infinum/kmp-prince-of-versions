@@ -11,7 +11,7 @@ package com.infinum.princeofversions
  * - [enqueue] for an asynchronous, callback-based approach.
  * - [execute] for a synchronous-style, coroutine-based approach.
  */
-public interface PrinceOfVersionsCall<T> {
+public interface BasePrinceOfVersionsCall<T> {
 
     /**
      * Schedules the update check to be executed asynchronously.
@@ -28,8 +28,8 @@ public interface PrinceOfVersionsCall<T> {
     /**
      * Executes the update check.
      *
-     * @return The [UpdateResult] of the check.
+     * @return The [BaseUpdateResult] of the check.
      *
      */
-    public suspend fun execute(): UpdateResult<T>
+    public suspend fun execute(): BaseUpdateResult<T>
 }

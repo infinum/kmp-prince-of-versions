@@ -1,6 +1,11 @@
 package com.infinum.princeofversions
 
-internal class JvmStorage : Storage<String> {
+/**
+ * Represents a local device storage object that can be used to save and retrieve the application version.
+ */
+public typealias Storage = BaseStorage<String>
+
+internal class JvmStorage : Storage {
     override suspend fun getLastSavedVersion(): String? {
         TODO("Not yet implemented")
     }

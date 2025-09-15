@@ -1,6 +1,6 @@
 package com.infinum.princeofversions
 
-public fun interface VersionComparator<T> {
+public fun interface BaseVersionComparator<T> {
     /**
      * Compares two versions and returns an integer value.
      *
@@ -13,6 +13,6 @@ public fun interface VersionComparator<T> {
     public fun compare(firstVersion: T, secondVersion: T): Int
 }
 
-internal fun <T> T.isGreaterThan(secondVersion: T, versionComparator: VersionComparator<T>): Boolean {
+internal fun <T> T.isGreaterThan(secondVersion: T, versionComparator: BaseVersionComparator<T>): Boolean {
     return versionComparator.compare(this, secondVersion) > 0
 }
