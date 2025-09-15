@@ -1,9 +1,8 @@
 package com.infinum.princeofversions
 
+import com.infinum.princeofversions.PrinceOfVersionsBase.Companion.DEFAULT_NETWORK_TIMEOUT
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
-
-private val DEFAULT_NETWORK_TIMEOUT = 60.seconds
 
 /**
  * Represents the base generic interface for using the library.
@@ -23,6 +22,10 @@ public interface PrinceOfVersionsBase<T> {
     public suspend fun checkForUpdates(
         source: Loader,
     ): UpdateResult<T>
+
+    public companion object {
+        public val DEFAULT_NETWORK_TIMEOUT: Duration = 60.seconds
+    }
 
 }
 
