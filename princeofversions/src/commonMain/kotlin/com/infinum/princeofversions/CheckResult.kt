@@ -80,7 +80,7 @@ internal data class CheckResult<T> private constructor(
      * @return The notification type if the update is optional.
      * @throws UnsupportedOperationException if the update is not optional.
      */
-    fun safeNotificationType(): NotificationType? =
+    fun requireNotificationType(): NotificationType? =
         if (isOptional()) notificationType
         else throw UnsupportedOperationException("There is no optional update available.")
 }

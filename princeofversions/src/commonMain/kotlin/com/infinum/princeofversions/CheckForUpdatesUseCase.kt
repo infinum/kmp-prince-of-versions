@@ -23,7 +23,7 @@ internal class CheckForUpdatesUseCaseImpl<T>(
             UpdateStatus.OPTIONAL -> {
                 val lastNotifiedVersion = storage.getLastSavedVersion()
                 val isNotified = lastNotifiedVersion == checkResult.updateVersion
-                val shouldNotify = !isNotified || checkResult.safeNotificationType() == NotificationType.ALWAYS
+                val shouldNotify = !isNotified || checkResult.requireNotificationType() == NotificationType.ALWAYS
 
                 val finalStatus = if (shouldNotify) {
                     storage.saveVersion(checkResult.updateVersion)
