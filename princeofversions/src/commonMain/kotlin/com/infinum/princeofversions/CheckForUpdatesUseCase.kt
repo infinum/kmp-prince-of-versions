@@ -1,11 +1,5 @@
 package com.infinum.princeofversions
 
-import com.infinum.princeofversions.enums.NotificationType
-import com.infinum.princeofversions.enums.UpdateStatus
-import com.infinum.princeofversions.Loader
-import com.infinum.princeofversions.models.Storage
-import com.infinum.princeofversions.models.UpdateResult
-
 internal interface CheckForUpdatesUseCase<T> {
     suspend fun checkForUpdates(loader: Loader): UpdateResult<T>
 }

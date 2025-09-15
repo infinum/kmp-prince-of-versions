@@ -1,4 +1,4 @@
-package com.infinum.princeofversions.enums
+package com.infinum.princeofversions
 
 /**
  * Represents the final status of an update check.

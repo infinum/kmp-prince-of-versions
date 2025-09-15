@@ -1,13 +1,11 @@
 package com.infinum.princeofversions
 
-import com.infinum.princeofversions.models.PrinceOfVersionsConfig
-
 /**
- * This class parses update resource text into [com.infinum.princeofversions.models.PrinceOfVersionsConfig].
+ * This class parses update resource text into [PrinceOfVersionsConfig].
  */
 public interface ConfigurationParser<T> {
     /**
-     * Parses update resource into [com.infinum.princeofversions.models.PrinceOfVersionsConfig].
+     * Parses update resource into [PrinceOfVersionsConfig].
      *
      * @param value text representation of update resource.
      * @return Class which holds all relevant data.

@@ -1,6 +1,4 @@
-package com.infinum.princeofversions.models
-
-import com.infinum.princeofversions.enums.NotificationType
+package com.infinum.princeofversions
 
 /**
  * This class holds loaded data from a configuration resource.

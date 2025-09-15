@@ -1,10 +1,5 @@
 package com.infinum.princeofversions
 
-import com.infinum.princeofversions.models.ApplicationConfiguration
-import com.infinum.princeofversions.models.CheckResult
-import com.infinum.princeofversions.Loader
-import com.infinum.princeofversions.models.UpdateInfo
-
 internal interface UpdateInfoInteractor<T> {
     suspend fun invoke(loader: Loader): CheckResult<T>
 }

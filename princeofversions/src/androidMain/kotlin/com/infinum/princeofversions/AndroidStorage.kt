@@ -1,4 +1,4 @@
-package com.infinum.princeofversions.models
+package com.infinum.princeofversions
 
 internal class AndroidStorage : Storage<Int> {
     override suspend fun getLastSavedVersion(): Int? {

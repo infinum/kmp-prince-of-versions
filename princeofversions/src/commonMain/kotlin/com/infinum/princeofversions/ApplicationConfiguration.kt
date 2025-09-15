@@ -1,4 +1,4 @@
-package com.infinum.princeofversions.models
+package com.infinum.princeofversions
 
 /**
  * Provides application parameters such as the application's version.

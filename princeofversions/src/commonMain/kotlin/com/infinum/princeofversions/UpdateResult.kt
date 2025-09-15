@@ -1,6 +1,4 @@
-package com.infinum.princeofversions.models
-
-import com.infinum.princeofversions.enums.UpdateStatus
+package com.infinum.princeofversions
 
 /**
  * Represents the final result of an update check.

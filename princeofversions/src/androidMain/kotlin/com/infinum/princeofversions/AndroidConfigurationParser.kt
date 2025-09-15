@@ -1,6 +1,4 @@
-package com.infinum.princeofversions.models
-
-import com.infinum.princeofversions.ConfigurationParser
+package com.infinum.princeofversions
 
 internal class AndroidConfigurationParser : ConfigurationParser<Int> {
     override fun parse(value: String): PrinceOfVersionsConfig<Int> {

@@ -1,6 +1,4 @@
-package com.infinum.princeofversions.models
-
-import com.infinum.princeofversions.ConfigurationParser
+package com.infinum.princeofversions
 
 internal class JvmConfigurationParser : ConfigurationParser<String> {
     override fun parse(value: String): PrinceOfVersionsConfig<String> {

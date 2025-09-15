@@ -1,6 +1,6 @@
-package com.infinum.princeofversions.models
+package com.infinum.princeofversions
 
-internal class JvmStorage : Storage<String> {
+internal class IosStorage : Storage<String> {
     override suspend fun getLastSavedVersion(): String? {
         TODO("Not yet implemented")
     }

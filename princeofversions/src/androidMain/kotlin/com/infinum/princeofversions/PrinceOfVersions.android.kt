@@ -1,7 +1,6 @@
 package com.infinum.princeofversions
 
 import android.content.Context
-import com.infinum.princeofversions.models.UpdateResult
 import kotlin.time.Duration
 
 /**

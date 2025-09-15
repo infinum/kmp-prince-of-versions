@@ -1,11 +1,11 @@
-package com.infinum.princeofversions.models
+package com.infinum.princeofversions
 
 /**
  * Represents a single, prepared call to check for an update.
  *
  * An instance of this class is a one-shot object; it can be used only once.
  * To perform another check, a new instance must be created
- * via [com.infinum.princeofversions.PrinceOfVersionsBase.newCall].
+ * via [PrinceOfVersionsBase.newCall].
  *
  * This interface provides two ways to perform the update check:
  * - [enqueue] for an asynchronous, callback-based approach.

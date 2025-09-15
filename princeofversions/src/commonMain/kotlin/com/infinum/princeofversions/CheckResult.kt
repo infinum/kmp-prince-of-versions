@@ -1,7 +1,4 @@
-package com.infinum.princeofversions.models
-
-import com.infinum.princeofversions.enums.NotificationType
-import com.infinum.princeofversions.enums.UpdateStatus
+package com.infinum.princeofversions
 
 /**
  * Intermediate result of update check.

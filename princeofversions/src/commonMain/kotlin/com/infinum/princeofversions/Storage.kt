@@ -1,4 +1,4 @@
-package com.infinum.princeofversions.models
+package com.infinum.princeofversions
 
 /**
  * Represents a local device storage object that can be used to save and retrieve the application version.

@@ -1,6 +1,5 @@
 package com.infinum.princeofversions
 
-import com.infinum.princeofversions.models.UpdateResult
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
