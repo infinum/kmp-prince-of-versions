@@ -2,8 +2,6 @@ package com.infinum.princeofversions
 
 import PrinceOfVersionsComponents
 import android.content.Context
-import com.infinum.princeofversions.models.AndroidApplicationConfiguration
-import com.infinum.princeofversions.models.UpdateResult
 import kotlin.time.Duration
 
 /**
@@ -15,6 +13,11 @@ import kotlin.time.Duration
 public typealias PrinceOfVersions = PrinceOfVersionsBase<Int>
 
 /**
+ * Represents the final result of an update check.
+ */
+public typealias UpdateResult = BaseUpdateResult<Int>
+
+/**
  * Creates and configures the main [PrinceOfVersions] instance.
  *
  * Uses the default components for parsing, requirements checking, version operations, and storage.
@@ -24,7 +27,6 @@ public typealias PrinceOfVersions = PrinceOfVersionsBase<Int>
  * @return A fully configured [PrinceOfVersions] instance, ready to be used for
  * checking for application updates.
  * @see PrinceOfVersions
- * @see UpdateResult
  */
 public fun PrinceOfVersions(
     context: Context,
@@ -40,7 +42,6 @@ public fun PrinceOfVersions(
  * @return A fully configured [PrinceOfVersions] instance, ready to be used for
  * checking for application updates.
  * @see PrinceOfVersions
- * @see UpdateResult
  */
 public fun PrinceOfVersions(
     princeOfVersionsComponents: PrinceOfVersionsComponents,

@@ -1,14 +1,12 @@
 package com.infinum.princeofversions
 
-import com.infinum.princeofversions.ApplicationVersionProvider
-
 /**
  * Provides application parameters such as the application's version.
  *
  * @param versionProvider A provider to retrieve the application's version code.
  */
 internal class AndroidApplicationConfiguration(
-    versionProvider: ApplicationVersionProvider<Int>,
+    versionProvider: ApplicationVersionProvider,
 ) : ApplicationConfiguration<Int> {
 
     /**

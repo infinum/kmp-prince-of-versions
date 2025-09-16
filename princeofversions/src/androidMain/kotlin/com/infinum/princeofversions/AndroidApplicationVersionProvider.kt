@@ -4,7 +4,13 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 
-internal class AndroidApplicationVersionProvider(context: Context) : ApplicationVersionProvider<Int> {
+/**
+ * Provides the current version of the application.
+ */
+public typealias ApplicationVersionProvider = BaseApplicationVersionProvider<Int>
+
+internal class AndroidApplicationVersionProvider(context: Context) : ApplicationVersionProvider {
+
     private val version: Int = try {
         val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
         val longVersionCode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
