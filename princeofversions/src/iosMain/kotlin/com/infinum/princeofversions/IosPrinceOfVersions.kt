@@ -10,22 +10,27 @@ import kotlin.time.Duration
  */
 public typealias PrinceOfVersions = PrinceOfVersionsBase<String>
 
+/**
+ * Represents the final result of an update check.
+ */
+public typealias UpdateResult = BaseUpdateResult<String>
+
 public fun PrinceOfVersions(): PrinceOfVersions = TODO("Not yet implemented")
 
-internal actual class PrinceOfVersionsBaseImpl<T>(
-    private val checkForUpdatesUseCase: CheckForUpdatesUseCase<T>,
-) : PrinceOfVersionsBase<T> {
-    actual override suspend fun checkForUpdates(source: Loader): BaseUpdateResult<T> =
+internal class PrinceOfVersionsImpl(
+    private val checkForUpdatesUseCase: CheckForUpdatesUseCase<String>,
+) : PrinceOfVersions {
+    override suspend fun checkForUpdates(source: Loader): UpdateResult =
         checkForUpdatesUseCase.checkForUpdates(source)
 }
 
-public actual suspend fun <T> PrinceOfVersionsBase<T>.checkForUpdates(
+public suspend fun PrinceOfVersions.checkForUpdates(
     url: String,
     username: String?,
     password: String?,
     networkTimeout: Duration,
-): BaseUpdateResult<T> = checkForUpdates(
-    source = IosDefaultLoader(
+): UpdateResult = checkForUpdates(
+    source = provideDefaultLoader(
         url = url,
         username = username,
         password = password,
