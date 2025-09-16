@@ -49,3 +49,15 @@ internal class AndroidDefaultLoader(
         }
     }
 }
+
+internal actual fun provideDefaultLoader(
+    url: String,
+    username: String?,
+    password: String?,
+    networkTimeout: Duration,
+): Loader = AndroidDefaultLoader(
+    url = url,
+    username = username,
+    password = password,
+    networkTimeout = networkTimeout,
+)

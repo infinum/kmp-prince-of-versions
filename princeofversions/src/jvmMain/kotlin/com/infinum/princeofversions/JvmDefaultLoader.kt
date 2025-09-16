@@ -13,3 +13,15 @@ internal class JvmDefaultLoader(
         TODO("Not yet implemented")
     }
 }
+
+internal actual fun provideDefaultLoader(
+    url: String,
+    username: String?,
+    password: String?,
+    networkTimeout: Duration,
+): Loader = JvmDefaultLoader(
+    url = url,
+    username = username,
+    password = password,
+    networkTimeout = networkTimeout,
+)
