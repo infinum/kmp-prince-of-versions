@@ -1,4 +1,4 @@
-package com.infinum.princeofversions.models
+package com.infinum.princeofversions
 
 import com.infinum.princeofversions.ApplicationVersionProvider
 

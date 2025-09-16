@@ -1,4 +1,4 @@
-package com.infinum.princeofversions.models
+package com.infinum.princeofversions
 
 /**
  * An exception thrown when there is no available update that satisfies the specified requirements.

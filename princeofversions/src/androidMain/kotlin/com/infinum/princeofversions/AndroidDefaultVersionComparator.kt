@@ -1,9 +1,11 @@
 package com.infinum.princeofversions
 
+public typealias VersionComparator = BaseVersionComparator<Int>
+
 /**
  * The default version comparator for Android, which compares two integer versions.
  */
-public class AndroidDefaultVersionComparator : VersionComparator<Int> {
+public class AndroidDefaultVersionComparator : VersionComparator {
     /**
      * Compares two versions and returns an integer value.
      *

@@ -4,6 +4,7 @@ import android.util.Base64
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
+import kotlin.time.Duration
 
 /**
  * Represents a concrete loader that loads a resource from the network using a provided URL.
@@ -13,11 +14,13 @@ import java.net.URL
  * @param password Optional password for Basic authentication.
  * @param networkTimeoutSeconds The network timeout in seconds.
  */
+
+@Suppress("unused") // Remove once implementation is provided
 internal class AndroidDefaultLoader(
     private val url: String,
     private val username: String?,
     private val password: String?,
-    networkTimeoutSeconds: Int,
+    networkTimeout: Duration,
 ) : Loader {
 
     private companion object {

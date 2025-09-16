@@ -4,6 +4,7 @@ import PrinceOfVersionsComponents
 import android.content.Context
 import com.infinum.princeofversions.models.AndroidApplicationConfiguration
 import com.infinum.princeofversions.models.UpdateResult
+import kotlin.time.Duration
 
 /**
  * Represents the main interface for using the library.
@@ -69,20 +70,20 @@ private fun createPrinceOfVersions(
 internal actual class PrinceOfVersionsBaseImpl<T>(
     private val checkForUpdatesUseCase: CheckForUpdatesUseCase<T>,
 ) : PrinceOfVersionsBase<T> {
-    actual override suspend fun checkForUpdates(source: Loader): UpdateResult<T> =
+    actual override suspend fun checkForUpdates(source: Loader): BaseUpdateResult<T> =
         checkForUpdatesUseCase.checkForUpdates(source)
-
-    actual override suspend fun checkForUpdates(
-        url: String,
-        username: String?,
-        password: String?,
-        networkTimeoutSeconds: Int
-    ): UpdateResult<T> = checkForUpdates(
-        AndroidDefaultLoader(
-            url = url,
-            username = username,
-            password = password,
-            networkTimeoutSeconds = networkTimeoutSeconds
-        )
-    )
 }
+
+public actual suspend fun <T> PrinceOfVersionsBase<T>.checkForUpdates(
+    url: String,
+    username: String?,
+    password: String?,
+    networkTimeout: Duration,
+): BaseUpdateResult<T> = checkForUpdates(
+    source = AndroidDefaultLoader(
+        url = url,
+        username = username,
+        password = password,
+        networkTimeout = networkTimeout,
+    )
+)

@@ -1,18 +1,13 @@
 package com.infinum.princeofversions
 
-import com.infinum.princeofversions.models.ApplicationConfiguration
-import com.infinum.princeofversions.models.CheckResult
-import com.infinum.princeofversions.Loader
-import com.infinum.princeofversions.models.UpdateInfo
-
 internal interface UpdateInfoInteractor<T> {
     suspend fun invoke(loader: Loader): CheckResult<T>
 }
 
 internal class UpdateInfoInteractorImpl<T>(
-    private val configurationParser: ConfigurationParser<T>,
+    private val configurationParser: BaseConfigurationParser<T>,
     private val appConfig: ApplicationConfiguration<T>,
-    private val versionComparator: VersionComparator<T>,
+    private val versionComparator: BaseVersionComparator<T>,
 ) : UpdateInfoInteractor<T> {
 
     override suspend fun invoke(loader: Loader): CheckResult<T> {

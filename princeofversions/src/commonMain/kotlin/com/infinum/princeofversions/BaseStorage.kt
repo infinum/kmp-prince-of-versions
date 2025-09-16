@@ -1,9 +1,9 @@
-package com.infinum.princeofversions.models
+package com.infinum.princeofversions
 
 /**
  * Represents a local device storage object that can be used to save and retrieve the application version.
  */
-public interface Storage<T> {
+public interface BaseStorage<T> {
 
     /**
      * Returns the last saved version of the application.

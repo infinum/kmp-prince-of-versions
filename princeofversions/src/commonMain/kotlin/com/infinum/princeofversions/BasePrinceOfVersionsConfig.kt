@@ -1,12 +1,9 @@
-package com.infinum.princeofversions.models
-
-import com.infinum.princeofversions.enums.NotificationType
+package com.infinum.princeofversions
 
 /**
  * This class holds loaded data from a configuration resource.
- *
  */
-public data class PrinceOfVersionsConfig<T>(
+public data class BasePrinceOfVersionsConfig<T>(
     val mandatoryVersion: T?,
     val optionalVersion: T?,
     val optionalNotificationType: NotificationType,

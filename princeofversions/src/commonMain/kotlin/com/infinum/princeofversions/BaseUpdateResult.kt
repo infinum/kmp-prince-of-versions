@@ -1,6 +1,4 @@
-package com.infinum.princeofversions.models
-
-import com.infinum.princeofversions.enums.UpdateStatus
+package com.infinum.princeofversions
 
 /**
  * Represents the final result of an update check.
@@ -15,7 +13,7 @@ import com.infinum.princeofversions.enums.UpdateStatus
  * @property metadata A map of metadata associated with the resolved update configuration. This is provided even
  * if no update is available.
  */
-public data class UpdateResult<T>(
+public data class BaseUpdateResult<T>(
     public val version: T,
     public val status: UpdateStatus,
     public val metadata: Map<String, String> = emptyMap()

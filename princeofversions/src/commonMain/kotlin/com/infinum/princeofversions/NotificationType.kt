@@ -1,4 +1,4 @@
-package com.infinum.princeofversions.enums
+package com.infinum.princeofversions
 
 /**
  * Type of notification used to determine if already notified updates should be notified again for optional version.

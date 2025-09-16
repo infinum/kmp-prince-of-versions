@@ -1,6 +1,4 @@
-package com.infinum.princeofversions.models
-
-import com.infinum.princeofversions.enums.NotificationType
+package com.infinum.princeofversions
 
 /**
  * Represents selected update configuration object based on requirements
