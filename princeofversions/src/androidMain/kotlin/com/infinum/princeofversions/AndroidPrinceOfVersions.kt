@@ -1,5 +1,6 @@
 package com.infinum.princeofversions
 
+import PrinceOfVersionsComponents
 import android.content.Context
 import kotlin.time.Duration
 
@@ -16,8 +17,56 @@ public typealias PrinceOfVersions = PrinceOfVersionsBase<Int>
  */
 public typealias UpdateResult = BaseUpdateResult<Int>
 
-@Suppress("unused")
-public fun PrinceOfVersions(context: Context): PrinceOfVersions = TODO("Not yet implemented")
+/**
+ * Creates and configures the main [PrinceOfVersions] instance.
+ *
+ * Uses the default components for parsing, requirements checking, version operations, and storage.
+ *
+ * @param context The Android context used for accessing application resources.
+ *
+ * @return A fully configured [PrinceOfVersions] instance, ready to be used for
+ * checking for application updates.
+ * @see PrinceOfVersions
+ */
+public fun PrinceOfVersions(
+    context: Context,
+): PrinceOfVersions = createPrinceOfVersions(
+    princeOfVersionsComponents = PrinceOfVersionsComponents.Builder(context).build(),
+)
+
+/**
+ * Creates and configures the main [PrinceOfVersions] instance.
+ *
+ * Allows for custom components to be provided for parsing, requirements checking, version operations, and storage.
+ *
+ * @return A fully configured [PrinceOfVersions] instance, ready to be used for
+ * checking for application updates.
+ * @see PrinceOfVersions
+ */
+public fun PrinceOfVersions(
+    princeOfVersionsComponents: PrinceOfVersionsComponents,
+): PrinceOfVersions = createPrinceOfVersions(
+    princeOfVersionsComponents = princeOfVersionsComponents,
+)
+
+private fun createPrinceOfVersions(
+    princeOfVersionsComponents: PrinceOfVersionsComponents,
+): PrinceOfVersions =
+    with(princeOfVersionsComponents) {
+        val applicationConfiguration = AndroidApplicationConfiguration(versionProvider = versionProvider)
+
+        val updateInfoInteractor = UpdateInfoInteractorImpl(
+            configurationParser = configurationParser,
+            appConfig = applicationConfiguration,
+            versionComparator = versionComparator,
+        )
+
+        val checkForUpdatesUseCase = CheckForUpdatesUseCaseImpl(
+            updateInfoInteractor = updateInfoInteractor,
+            storage = storage,
+        )
+        return PrinceOfVersionsImpl(checkForUpdatesUseCase = checkForUpdatesUseCase)
+    }
 
 internal class PrinceOfVersionsImpl(
     private val checkForUpdatesUseCase: CheckForUpdatesUseCase<Int>,
