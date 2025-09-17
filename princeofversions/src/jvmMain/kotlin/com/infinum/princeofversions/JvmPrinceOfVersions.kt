@@ -16,7 +16,7 @@ public typealias PrinceOfVersions = PrinceOfVersionsBase<String>
 public typealias UpdateResult = BaseUpdateResult<String>
 
 /**
- * Creates and configures the main [PrinceOfVersions] instance for a JVM environment.
+ * Creates and configures the main [PrinceOfVersions] instance.
  *
  * @param mainClass A class reference from your application, used to create a unique storage location.
  * needed for the library to work.
@@ -25,11 +25,11 @@ public typealias UpdateResult = BaseUpdateResult<String>
 public fun PrinceOfVersions(
     mainClass: Class<*>,
 ): PrinceOfVersions = createPrinceOfVersions(
-    princeOfVersionsComponents = PrinceOfVersionsComponents.Builder(mainClass).build(),
+    princeOfVersionsComponents = PrinceOfVersionsComponents.Builder().build(mainClass),
 )
 
 /**
- * Creates and configures the main [PrinceOfVersions] instance for a JVM environment.
+ * Creates and configures the main [PrinceOfVersions] instance.
  *
  * @param princeOfVersionsComponents A customizable config data class that holds all the components
  *
@@ -39,6 +39,43 @@ public fun PrinceOfVersions(
     princeOfVersionsComponents: PrinceOfVersionsComponents,
 ): PrinceOfVersions = createPrinceOfVersions(
     princeOfVersionsComponents = princeOfVersionsComponents,
+)
+
+/**
+ * Creates and configures the main [PrinceOfVersions] instance.
+ *
+ * Allows for custom components to be provided for parsing, requirements checking, version operations, and storage.
+ *
+ * @param block A lambda with receiver that allows for configuring the [PrinceOfVersionsComponents.Builder].
+ * **Note**: The block must construct a custom [Storage] component. Use
+ * [PrinceOfVersions(context, block)] if you want to use the default implementations.
+ * @return A fully configured [PrinceOfVersions] instance, ready to be used for
+ * checking for application updates.
+ * @throws IllegalArgumentException if the custom [Storage] component
+ * is not provided.
+ */
+public fun PrinceOfVersions(
+    block: PrinceOfVersionsComponents.Builder.() -> Unit,
+): PrinceOfVersions = createPrinceOfVersions(
+    princeOfVersionsComponents = PrinceOfVersionsComponents.Builder().apply(block).build(),
+)
+
+/**
+ * Creates and configures the main [PrinceOfVersions] instance.
+ *
+ * Allows for custom components to be provided for parsing, requirements checking, version operations, and storage.
+ *
+ * @param mainClass The main class of the application, used to create a default [JvmStorage] component.
+ * @param block A lambda with receiver that allows for configuring the [PrinceOfVersionsComponents.Builder].
+ *
+ * @return A fully configured [PrinceOfVersions] instance, ready to be used for
+ * checking for application updates.
+ */
+public fun PrinceOfVersions(
+    mainClass: Class<*>,
+    block: PrinceOfVersionsComponents.Builder.() -> Unit,
+): PrinceOfVersions = createPrinceOfVersions(
+    princeOfVersionsComponents = PrinceOfVersionsComponents.Builder().apply(block).build(mainClass),
 )
 
 private fun createPrinceOfVersions(

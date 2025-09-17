@@ -6,7 +6,6 @@ package com.infinum.princeofversions
  * This class has an internal constructor and must be created via its `Builder`.
  * This ensures that the internal dependencies between its components are always consistent.
  *
- * @property mainClass A class reference from your application, used to create a unique storage location.
  * @property versionProvider An object that provides the current version of the application.
  * @property versionComparator An object that compares the app's current version with the
  * versions from the configuration file.
@@ -17,7 +16,6 @@ package com.infinum.princeofversions
  */
 @ConsistentCopyVisibility
 public data class PrinceOfVersionsComponents internal constructor(
-    val mainClass: Class<*>,
     val versionProvider: ApplicationVersionProvider,
     val versionComparator: VersionComparator,
     val requirementCheckers: Map<String, RequirementChecker>,
@@ -26,15 +24,14 @@ public data class PrinceOfVersionsComponents internal constructor(
 ) {
     /**
      * A builder for creating a consistent `PrinceOfVersionsComponents` instance for the JVM.
-     * @param mainClass A class reference from your application, used to create a unique storage location.
      */
-    public class Builder(private val mainClass: Class<*>) {
+    public class Builder {
         private var versionProvider: ApplicationVersionProvider = PropertiesApplicationVersionProvider()
         private var versionComparator: VersionComparator = JvmDefaultVersionComparator()
         private var requirementCheckers: Map<String, RequirementChecker> = mapOf(
             JvmVersionRequirementChecker.KEY to JvmVersionRequirementChecker()
         )
-        private var storage: Storage = JvmStorage(mainClass)
+        private var storage: Storage? = null
         private var configurationParser: ConfigurationParser? = null
 
         /**
@@ -90,19 +87,48 @@ public data class PrinceOfVersionsComponents internal constructor(
 
         /**
          * Assembles the final, immutable `PrinceOfVersionsComponents` object.
+         *
+         * @return A configured [PrinceOfVersionsComponents] instance.
+         * @throws IllegalArgumentException if the custom [Storage] component is not provided.
          */
         public fun build(): PrinceOfVersionsComponents {
             val finalParser = this.configurationParser ?: JvmConfigurationParser(
                 RequirementsProcessor(this.requirementCheckers)
             )
 
+            val storage = requireNotNull(this.storage) {
+                "Storage is required to build PrinceOfVersionsComponents without the mainClass parameter."
+            }
+
             return PrinceOfVersionsComponents(
-                mainClass = this.mainClass,
                 versionProvider = this.versionProvider,
                 versionComparator = this.versionComparator,
                 requirementCheckers = this.requirementCheckers,
                 configurationParser = finalParser,
-                storage = this.storage
+                storage = storage,
+            )
+        }
+
+        /**
+         * Assembles the final, `PrinceOfVersionsComponents` object.
+         *
+         * @param mainClass The main application class, used to create the [JvmStorage] component.
+         *
+         * @return A configured [PrinceOfVersionsComponents] instance.
+         */
+        public fun build(mainClass: Class<*>): PrinceOfVersionsComponents {
+            val finalParser = this.configurationParser ?: JvmConfigurationParser(
+                RequirementsProcessor(this.requirementCheckers)
+            )
+
+            val storage = JvmStorage(mainClass)
+
+            return PrinceOfVersionsComponents(
+                versionProvider = this.versionProvider,
+                versionComparator = this.versionComparator,
+                requirementCheckers = this.requirementCheckers,
+                configurationParser = finalParser,
+                storage = storage,
             )
         }
     }
