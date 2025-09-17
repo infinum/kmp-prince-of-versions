@@ -25,7 +25,7 @@ public data class PrinceOfVersionsComponents internal constructor(
     /**
      * A builder for creating a `PrinceOfVersionsComponents` instance.
      */
-    public class Builder() {
+    public class Builder {
         private var storage: Storage? = null
         private var configurationParser: ConfigurationParser? = null
         private var versionProvider: ApplicationVersionProvider? = null

@@ -145,7 +145,7 @@ internal class AndroidConfigurationParser(
             return json.getLong(key)
         } catch (e: JSONException) {
             throw IllegalArgumentException(
-                "In update configuration $key should be Long, but the actual value is ${json[key]}"
+                "In update configuration $key should be Long, but the actual value is ${json[key]}. $e"
             )
         }
     }
