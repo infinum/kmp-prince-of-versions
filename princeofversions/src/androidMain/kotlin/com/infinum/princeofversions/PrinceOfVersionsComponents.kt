@@ -1,15 +1,6 @@
+package com.infinum.princeofversions
+
 import android.content.Context
-import com.infinum.princeofversions.AndroidApplicationVersionProvider
-import com.infinum.princeofversions.AndroidConfigurationParser
-import com.infinum.princeofversions.AndroidDefaultVersionComparator
-import com.infinum.princeofversions.AndroidStorage
-import com.infinum.princeofversions.ApplicationVersionProvider
-import com.infinum.princeofversions.ConfigurationParser
-import com.infinum.princeofversions.RequirementChecker
-import com.infinum.princeofversions.RequirementsProcessor
-import com.infinum.princeofversions.Storage
-import com.infinum.princeofversions.SystemVersionRequirementChecker
-import com.infinum.princeofversions.VersionComparator
 
 /**
  * A data class that holds the functional components required by PrinceOfVersions.

@@ -1,6 +1,5 @@
 package com.infinum.princeofversions
 
-import PrinceOfVersionsComponents
 import android.content.Context
 import kotlin.time.Duration
 
