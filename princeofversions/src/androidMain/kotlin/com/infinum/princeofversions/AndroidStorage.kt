@@ -8,7 +8,7 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.first
 
-private const val FILE_NAME = "com.infinum.princeofversions.PREFERENCES"
+private const val FILE_NAME = "co.infinum.princeofversions.PREF_FILE"
 
 /**
  * Represents a local device storage object that can be used to save and retrieve the application version.
