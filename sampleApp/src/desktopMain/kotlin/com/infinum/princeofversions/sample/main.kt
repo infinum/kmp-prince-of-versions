@@ -23,9 +23,8 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import com.infinum.princeofversions.Loader
 import com.infinum.princeofversions.PrinceOfVersions
-import com.infinum.princeofversions.enums.UpdateStatus
-import com.infinum.princeofversions.models.PrinceOfVersionsComponents
-import com.infinum.princeofversions.models.UpdateResult
+import com.infinum.princeofversions.UpdateResult
+import com.infinum.princeofversions.UpdateStatus
 import java.net.URI
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -53,30 +52,24 @@ class AppState(
 
     private var updateCheckJob: Job? = null
 
-    private val princeOfVersions: PrinceOfVersions
-
-    init {
-        val componentsBuilder = PrinceOfVersionsComponents.Builder(javaClass)
+    private val princeOfVersions: PrinceOfVersions = PrinceOfVersions(mainClass = javaClass) {
         when (exampleName) {
             "Custom Parser" -> {
-                componentsBuilder.withConfigurationParser(JvmCustomParser())
+                withConfigurationParser(JvmCustomParser())
             }
             "Custom Storage" -> {
-                componentsBuilder.withStorage(JvmInMemoryStorage())
+                withStorage(JvmInMemoryStorage())
             }
             "Custom Version Logic" -> {
-                componentsBuilder
-                    .withVersionProvider(JvmHardcodedVersionProvider())
-                    .withVersionComparator(JvmDeveloperBuildVersionComparator())
+                withVersionProvider(JvmHardcodedVersionProvider())
+                withVersionComparator(JvmDeveloperBuildVersionComparator())
             }
             "Custom Checker" -> {
                 val checkers = mapOf("requiredNumberOfLetters" to JvmExampleRequirementsChecker())
-                componentsBuilder.withRequirementCheckers(checkers)
+                withRequirementCheckers(checkers)
             }
         }
-        princeOfVersions = PrinceOfVersions(componentsBuilder.build())
     }
-
 
     fun checkForUpdates(isSlow: Boolean = false) {
         updateCheckJob?.cancel()
@@ -97,7 +90,7 @@ class AppState(
                         Loader { stream.bufferedReader().use { it.readText() } }
                     }
                     else -> {
-                        val url = when(exampleName) {
+                        val url = when (exampleName) {
                             "Common Usage", "Custom Storage", "Custom Version Logic" -> "https://pastebin.com/raw/AFBCVbrL"
                             "Custom Parser" -> "https://pastebin.com/raw/9CfSVzz4"
                             "Custom Checker" -> "https://pastebin.com/raw/fdXFhsRE"
@@ -127,7 +120,7 @@ class AppState(
         }
     }
 
-    private fun handleUpdateResult(result: UpdateResult<String>) {
+    private fun handleUpdateResult(result: UpdateResult) {
         statusText = when (result.status) {
             UpdateStatus.MANDATORY -> "A mandatory update to version ${result.version} is available."
             UpdateStatus.OPTIONAL -> "An optional update to version ${result.version} is available."
@@ -163,7 +156,6 @@ fun ExampleDetailsScreen(exampleName: String, onBackClick: () -> Unit) {
         }
     }
 }
-
 
 @Composable
 @Preview

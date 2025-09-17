@@ -1,6 +1,5 @@
 package com.infinum.princeofversions.sample
 
-import PrinceOfVersionsComponents
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -14,11 +13,11 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import com.infinum.princeofversions.ConfigurationParser
 import com.infinum.princeofversions.Loader
+import com.infinum.princeofversions.NotificationType
 import com.infinum.princeofversions.PrinceOfVersions
-import com.infinum.princeofversions.enums.NotificationType
-import com.infinum.princeofversions.enums.UpdateStatus
-import com.infinum.princeofversions.models.PrinceOfVersionsConfig
-import com.infinum.princeofversions.models.UpdateResult
+import com.infinum.princeofversions.PrinceOfVersionsConfig
+import com.infinum.princeofversions.UpdateResult
+import com.infinum.princeofversions.UpdateStatus
 import java.net.URL
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -40,13 +39,13 @@ class CustomConfigurationParserExample : ComponentActivity() {
      * Custom parser factory, used for parsing in special format.
      * Custom parser is defined for JSON object containing only one key: minimum_version.
      */
-    private class CustomParser : ConfigurationParser<Int> {
+    private class CustomParser : ConfigurationParser {
         companion object {
             private const val MINIMUM_VERSION = "minimum_version"
         }
 
-        override fun parse(value: String): PrinceOfVersionsConfig<Int> {
-            val mandatoryVersion = JSONObject(value).getInt(MINIMUM_VERSION)
+        override fun parse(value: String): PrinceOfVersionsConfig {
+            val mandatoryVersion = JSONObject(value).getLong(MINIMUM_VERSION)
             return PrinceOfVersionsConfig(
                 mandatoryVersion = mandatoryVersion,
                 optionalVersion = null,
@@ -62,12 +61,9 @@ class CustomConfigurationParserExample : ComponentActivity() {
         super.onCreate(savedInstanceState)
         WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = true
 
-        princeOfVersions = PrinceOfVersions(
-            princeOfVersionsComponents = PrinceOfVersionsComponents
-                .Builder(this)
-                .withConfigurationParser(CustomParser())
-                .build()
-        )
+        princeOfVersions = PrinceOfVersions(context = this) {
+            withConfigurationParser(CustomParser())
+        }
 
         setContent {
             ExampleScreen(
@@ -119,7 +115,7 @@ class CustomConfigurationParserExample : ComponentActivity() {
         updateCheckJob?.cancel()
     }
 
-    private fun handleUpdateResult(result: UpdateResult<Int>) {
+    private fun handleUpdateResult(result: UpdateResult) {
         val message = when (result.status) {
             UpdateStatus.MANDATORY -> getString(
                 R.string.update_available_msg,

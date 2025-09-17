@@ -1,34 +1,22 @@
 package com.infinum.princeofversions.sample
 
-import PrinceOfVersionsComponents
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import com.infinum.princeofversions.Loader
 import com.infinum.princeofversions.PrinceOfVersions
 import com.infinum.princeofversions.RequirementChecker
-import com.infinum.princeofversions.enums.UpdateStatus
-import com.infinum.princeofversions.models.RequirementsNotSatisfiedException
-import com.infinum.princeofversions.models.UpdateResult
+import com.infinum.princeofversions.RequirementsNotSatisfiedException
+import com.infinum.princeofversions.UpdateResult
+import com.infinum.princeofversions.UpdateStatus
 import java.net.URL
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -47,8 +35,8 @@ class CustomRequirementCheckerExample : ComponentActivity() {
     private val updateUrl = "https://pastebin.com/raw/VMgd71VH"
 
     class ExampleRequirementsChecker : RequirementChecker {
-        override fun checkRequirements(value: String): Boolean {
-            val numberFromConfig = value.toIntOrNull() ?: 0
+        override fun checkRequirements(value: String?): Boolean {
+            val numberFromConfig = value?.toIntOrNull() ?: 0
             return numberFromConfig >= THRESHOLD
         }
     }
@@ -60,12 +48,9 @@ class CustomRequirementCheckerExample : ComponentActivity() {
 
         val checkers = mutableMapOf("requiredNumberOfLetters" to ExampleRequirementsChecker())
 
-        princeOfVersions = PrinceOfVersions(
-            princeOfVersionsComponents = PrinceOfVersionsComponents
-                .Builder(this)
-                .withRequirementCheckers(checkers)
-                .build()
-        )
+        princeOfVersions = PrinceOfVersions(context = this) {
+            withRequirementCheckers(checkers)
+        }
 
         setContent {
             ExampleScreen(
@@ -128,7 +113,7 @@ class CustomRequirementCheckerExample : ComponentActivity() {
         updateCheckJob?.cancel()
     }
 
-    private fun handleUpdateResult(result: UpdateResult<Int>) {
+    private fun handleUpdateResult(result: UpdateResult) {
         val message = when (result.status) {
             UpdateStatus.MANDATORY -> getString(
                 R.string.update_available_msg,

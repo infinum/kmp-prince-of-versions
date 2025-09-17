@@ -9,8 +9,8 @@ private const val THRESHOLD = 5
  * configuration meets a certain threshold.
  */
 class JvmExampleRequirementsChecker : RequirementChecker {
-    override fun checkRequirements(value: String): Boolean {
-        val numberFromConfig = value.toIntOrNull() ?: 0
+    override fun checkRequirements(value: String?): Boolean {
+        val numberFromConfig = value?.toIntOrNull() ?: 0
         return numberFromConfig >= THRESHOLD
     }
 }

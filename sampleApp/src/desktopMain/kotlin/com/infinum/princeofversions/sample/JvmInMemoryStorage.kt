@@ -1,6 +1,6 @@
 package com.infinum.princeofversions.sample
 
-import com.infinum.princeofversions.models.Storage
+import com.infinum.princeofversions.Storage
 import kotlinx.coroutines.delay
 
 /**
@@ -8,7 +8,7 @@ import kotlinx.coroutines.delay
  * to work with the <String> generic type used by the desktop components.
  * The value is lost when the app is closed.
  */
-class JvmInMemoryStorage : Storage<String> {
+class JvmInMemoryStorage : Storage {
     private var lastSavedVersion: String? = null
 
     override suspend fun getLastSavedVersion(): String? {

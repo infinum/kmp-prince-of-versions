@@ -5,7 +5,7 @@ import com.infinum.princeofversions.VersionComparator
 /**
  * A JVM-specific comparator with a special rule for developer builds.
  */
-class JvmDeveloperBuildVersionComparator : VersionComparator<String> {
+class JvmDeveloperBuildVersionComparator : VersionComparator {
     /**
      * Compares versions, but treats any remote version ending in '0' as a
      * developer build that should not trigger an update.

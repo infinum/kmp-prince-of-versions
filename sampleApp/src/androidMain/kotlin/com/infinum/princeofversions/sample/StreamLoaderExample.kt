@@ -5,27 +5,16 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import com.infinum.princeofversions.Loader
 import com.infinum.princeofversions.PrinceOfVersions
-import com.infinum.princeofversions.enums.UpdateStatus
-import com.infinum.princeofversions.models.UpdateResult
+import com.infinum.princeofversions.UpdateResult
+import com.infinum.princeofversions.UpdateStatus
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -102,7 +91,7 @@ class StreamLoaderExample : ComponentActivity() {
         updateCheckJob?.cancel()
     }
 
-    private fun handleUpdateResult(result: UpdateResult<Int>) {
+    private fun handleUpdateResult(result: UpdateResult) {
         val message = when (result.status) {
             UpdateStatus.MANDATORY -> getString(
                 R.string.update_available_msg,

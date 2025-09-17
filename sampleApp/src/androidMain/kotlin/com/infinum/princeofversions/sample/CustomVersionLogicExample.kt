@@ -1,33 +1,21 @@
 package com.infinum.princeofversions.sample
 
-import PrinceOfVersionsComponents
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import com.infinum.princeofversions.ApplicationVersionProvider
 import com.infinum.princeofversions.Loader
 import com.infinum.princeofversions.PrinceOfVersions
+import com.infinum.princeofversions.UpdateResult
+import com.infinum.princeofversions.UpdateStatus
 import com.infinum.princeofversions.VersionComparator
-import com.infinum.princeofversions.enums.UpdateStatus
-import com.infinum.princeofversions.models.UpdateResult
 import java.net.URL
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -50,9 +38,9 @@ class CustomVersionLogicExample : ComponentActivity() {
      * A custom version provider that returns a hardcoded integer version.
      * In a real app, this could come from a local file, database, or build flavor config.
      */
-    class HardcodedVersionProvider : ApplicationVersionProvider<Int> {
-        private val currentAppVersion = 26
-        override fun getVersion(): Int {
+    class HardcodedVersionProvider : ApplicationVersionProvider {
+        private val currentAppVersion = 26L
+        override fun getVersion(): Long {
             return currentAppVersion
         }
     }
@@ -60,14 +48,14 @@ class CustomVersionLogicExample : ComponentActivity() {
     /**
      * A custom comparator with a special rule for developer builds.
      */
-    class DeveloperBuildVersionComparator : VersionComparator<Int> {
+    class DeveloperBuildVersionComparator : VersionComparator {
         /**
          * Compares versions, but treats any remote version ending in '0' as a
          * developer build that should not trigger an update.
          */
-        override fun compare(firstVersion: Int, secondVersion: Int): Int {
+        override fun compare(firstVersion: Long, secondVersion: Long): Int {
             // Custom rule: never show an update for developer builds (versions ending in 0)
-            if (secondVersion % 10 == 0) {
+            if (secondVersion % 10 == 0L) {
                 return -1 // Treat as "no update available"
             }
             return secondVersion.compareTo(firstVersion)
@@ -79,13 +67,10 @@ class CustomVersionLogicExample : ComponentActivity() {
         super.onCreate(savedInstanceState)
         WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = true
 
-        princeOfVersions = PrinceOfVersions(
-            princeOfVersionsComponents = PrinceOfVersionsComponents
-                .Builder(this)
-                .withVersionProvider(HardcodedVersionProvider())
-                .withVersionComparator(DeveloperBuildVersionComparator())
-                .build()
-        )
+        princeOfVersions = PrinceOfVersions(context = this) {
+            withVersionProvider(HardcodedVersionProvider())
+            withVersionComparator(DeveloperBuildVersionComparator())
+        }
 
         setContent {
             ExampleScreen(
@@ -137,7 +122,7 @@ class CustomVersionLogicExample : ComponentActivity() {
         updateCheckJob?.cancel()
     }
 
-    private fun handleUpdateResult(result: UpdateResult<Int>) {
+    private fun handleUpdateResult(result: UpdateResult) {
         val message = when (result.status) {
             UpdateStatus.MANDATORY -> getString(
                 R.string.update_available_msg,

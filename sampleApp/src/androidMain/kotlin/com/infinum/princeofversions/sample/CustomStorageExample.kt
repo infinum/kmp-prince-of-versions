@@ -1,6 +1,5 @@
 package com.infinum.princeofversions.sample
 
-import PrinceOfVersionsComponents
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -14,9 +13,9 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import com.infinum.princeofversions.Loader
 import com.infinum.princeofversions.PrinceOfVersions
-import com.infinum.princeofversions.enums.UpdateStatus
-import com.infinum.princeofversions.models.Storage
-import com.infinum.princeofversions.models.UpdateResult
+import com.infinum.princeofversions.Storage
+import com.infinum.princeofversions.UpdateResult
+import com.infinum.princeofversions.UpdateStatus
 import java.net.URL
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -37,16 +36,16 @@ class CustomStorageExample : ComponentActivity() {
      * A simple custom storage implementation that stores the last notified
      * version in memory. The value is lost when the app is closed.
      */
-    class InMemoryStorage : Storage<Int> {
-        private var lastSavedVersion: Int? = null
+    class InMemoryStorage : Storage {
+        private var lastSavedVersion: Long? = null
 
-        override suspend fun getLastSavedVersion(): Int? {
+        override suspend fun getLastSavedVersion(): Long? {
             // Add a small delay to simulate real storage access
             delay(100)
             return lastSavedVersion
         }
 
-        override suspend fun saveVersion(version: Int) {
+        override suspend fun saveVersion(version: Long) {
             // Add a small delay to simulate real storage access
             delay(100)
             lastSavedVersion = version
@@ -58,12 +57,9 @@ class CustomStorageExample : ComponentActivity() {
         super.onCreate(savedInstanceState)
         WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = true
 
-        princeOfVersions = PrinceOfVersions(
-            princeOfVersionsComponents = PrinceOfVersionsComponents
-                .Builder(this)
-                .withStorage(InMemoryStorage())
-                .build()
-        )
+        princeOfVersions = PrinceOfVersions(context = this) {
+            withStorage(InMemoryStorage())
+        }
 
         setContent {
             ExampleScreen(
@@ -115,7 +111,7 @@ class CustomStorageExample : ComponentActivity() {
         updateCheckJob?.cancel()
     }
 
-    private fun handleUpdateResult(result: UpdateResult<Int>) {
+    private fun handleUpdateResult(result: UpdateResult) {
         val message = when (result.status) {
             UpdateStatus.MANDATORY -> getString(
                 R.string.update_available_msg,
