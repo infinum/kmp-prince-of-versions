@@ -15,7 +15,7 @@ public typealias ApplicationVersionProvider = BaseApplicationVersionProvider<Str
  * @throws IOException if the properties file does not exist
  * @throws IllegalStateException if the expected key is not present in the properties file
  */
-internal class JvmApplicationVersionProvider(
+internal class PropertiesApplicationVersionProvider(
     private val versionFilePath: String = "/version.properties",
     private val versionKey: String = "application.version"
 ) : ApplicationVersionProvider {

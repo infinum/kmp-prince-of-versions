@@ -29,7 +29,7 @@ public data class PrinceOfVersionsComponents internal constructor(
      * @param mainClass A class reference from your application, used to create a unique storage location.
      */
     public class Builder(private val mainClass: Class<*>) {
-        private var versionProvider: ApplicationVersionProvider = JvmApplicationVersionProvider()
+        private var versionProvider: ApplicationVersionProvider = PropertiesApplicationVersionProvider()
         private var versionComparator: VersionComparator = JvmDefaultVersionComparator()
         private var requirementCheckers: Map<String, RequirementChecker> = mapOf(
             JvmVersionRequirementChecker.KEY to JvmVersionRequirementChecker()
