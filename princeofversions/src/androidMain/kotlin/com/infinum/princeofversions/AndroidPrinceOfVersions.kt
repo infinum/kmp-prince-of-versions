@@ -1,7 +1,9 @@
 package com.infinum.princeofversions
 
 import android.content.Context
+import com.infinum.princeofversions.PrinceOfVersionsBase.Companion.DEFAULT_NETWORK_TIMEOUT
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Represents the main interface for using the library.
@@ -122,11 +124,11 @@ internal class PrinceOfVersionsImpl(
  *
  * @return An [UpdateResult] instance that contains the result of the update check.
  */
-public suspend fun PrinceOfVersions.checkForUpdates(
+public suspend fun PrinceOfVersions.checkForUpdatesFromUrl(
     url: String,
-    username: String?,
-    password: String?,
-    networkTimeout: Duration,
+    username: String? = null,
+    password: String? = null,
+    networkTimeout: Duration = DEFAULT_NETWORK_TIMEOUT,
 ): UpdateResult = checkForUpdates(
     source = provideDefaultLoader(
         url = url,
