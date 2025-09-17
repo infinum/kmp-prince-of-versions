@@ -1,13 +1,4 @@
-package com.infinum.princeofversions.models
-
-import com.infinum.princeofversions.ApplicationVersionProvider
-import com.infinum.princeofversions.ConfigurationParser
-import com.infinum.princeofversions.DefaultRequirementChecker
-import com.infinum.princeofversions.JvmApplicationVersionProvider
-import com.infinum.princeofversions.JvmDefaultVersionComparator
-import com.infinum.princeofversions.RequirementChecker
-import com.infinum.princeofversions.RequirementsProcessor
-import com.infinum.princeofversions.VersionComparator
+package com.infinum.princeofversions
 
 /**
  * A data class that holds the functional components required by PrinceOfVersions for the JVM.
@@ -24,32 +15,33 @@ import com.infinum.princeofversions.VersionComparator
  * @property configurationParser An object that parses the remote configuration stream.
  * @property storage An object used to persist the last version the user was notified about.
  */
+@ConsistentCopyVisibility
 public data class PrinceOfVersionsComponents internal constructor(
     val mainClass: Class<*>,
-    val versionProvider: ApplicationVersionProvider<String>,
-    val versionComparator: VersionComparator<String>,
+    val versionProvider: ApplicationVersionProvider,
+    val versionComparator: VersionComparator,
     val requirementCheckers: Map<String, RequirementChecker>,
-    val configurationParser: ConfigurationParser<String>,
-    val storage: Storage<String>,
+    val configurationParser: ConfigurationParser,
+    val storage: Storage,
 ) {
     /**
      * A builder for creating a consistent `PrinceOfVersionsComponents` instance for the JVM.
      * @param mainClass A class reference from your application, used to create a unique storage location.
      */
     public class Builder(private val mainClass: Class<*>) {
-        private var versionProvider: ApplicationVersionProvider<String> = JvmApplicationVersionProvider()
-        private var versionComparator: VersionComparator<String> = JvmDefaultVersionComparator()
+        private var versionProvider: ApplicationVersionProvider = JvmApplicationVersionProvider()
+        private var versionComparator: VersionComparator = JvmDefaultVersionComparator()
         private var requirementCheckers: Map<String, RequirementChecker> = mapOf(
-            DefaultRequirementChecker.KEY to DefaultRequirementChecker()
+            JvmVersionRequirementChecker.KEY to JvmVersionRequirementChecker()
         )
-        private var storage: Storage<String> = JvmStorage(mainClass)
-        private var configurationParser: ConfigurationParser<String>? = null
+        private var storage: Storage = JvmStorage(mainClass)
+        private var configurationParser: ConfigurationParser? = null
 
         /**
          * Sets the version provider component.
          * @param provider An object that provides the current version of the application.
          */
-        public fun withVersionProvider(provider: ApplicationVersionProvider<String>): Builder = apply {
+        public fun withVersionProvider(provider: ApplicationVersionProvider): Builder = apply {
             this.versionProvider = provider
         }
 
@@ -58,7 +50,7 @@ public data class PrinceOfVersionsComponents internal constructor(
          * @param comparator An object that compares the app's current version with the
          * versions from the configuration file.
          */
-        public fun withVersionComparator(comparator: VersionComparator<String>): Builder = apply {
+        public fun withVersionComparator(comparator: VersionComparator): Builder = apply {
             this.versionComparator = comparator
         }
 
@@ -84,7 +76,7 @@ public data class PrinceOfVersionsComponents internal constructor(
          * Sets the storage component.
          * @param storage An object used to persist the last version the user was notified about.
          */
-        public fun withStorage(storage: Storage<String>): Builder = apply {
+        public fun withStorage(storage: Storage): Builder = apply {
             this.storage = storage
         }
 
@@ -92,7 +84,7 @@ public data class PrinceOfVersionsComponents internal constructor(
          * Sets the configuration parser component.
          * @param parser An object that parses the remote configuration stream.
          */
-        public fun withConfigurationParser(parser: ConfigurationParser<String>): Builder = apply {
+        public fun withConfigurationParser(parser: ConfigurationParser): Builder = apply {
             this.configurationParser = parser
         }
 

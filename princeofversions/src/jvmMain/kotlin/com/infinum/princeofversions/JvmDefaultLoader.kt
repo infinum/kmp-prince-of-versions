@@ -12,7 +12,7 @@ import kotlin.time.Duration
  * @param url The URL representing the resource locator.
  * @param username Optional username for Basic authentication.
  * @param password Optional password for Basic authentication.
- * @param networkTimeoutSeconds The network timeout in seconds.
+ * @param networkTimeout The network timeout duration.
  */
 
 internal class JvmDefaultLoader(
@@ -22,17 +22,10 @@ internal class JvmDefaultLoader(
     networkTimeout: Duration,
 ) : Loader {
 
-    private companion object {
-        /**
-         * Default request timeout in seconds.
-         */
-        private const val MILLISECONDS_IN_SECOND = 1000
-    }
-
     /**
      * Custom network timeout in milliseconds.
      */
-    private val networkTimeoutMilliseconds = networkTimeoutSeconds * MILLISECONDS_IN_SECOND
+    private val networkTimeoutMilliseconds = networkTimeout.inWholeMilliseconds.toInt()
 
     @Throws(IOException::class)
     override suspend fun load(): String {

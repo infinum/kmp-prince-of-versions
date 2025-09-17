@@ -1,14 +1,12 @@
 package com.infinum.princeofversions
 
-import com.infinum.princeofversions.ApplicationVersionProvider
-
 /**
  * Provides application parameters such as the application's version.
  *
  * @param versionProvider A provider to fetch the application's version.
  */
 internal class JvmApplicationConfiguration(
-    versionProvider: ApplicationVersionProvider<String>,
+    versionProvider: ApplicationVersionProvider,
 ) : ApplicationConfiguration<String> {
 
     /**

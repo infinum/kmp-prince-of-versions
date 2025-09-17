@@ -15,7 +15,50 @@ public typealias PrinceOfVersions = PrinceOfVersionsBase<String>
  */
 public typealias UpdateResult = BaseUpdateResult<String>
 
-public fun PrinceOfVersions(): PrinceOfVersions = TODO("Not yet implemented")
+/**
+ * Creates and configures the main [PrinceOfVersions] instance for a JVM environment.
+ *
+ * @param mainClass A class reference from your application, used to create a unique storage location.
+ * needed for the library to work.
+ * @return A fully configured [PrinceOfVersions] instance.
+ */
+public fun PrinceOfVersions(
+    mainClass: Class<*>,
+): PrinceOfVersions = createPrinceOfVersions(
+    princeOfVersionsComponents = PrinceOfVersionsComponents.Builder(mainClass).build(),
+)
+
+/**
+ * Creates and configures the main [PrinceOfVersions] instance for a JVM environment.
+ *
+ * @param princeOfVersionsComponents A customizable config data class that holds all the components
+ *
+ * @return A fully configured [PrinceOfVersions] instance.
+ */
+public fun PrinceOfVersions(
+    princeOfVersionsComponents: PrinceOfVersionsComponents,
+): PrinceOfVersions = createPrinceOfVersions(
+    princeOfVersionsComponents = princeOfVersionsComponents,
+)
+
+private fun createPrinceOfVersions(
+    princeOfVersionsComponents: PrinceOfVersionsComponents,
+): PrinceOfVersions = with(princeOfVersionsComponents) {
+    val applicationConfiguration = JvmApplicationConfiguration(versionProvider)
+
+    val updateInfoInteractor = UpdateInfoInteractorImpl(
+        configurationParser = configurationParser,
+        appConfig = applicationConfiguration,
+        versionComparator = versionComparator,
+    )
+
+    val checkForUpdatesUseCase = CheckForUpdatesUseCaseImpl(
+        updateInfoInteractor = updateInfoInteractor,
+        storage = storage,
+    )
+
+    return PrinceOfVersionsImpl(checkForUpdatesUseCase = checkForUpdatesUseCase)
+}
 
 internal class PrinceOfVersionsImpl(
     private val checkForUpdatesUseCase: CheckForUpdatesUseCase<String>,
