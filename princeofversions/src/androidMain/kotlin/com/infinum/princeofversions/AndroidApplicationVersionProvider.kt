@@ -2,7 +2,7 @@ package com.infinum.princeofversions
 
 import android.content.Context
 import android.content.pm.PackageManager
-import android.os.Build
+import androidx.core.content.pm.PackageInfoCompat
 
 /**
  * Provides the current version of the application.
@@ -13,13 +13,7 @@ internal class AndroidApplicationVersionProvider(context: Context) : Application
 
     private val version: Long = try {
         val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
-        val longVersionCode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            packageInfo.longVersionCode
-        } else {
-            @Suppress("DEPRECATION")
-            packageInfo.versionCode.toLong()
-        }
-        longVersionCode
+        PackageInfoCompat.getLongVersionCode(packageInfo)
     } catch (e: PackageManager.NameNotFoundException) {
         throw kotlin.IllegalStateException("Could not find package name", e)
     }
