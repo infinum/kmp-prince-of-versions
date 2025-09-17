@@ -25,14 +25,14 @@ public data class PrinceOfVersionsComponents internal constructor(
     /**
      * A builder for creating a `PrinceOfVersionsComponents` instance.
      */
-    public class Builder(context: Context) {
+    public class Builder() {
+        private var storage: Storage? = null
+        private var configurationParser: ConfigurationParser? = null
+        private var versionProvider: ApplicationVersionProvider? = null
         private var versionComparator: VersionComparator = AndroidDefaultVersionComparator()
-        private var versionProvider: ApplicationVersionProvider = AndroidApplicationVersionProvider(context)
         private var requirementCheckers: Map<String, RequirementChecker> = mapOf(
             SystemVersionRequirementChecker.KEY to SystemVersionRequirementChecker()
         )
-        private var storage: Storage = AndroidStorage(context)
-        private var configurationParser: ConfigurationParser? = null
 
         /**
          * Sets the version comparator component.
@@ -57,6 +57,8 @@ public data class PrinceOfVersionsComponents internal constructor(
          * user-specific conditions before an update is considered valid.
          * @param keepDefaultCheckers If true, the provided checkers will be added to the
          * default set. If false, they will replace the default set.
+         *
+         * @see SystemVersionRequirementChecker
          */
         public fun withRequirementCheckers(
             checkers: Map<String, RequirementChecker>,
@@ -87,19 +89,54 @@ public data class PrinceOfVersionsComponents internal constructor(
 
         /**
          * Assembles the final, `PrinceOfVersionsComponents` object.
+         *
+         * @return A configured [PrinceOfVersionsComponents] instance.
+         * @throws IllegalArgumentException if the custom [Storage] and [ApplicationVersionProvider] components
+         * are not provided.
          */
         public fun build(): PrinceOfVersionsComponents {
-
             val configurationParser = this.configurationParser ?: AndroidConfigurationParser(
                 RequirementsProcessor(this.requirementCheckers)
             )
 
+            val versionProvider = requireNotNull(this.versionProvider) {
+                "ApplicationVersionProvider is required to build PrinceOfVersionsComponents without context."
+            }
+            val storage = requireNotNull(this.storage) {
+                "Storage is required to build PrinceOfVersionsComponents without context."
+            }
+
             return PrinceOfVersionsComponents(
                 versionComparator = this.versionComparator,
-                versionProvider = this.versionProvider,
+                versionProvider = versionProvider,
+                configurationParser = configurationParser,
+                requirementCheckers = this.requirementCheckers,
+                storage = storage,
+            )
+        }
+
+        /**
+         * Assembles the final, `PrinceOfVersionsComponents` object.
+         *
+         * @param context The Android context required to construct the default
+         * [AndroidStorage] and [AndroidApplicationVersionProvider] components
+         *
+         * @return A configured [PrinceOfVersionsComponents] instance.
+         */
+        public fun build(context: Context): PrinceOfVersionsComponents {
+
+            val configurationParser = this.configurationParser ?: AndroidConfigurationParser(
+                RequirementsProcessor(this.requirementCheckers)
+            )
+            val storage = this.storage ?: AndroidStorage(context)
+            val versionProvider = this.versionProvider ?: AndroidApplicationVersionProvider(context)
+
+            return PrinceOfVersionsComponents(
+                versionComparator = this.versionComparator,
+                versionProvider = versionProvider,
                 requirementCheckers = this.requirementCheckers,
                 configurationParser = configurationParser,
-                storage = this.storage
+                storage = storage
             )
         }
     }

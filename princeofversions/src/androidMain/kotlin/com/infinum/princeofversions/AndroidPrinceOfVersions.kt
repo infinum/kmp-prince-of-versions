@@ -25,12 +25,11 @@ public typealias UpdateResult = BaseUpdateResult<Long>
  *
  * @return A fully configured [PrinceOfVersions] instance, ready to be used for
  * checking for application updates.
- * @see PrinceOfVersions
  */
 public fun PrinceOfVersions(
     context: Context,
 ): PrinceOfVersions = createPrinceOfVersions(
-    princeOfVersionsComponents = PrinceOfVersionsComponents.Builder(context).build(),
+    princeOfVersionsComponents = PrinceOfVersionsComponents.Builder().build(context),
 )
 
 /**
@@ -38,14 +37,53 @@ public fun PrinceOfVersions(
  *
  * Allows for custom components to be provided for parsing, requirements checking, version operations, and storage.
  *
+ * @param princeOfVersionsComponents A configured [PrinceOfVersionsComponents] instance.
  * @return A fully configured [PrinceOfVersions] instance, ready to be used for
  * checking for application updates.
- * @see PrinceOfVersions
  */
 public fun PrinceOfVersions(
     princeOfVersionsComponents: PrinceOfVersionsComponents,
 ): PrinceOfVersions = createPrinceOfVersions(
     princeOfVersionsComponents = princeOfVersionsComponents,
+)
+
+/**
+ * Creates and configures the main [PrinceOfVersions] instance.
+ *
+ * Allows for custom components to be provided for parsing, requirements checking, version operations, and storage.
+ *
+ * @param block A lambda with receiver that allows for configuring the [PrinceOfVersionsComponents.Builder].
+ *
+ * **Note**: The block must construct custom [Storage] and [ApplicationVersionProvider] components. Use
+ * [PrinceOfVersions(context, block)] if you want to use default implementations.
+ * @return A fully configured [PrinceOfVersions] instance, ready to be used for
+ * checking for application updates.
+ * @throws IllegalArgumentException if the custom [Storage] and [ApplicationVersionProvider] components
+ * are not provided.
+ */
+public fun PrinceOfVersions(
+    block: PrinceOfVersionsComponents.Builder.() -> Unit,
+): PrinceOfVersions = createPrinceOfVersions(
+    princeOfVersionsComponents = PrinceOfVersionsComponents.Builder().apply(block).build(),
+)
+
+/**
+ * Creates and configures the main [PrinceOfVersions] instance.
+ *
+ * Allows for custom components to be provided for parsing, requirements checking, version operations, and storage.
+ *
+ * @param context The Android context required to construct the default
+ * [AndroidStorage] and [AndroidApplicationVersionProvider] components
+ * @param block A lambda with receiver that allows for configuring the [PrinceOfVersionsComponents.Builder].
+ *
+ * @return A fully configured [PrinceOfVersions] instance, ready to be used for
+ * checking for application updates.
+ */
+public fun PrinceOfVersions(
+    context: Context,
+    block: PrinceOfVersionsComponents.Builder.() -> Unit,
+): PrinceOfVersions = createPrinceOfVersions(
+    princeOfVersionsComponents = PrinceOfVersionsComponents.Builder().apply(block).build(context),
 )
 
 private fun createPrinceOfVersions(
