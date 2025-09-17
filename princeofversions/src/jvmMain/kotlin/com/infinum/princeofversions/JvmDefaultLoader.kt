@@ -4,6 +4,7 @@ import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URI
 import kotlin.io.encoding.Base64
+import kotlin.time.Duration
 
 /**
  * Represents a concrete loader that loads a resource from the network using a provided URL.
@@ -13,11 +14,12 @@ import kotlin.io.encoding.Base64
  * @param password Optional password for Basic authentication.
  * @param networkTimeoutSeconds The network timeout in seconds.
  */
+
 internal class JvmDefaultLoader(
     private val url: String,
     private val username: String?,
     private val password: String?,
-    networkTimeoutSeconds: Int,
+    networkTimeout: Duration,
 ) : Loader {
 
     private companion object {
@@ -54,3 +56,15 @@ internal class JvmDefaultLoader(
         }
     }
 }
+
+internal actual fun provideDefaultLoader(
+    url: String,
+    username: String?,
+    password: String?,
+    networkTimeout: Duration,
+): Loader = JvmDefaultLoader(
+    url = url,
+    username = username,
+    password = password,
+    networkTimeout = networkTimeout,
+)

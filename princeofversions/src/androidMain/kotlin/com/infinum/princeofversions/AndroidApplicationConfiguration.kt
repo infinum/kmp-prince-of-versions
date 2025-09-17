@@ -1,4 +1,4 @@
-package com.infinum.princeofversions.models
+package com.infinum.princeofversions
 
 internal class AndroidApplicationConfiguration : ApplicationConfiguration<Int> {
     override val version: Int
