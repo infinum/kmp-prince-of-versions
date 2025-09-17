@@ -1,5 +1,7 @@
 package com.infinum.princeofversions
 
+public typealias VersionComparator = BaseVersionComparator<String>
+
 /**
  * The default version comparator for JVM, which compares simple dotted numeric versions.
  * This implementation handles versions consisting of one or more non-negative integers
@@ -9,7 +11,7 @@ package com.infinum.princeofversions
  * you can provide a custom [VersionComparator] implementation. A library like
  * 'jsemver' can be used for full Semantic Versioning 2.0.0 support.
  */
-internal class JvmDefaultVersionComparator : VersionComparator<String> {
+internal class JvmDefaultVersionComparator : VersionComparator {
 
     /**
      * Compares two simple dotted numeric version strings.

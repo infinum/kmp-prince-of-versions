@@ -24,8 +24,7 @@ internal class RequirementsProcessor(checkers: Map<String, RequirementChecker> =
         return runCatching {
             requirements.all { (key, value) ->
                 // A requirement is met if a checker exists for its key and that checker returns true.
-                // If value is null, it's considered not satisfied.
-                value != null && installedCheckers[key]?.checkRequirements(value) == true
+                installedCheckers[key]?.checkRequirements(value) == true
             }
         }.getOrDefault(false)
     }

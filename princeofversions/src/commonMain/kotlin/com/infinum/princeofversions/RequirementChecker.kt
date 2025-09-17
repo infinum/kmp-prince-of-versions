@@ -12,5 +12,5 @@ public fun interface RequirementChecker {
      * @throws Throwable in case of any error in parsing
      */
     @Throws(Throwable::class)
-    public fun checkRequirements(value: String): Boolean
+    public fun checkRequirements(value: String?): Boolean
 }

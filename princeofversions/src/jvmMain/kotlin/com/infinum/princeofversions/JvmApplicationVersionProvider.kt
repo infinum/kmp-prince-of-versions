@@ -4,16 +4,21 @@ import java.io.IOException
 import java.util.Properties
 
 /**
+ * Provides the current version of the application.
+ */
+public typealias ApplicationVersionProvider = BaseApplicationVersionProvider<String>
+
+/**
  * Loads and provides the current application version. Assumes the version is stored in a properties file
  * with a path of `/version.properties` containing a key `application.version`.
  *
  * @throws IOException if the properties file does not exist
  * @throws IllegalStateException if the expected key is not present in the properties file
  */
-internal class JvmApplicationVersionProvider(
+internal class PropertiesApplicationVersionProvider(
     private val versionFilePath: String = "/version.properties",
     private val versionKey: String = "application.version"
-) : ApplicationVersionProvider<String> {
+) : ApplicationVersionProvider {
 
     private val applicationVersion: String by lazy {
         val inputStream = javaClass.getResourceAsStream(versionFilePath)
