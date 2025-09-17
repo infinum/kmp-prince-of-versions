@@ -9,12 +9,12 @@ import kotlin.time.Duration
  * This library checks for application updates by fetching a configuration from a given source.
  *
  */
-public typealias PrinceOfVersions = PrinceOfVersionsBase<Int>
+public typealias PrinceOfVersions = PrinceOfVersionsBase<Long>
 
 /**
  * Represents the final result of an update check.
  */
-public typealias UpdateResult = BaseUpdateResult<Int>
+public typealias UpdateResult = BaseUpdateResult<Long>
 
 /**
  * Creates and configures the main [PrinceOfVersions] instance.
@@ -68,7 +68,7 @@ private fun createPrinceOfVersions(
     }
 
 internal class PrinceOfVersionsImpl(
-    private val checkForUpdatesUseCase: CheckForUpdatesUseCase<Int>,
+    private val checkForUpdatesUseCase: CheckForUpdatesUseCase<Long>,
 ) : PrinceOfVersions {
     override suspend fun checkForUpdates(source: Loader): UpdateResult =
         checkForUpdatesUseCase.checkForUpdates(source)

@@ -1,6 +1,6 @@
 package com.infinum.princeofversions
 
-public typealias VersionComparator = BaseVersionComparator<Int>
+public typealias VersionComparator = BaseVersionComparator<Long>
 
 /**
  * The default version comparator for Android, which compares two integer versions.
@@ -15,5 +15,5 @@ public class AndroidDefaultVersionComparator : VersionComparator {
      * @return Zero if the values is equal, a positive number if firstVersion is greater than secondVersion,
      * or a negative number if firstVersion is less than secondVersion.
      */
-    override fun compare(firstVersion: Int, secondVersion: Int): Int = firstVersion.compareTo(secondVersion)
+    override fun compare(firstVersion: Long, secondVersion: Long): Int = firstVersion.compareTo(secondVersion)
 }

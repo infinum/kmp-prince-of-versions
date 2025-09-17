@@ -7,10 +7,10 @@ package com.infinum.princeofversions
  */
 internal class AndroidApplicationConfiguration(
     versionProvider: ApplicationVersionProvider,
-) : ApplicationConfiguration<Int> {
+) : ApplicationConfiguration<Long> {
 
     /**
      * The application's version code, retrieved from the version provider.
      */
-    override val version: Int = versionProvider.getVersion()
+    override val version: Long = versionProvider.getVersion()
 }

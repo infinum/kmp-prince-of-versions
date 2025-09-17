@@ -1,17 +1,18 @@
 package com.infinum.princeofversions
 
 import org.json.JSONArray
+import org.json.JSONException
 import org.json.JSONObject
 
 /**
  * This class parses update resource text into [PrinceOfVersionsConfig].
  */
-public typealias ConfigurationParser = BaseConfigurationParser<Int>
+public typealias ConfigurationParser = BaseConfigurationParser<Long>
 
 /**
  * This class holds loaded data from a configuration resource.
  */
-public typealias PrinceOfVersionsConfig = BasePrinceOfVersionsConfig<Int>
+public typealias PrinceOfVersionsConfig = BasePrinceOfVersionsConfig<Long>
 
 /**
  * This class represents a parser for update configurations in the JSON format.
@@ -41,8 +42,8 @@ internal class AndroidConfigurationParser(
      * creating the final PrinceOfVersionsConfig.
      */
     private data class ParsedUpdateData(
-        val mandatoryVersion: Int? = null,
-        val optionalVersion: Int? = null,
+        val mandatoryVersion: Long? = null,
+        val optionalVersion: Long? = null,
         val optionalNotificationType: NotificationType = NotificationType.ONCE,
         val updateMetadata: Map<String, String> = emptyMap(),
         val requirements: Map<String, String> = emptyMap()
@@ -114,8 +115,8 @@ internal class AndroidConfigurationParser(
         val requirements = parseAndCheckRequirements(update)
             ?: return null // Requirements not met, skip this update entry
 
-        val mandatoryVersion = parseInt(update, MINIMUM_VERSION)
-        val optionalVersion = parseInt(update, LATEST_VERSION)
+        val mandatoryVersion = parseLong(update, MINIMUM_VERSION)
+        val optionalVersion = parseLong(update, LATEST_VERSION)
         val notificationType = parseNotificationType(update)
         val updateMetadata = update.optJSONObject(META)?.let { jsonObjectToMap(it) } ?: emptyMap()
 
@@ -136,14 +137,15 @@ internal class AndroidConfigurationParser(
         return requirements
     }
 
-    private fun parseInt(json: JSONObject, key: String): Int? {
+    private fun parseLong(json: JSONObject, key: String): Long? {
         if (json.isNull(key)) {
             return null
         }
-        return when (val value = json[key]) {
-            is Int -> value
-            else -> throw IllegalArgumentException(
-                "In update configuration $key should be int, but the actual value is $value"
+        try {
+            return json.getLong(key)
+        } catch (e: JSONException) {
+            throw IllegalArgumentException(
+                "In update configuration $key should be Long, but the actual value is ${json[key]}"
             )
         }
     }
