@@ -31,6 +31,7 @@ kotlin {
     sourceSets {
         androidMain.dependencies {
             implementation(libs.androidx.datastore.preferences)
+            implementation(libs.androidx.core.ktx)
         }
         jvmMain.dependencies {
             implementation(libs.json)
