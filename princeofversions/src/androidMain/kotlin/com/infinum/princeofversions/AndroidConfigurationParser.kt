@@ -11,6 +11,7 @@ public typealias ConfigurationParser = BaseConfigurationParser<Int>
 public typealias PrinceOfVersionsConfig = BasePrinceOfVersionsConfig<Int>
 
 internal class AndroidConfigurationParser : ConfigurationParser {
+    @Suppress("NotImplementedDeclaration")
     override fun parse(value: String): PrinceOfVersionsConfig {
         TODO("Not yet implemented")
     }

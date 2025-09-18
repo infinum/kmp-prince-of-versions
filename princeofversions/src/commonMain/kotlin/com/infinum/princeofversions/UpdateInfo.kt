@@ -8,7 +8,7 @@ internal data class UpdateInfo<T>(
     val lastVersionAvailable: T?,
     val requirements: Map<String, String>,
     val installedVersion: T,
-    val notificationFrequency: NotificationType
+    val notificationFrequency: NotificationType,
 ) {
 
     override fun toString(): String =

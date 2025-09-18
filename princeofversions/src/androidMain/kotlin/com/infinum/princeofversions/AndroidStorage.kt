@@ -5,6 +5,7 @@ package com.infinum.princeofversions
  */
 public typealias Storage = BaseStorage<Int>
 
+@Suppress("NotImplementedDeclaration")
 internal class AndroidStorage : Storage {
     override suspend fun getLastSavedVersion(): Int? {
         TODO("Not yet implemented")
