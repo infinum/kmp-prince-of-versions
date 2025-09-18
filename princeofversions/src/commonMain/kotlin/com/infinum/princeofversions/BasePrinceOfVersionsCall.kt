@@ -4,13 +4,14 @@ package com.infinum.princeofversions
  * Represents a single, prepared call to check for an update.
  *
  * An instance of this class is a one-shot object; it can be used only once.
- * To perform another check, a new instance must be created via [PrinceOfVersions.newCall].
+ * To perform another check, a new instance must be created
+ * via [PrinceOfVersionsBase.newCall].
  *
  * This interface provides two ways to perform the update check:
  * - [enqueue] for an asynchronous, callback-based approach.
  * - [execute] for a synchronous-style, coroutine-based approach.
  */
-public interface PrinceOfVersionsCall {
+public interface BasePrinceOfVersionsCall<T> {
 
     /**
      * Schedules the update check to be executed asynchronously.
@@ -27,8 +28,8 @@ public interface PrinceOfVersionsCall {
     /**
      * Executes the update check.
      *
-     * @return The [UpdateResult] of the check.
+     * @return The [BaseUpdateResult] of the check.
      *
      */
-    public suspend fun execute(): UpdateResult
+    public suspend fun execute(): BaseUpdateResult<T>
 }

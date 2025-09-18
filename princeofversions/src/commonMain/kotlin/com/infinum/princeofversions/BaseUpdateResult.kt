@@ -13,8 +13,8 @@ package com.infinum.princeofversions
  * @property metadata A map of metadata associated with the resolved update configuration. This is provided even
  * if no update is available.
  */
-public data class UpdateResult(
-    public val version: String,
+public data class BaseUpdateResult<T>(
+    public val version: T,
     public val status: UpdateStatus,
     public val metadata: Map<String, String> = emptyMap()
 )
