@@ -6,7 +6,8 @@ package com.infinum.princeofversions
  * This data class encapsulates all the information needed to act on the
  * result of a Prince of Versions check, such as showing a dialog to the user.
  *
- * @property version The version string of the available update. In the case of [UpdateStatus.NO_UPDATE], this will
+ * @param T the type of a version that is being checked.
+ * @property version The version of the available update. In the case of [UpdateStatus.NO_UPDATE], this will
  * be the currently installed version of the application.
  * @property status The final status of the update check, indicating whether an update is available, mandatory,
  * or if there is no update.
@@ -16,5 +17,5 @@ package com.infinum.princeofversions
 public data class BaseUpdateResult<T>(
     public val version: T,
     public val status: UpdateStatus,
-    public val metadata: Map<String, String> = emptyMap()
+    public val metadata: Map<String, String> = emptyMap(),
 )
