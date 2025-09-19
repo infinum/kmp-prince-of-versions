@@ -9,6 +9,7 @@ internal class IosDefaultLoader(
     password: String?,
     networkTimeout: Duration,
 ) : Loader {
+    @Suppress("NotImplementedDeclaration")
     override suspend fun load(): String {
         TODO("Not yet implemented")
     }

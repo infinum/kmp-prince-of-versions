@@ -10,6 +10,7 @@ public typealias ConfigurationParser = BaseConfigurationParser<String>
  */
 public typealias PrinceOfVersionsConfig = BasePrinceOfVersionsConfig<String>
 
+@Suppress("NotImplementedDeclaration")
 internal class JvmConfigurationParser : ConfigurationParser {
     override fun parse(value: String): PrinceOfVersionsConfig {
         TODO("Not yet implemented")

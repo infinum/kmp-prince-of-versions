@@ -5,6 +5,7 @@ package com.infinum.princeofversions
  */
 public typealias Storage = BaseStorage<String>
 
+@Suppress("NotImplementedDeclaration")
 internal class JvmStorage : Storage {
     override suspend fun getLastSavedVersion(): String? {
         TODO("Not yet implemented")

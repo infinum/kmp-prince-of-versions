@@ -11,7 +11,6 @@ internal class UpdateInfoInteractorImpl<T>(
 ) : UpdateInfoInteractor<T> {
 
     override suspend fun invoke(loader: Loader): CheckResult<T> {
-
         val configJson = loader.load()
         val currentVersion = appConfig.version
 
@@ -45,14 +44,14 @@ internal class UpdateInfoInteractorImpl<T>(
                 )
             }
             // If no mandatory update, check for an optional update
-            optionalVersion != null && optionalVersion.isGreaterThan(currentVersion, versionComparator) -> {
+            optionalVersion != null && optionalVersion.isGreaterThan(currentVersion, versionComparator) ->
                 CheckResult.optionalUpdate(
                     version = optionalVersion,
                     notificationType = config.optionalNotificationType,
                     metadata = config.metadata,
                     updateInfo = updateInfo,
                 )
-            }
+
             else -> {
                 if (mandatoryVersion == null && optionalVersion == null) {
                     // neither mandatory nor optional version is provided
