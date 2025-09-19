@@ -19,13 +19,6 @@ internal class JvmStorage(
     private val clazz: Class<*>,
 ) : Storage {
 
-    private companion object Companion {
-        /**
-         * Defines the key for storing the last notified version code.
-         */
-        const val LAST_NOTIFIED_VERSION_KEY = "PrinceOfVersions_LastNotifiedUpdate"
-    }
-
     // Get the preferences node specific to the provided class's package.
     private val preferences: Preferences by lazy {
         Preferences.userNodeForPackage(clazz)
@@ -48,5 +41,12 @@ internal class JvmStorage(
      */
     override suspend fun saveVersion(version: String) = withContext(Dispatchers.IO) {
         preferences.put(LAST_NOTIFIED_VERSION_KEY, version)
+    }
+
+    private companion object Companion {
+        /**
+         * Defines the key for storing the last notified version code.
+         */
+        const val LAST_NOTIFIED_VERSION_KEY = "PrinceOfVersions_LastNotifiedUpdate"
     }
 }

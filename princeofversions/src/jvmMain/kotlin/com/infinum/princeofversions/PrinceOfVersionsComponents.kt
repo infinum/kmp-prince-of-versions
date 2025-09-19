@@ -29,7 +29,7 @@ public data class PrinceOfVersionsComponents internal constructor(
         private var versionProvider: ApplicationVersionProvider = PropertiesApplicationVersionProvider()
         private var versionComparator: VersionComparator = JvmDefaultVersionComparator()
         private var requirementCheckers: Map<String, RequirementChecker> = mapOf(
-            JvmVersionRequirementChecker.KEY to JvmVersionRequirementChecker()
+            JvmVersionRequirementChecker.KEY to JvmVersionRequirementChecker(),
         )
         private var storage: Storage? = null
         private var configurationParser: ConfigurationParser? = null
@@ -93,7 +93,7 @@ public data class PrinceOfVersionsComponents internal constructor(
          */
         public fun build(): PrinceOfVersionsComponents {
             val finalParser = this.configurationParser ?: JvmConfigurationParser(
-                RequirementsProcessor(this.requirementCheckers)
+                RequirementsProcessor(this.requirementCheckers),
             )
 
             val storage = requireNotNull(this.storage) {
@@ -118,7 +118,7 @@ public data class PrinceOfVersionsComponents internal constructor(
          */
         public fun build(mainClass: Class<*>): PrinceOfVersionsComponents {
             val finalParser = this.configurationParser ?: JvmConfigurationParser(
-                RequirementsProcessor(this.requirementCheckers)
+                RequirementsProcessor(this.requirementCheckers),
             )
 
             val storage = JvmStorage(mainClass)

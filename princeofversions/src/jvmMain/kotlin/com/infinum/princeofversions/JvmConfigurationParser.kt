@@ -18,25 +18,12 @@ public typealias PrinceOfVersionsConfig = BasePrinceOfVersionsConfig<String>
  */
 internal class JvmConfigurationParser(private val requirementsProcessor: RequirementsProcessor) : ConfigurationParser {
 
-    private companion object {
-        // JSON Keys
-        private const val JVM_KEY = "jvm"
-        private const val MINIMUM_VERSION = "required_version"
-        private const val LATEST_VERSION = "last_version_available"
-        private const val NOTIFICATION = "notify_last_version_frequency"
-        private const val META = "meta"
-        private const val REQUIREMENTS = "requirements"
-
-        // Notification Values
-        private const val NOTIFICATION_ALWAYS = "always"
-    }
-
     private data class ParsedUpdateData(
         val mandatoryVersion: String? = null,
         val optionalVersion: String? = null,
         val optionalNotificationType: NotificationType = NotificationType.ONCE,
         val updateMetadata: Map<String, String> = emptyMap(),
-        val requirements: Map<String, String> = emptyMap()
+        val requirements: Map<String, String> = emptyMap(),
     )
 
     override fun parse(value: String): PrinceOfVersionsConfig {
@@ -61,7 +48,7 @@ internal class JvmConfigurationParser(private val requirementsProcessor: Require
 
     private fun handleJvmJsonArray(
         jvm: JSONArray,
-        rootMeta: Map<String, String>
+        rootMeta: Map<String, String>,
     ): PrinceOfVersionsConfig {
         for (i in 0 until jvm.length()) {
             val update = jvm.getJSONObject(i)
@@ -73,7 +60,7 @@ internal class JvmConfigurationParser(private val requirementsProcessor: Require
                     optionalVersion = parsedData.optionalVersion,
                     optionalNotificationType = parsedData.optionalNotificationType,
                     requirements = parsedData.requirements,
-                    metadata = rootMeta + parsedData.updateMetadata
+                    metadata = rootMeta + parsedData.updateMetadata,
                 )
             }
         }
@@ -84,7 +71,7 @@ internal class JvmConfigurationParser(private val requirementsProcessor: Require
 
     private fun handleJvmJsonObject(
         jvm: JSONObject,
-        rootMeta: Map<String, String>
+        rootMeta: Map<String, String>,
     ): PrinceOfVersionsConfig {
         val parsedData = parseJsonUpdate(jvm)
             ?: throw RequirementsNotSatisfiedException(rootMeta)
@@ -94,7 +81,7 @@ internal class JvmConfigurationParser(private val requirementsProcessor: Require
             optionalVersion = parsedData.optionalVersion,
             optionalNotificationType = parsedData.optionalNotificationType,
             requirements = parsedData.requirements,
-            metadata = rootMeta + parsedData.updateMetadata
+            metadata = rootMeta + parsedData.updateMetadata,
         )
     }
 
@@ -107,7 +94,7 @@ internal class JvmConfigurationParser(private val requirementsProcessor: Require
             optionalVersion = parseString(update, LATEST_VERSION),
             optionalNotificationType = parseNotificationType(update),
             updateMetadata = update.optJSONObject(META)?.let { jsonObjectToMap(it) } ?: emptyMap(),
-            requirements = requirements
+            requirements = requirements,
         )
     }
 
@@ -137,7 +124,7 @@ internal class JvmConfigurationParser(private val requirementsProcessor: Require
                 NotificationType.ONCE
             }
             else -> throw IllegalArgumentException(
-                "In update configuration $NOTIFICATION should be String, but the actual value is $value"
+                "In update configuration $NOTIFICATION should be String, but the actual value is $value",
             )
         }
     }
@@ -161,5 +148,18 @@ internal class JvmConfigurationParser(private val requirementsProcessor: Require
             }
         }
         return map
+    }
+
+    private companion object {
+        // JSON Keys
+        private const val JVM_KEY = "jvm"
+        private const val MINIMUM_VERSION = "required_version"
+        private const val LATEST_VERSION = "last_version_available"
+        private const val NOTIFICATION = "notify_last_version_frequency"
+        private const val META = "meta"
+        private const val REQUIREMENTS = "requirements"
+
+        // Notification Values
+        private const val NOTIFICATION_ALWAYS = "always"
     }
 }
