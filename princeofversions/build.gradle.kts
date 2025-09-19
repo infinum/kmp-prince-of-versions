@@ -64,8 +64,12 @@ android {
     }
 }
 
+dependencies{
+    detektPlugins(rootProject.libs.detekt.formatting)
+}
+
 detekt {
-    buildUponDefaultConfig = true
+    config.setFrom(files("${rootProject.rootDir}/config/detekt.yml"))
     source.setFrom(
         files(
             "src/androidMain/kotlin",

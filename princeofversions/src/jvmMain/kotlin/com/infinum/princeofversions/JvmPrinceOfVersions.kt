@@ -15,6 +15,7 @@ public typealias PrinceOfVersions = PrinceOfVersionsBase<String>
  */
 public typealias UpdateResult = BaseUpdateResult<String>
 
+@Suppress("NotImplementedDeclaration")
 public fun PrinceOfVersions(): PrinceOfVersions = TODO("Not yet implemented")
 
 internal class PrinceOfVersionsImpl(
@@ -35,5 +36,5 @@ public suspend fun PrinceOfVersions.checkForUpdates(
         username = username,
         password = password,
         networkTimeout = networkTimeout,
-    )
+    ),
 )
