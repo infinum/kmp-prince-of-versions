@@ -1,17 +1,52 @@
 package com.infinum.princeofversions
 
+import java.io.IOException
+import java.net.HttpURLConnection
+import java.net.URI
+import kotlin.io.encoding.Base64
 import kotlin.time.Duration
 
-@Suppress("unused") // Remove once implementation is provided
+/**
+ * Represents a concrete loader that loads a resource from the network using a provided URL.
+ *
+ * @param url The URL representing the resource locator.
+ * @param username Optional username for Basic authentication.
+ * @param password Optional password for Basic authentication.
+ * @param networkTimeout The network timeout duration.
+ */
+
 internal class JvmDefaultLoader(
-    url: String,
-    username: String?,
-    password: String?,
+    private val url: String,
+    private val username: String?,
+    private val password: String?,
     networkTimeout: Duration,
 ) : Loader {
-    @Suppress("NotImplementedDeclaration")
+
+    /**
+     * Custom network timeout in milliseconds.
+     */
+    private val networkTimeoutMilliseconds = networkTimeout.inWholeMilliseconds.toInt()
+
+    @Throws(IOException::class)
     override suspend fun load(): String {
-        TODO("Not yet implemented")
+        val connection = URI(url).toURL().openConnection() as HttpURLConnection
+        try {
+            // Apply Basic Authentication if credentials are provided
+            if (username != null && password != null) {
+                val credentials = "$username:$password"
+                val basicAuth = "Basic ${
+                    Base64.encode(credentials.encodeToByteArray())
+                }"
+                connection.setRequestProperty("Authorization", basicAuth)
+            }
+
+            connection.connectTimeout = networkTimeoutMilliseconds
+            connection.readTimeout = networkTimeoutMilliseconds
+
+            return connection.inputStream.bufferedReader().use { it.readText() }
+        } finally {
+            connection.disconnect()
+        }
     }
 }
 
