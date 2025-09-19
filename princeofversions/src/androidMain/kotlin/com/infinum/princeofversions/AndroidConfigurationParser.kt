@@ -22,21 +22,6 @@ public typealias PrinceOfVersionsConfig = BasePrinceOfVersionsConfig<Long>
 internal class AndroidConfigurationParser(
     private val requirementsProcessor: RequirementsProcessor,
 ) : ConfigurationParser {
-
-    private companion object {
-        // JSON Keys
-        private const val ANDROID_FALLBACK_KEY = "android"
-        private const val ANDROID_KEY = "android2"
-        private const val MINIMUM_VERSION = "required_version"
-        private const val LATEST_VERSION = "last_version_available"
-        private const val NOTIFICATION = "notify_last_version_frequency"
-        private const val META = "meta"
-        private const val REQUIREMENTS = "requirements"
-
-        // Notification Values
-        private const val NOTIFICATION_ALWAYS = "always"
-    }
-
     /**
      * A private data class to hold the parsed values from a single update entry before
      * creating the final PrinceOfVersionsConfig.
@@ -46,7 +31,7 @@ internal class AndroidConfigurationParser(
         val optionalVersion: Long? = null,
         val optionalNotificationType: NotificationType = NotificationType.ONCE,
         val updateMetadata: Map<String, String> = emptyMap(),
-        val requirements: Map<String, String> = emptyMap()
+        val requirements: Map<String, String> = emptyMap(),
     )
 
     override fun parse(value: String): PrinceOfVersionsConfig {
@@ -72,7 +57,7 @@ internal class AndroidConfigurationParser(
 
     private fun handleAndroidJsonArray(
         android: JSONArray,
-        rootMeta: Map<String, String>
+        rootMeta: Map<String, String>,
     ): PrinceOfVersionsConfig {
         for (i in 0 until android.length()) {
             val update = android.getJSONObject(i)
@@ -85,7 +70,7 @@ internal class AndroidConfigurationParser(
                     optionalVersion = parsedData.optionalVersion,
                     optionalNotificationType = parsedData.optionalNotificationType,
                     requirements = parsedData.requirements,
-                    metadata = rootMeta + parsedData.updateMetadata
+                    metadata = rootMeta + parsedData.updateMetadata,
                 )
             }
         }
@@ -97,7 +82,7 @@ internal class AndroidConfigurationParser(
 
     private fun handleAndroidJsonObject(
         android: JSONObject,
-        rootMeta: Map<String, String>
+        rootMeta: Map<String, String>,
     ): PrinceOfVersionsConfig {
         val parsedData = parseJsonUpdate(android)
             ?: throw RequirementsNotSatisfiedException(rootMeta)
@@ -107,7 +92,7 @@ internal class AndroidConfigurationParser(
             optionalVersion = parsedData.optionalVersion,
             optionalNotificationType = parsedData.optionalNotificationType,
             requirements = parsedData.requirements,
-            metadata = rootMeta + parsedData.updateMetadata
+            metadata = rootMeta + parsedData.updateMetadata,
         )
     }
 
@@ -125,7 +110,7 @@ internal class AndroidConfigurationParser(
             optionalVersion = optionalVersion,
             optionalNotificationType = notificationType,
             updateMetadata = updateMetadata,
-            requirements = requirements
+            requirements = requirements,
         )
     }
 
@@ -145,7 +130,7 @@ internal class AndroidConfigurationParser(
             return json.getLong(key)
         } catch (e: JSONException) {
             throw IllegalArgumentException(
-                "In update configuration $key should be Long, but the actual value is ${json[key]}. $e"
+                "In update configuration $key should be Long, but the actual value is ${json[key]}. $e",
             )
         }
     }
@@ -162,7 +147,7 @@ internal class AndroidConfigurationParser(
                 NotificationType.ONCE
             }
             else -> throw IllegalArgumentException(
-                "In update configuration $key should be String, but the actual value is $value"
+                "In update configuration $key should be String, but the actual value is $value",
             )
         }
     }
@@ -186,5 +171,19 @@ internal class AndroidConfigurationParser(
             }
         }
         return map
+    }
+
+    private companion object {
+        // JSON Keys
+        private const val ANDROID_FALLBACK_KEY = "android"
+        private const val ANDROID_KEY = "android2"
+        private const val MINIMUM_VERSION = "required_version"
+        private const val LATEST_VERSION = "last_version_available"
+        private const val NOTIFICATION = "notify_last_version_frequency"
+        private const val META = "meta"
+        private const val REQUIREMENTS = "requirements"
+
+        // Notification Values
+        private const val NOTIFICATION_ALWAYS = "always"
     }
 }

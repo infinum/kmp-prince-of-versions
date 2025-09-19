@@ -24,14 +24,6 @@ private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(na
  * An implementation of [Storage] that uses Jetpack DataStore for persistence.
  */
 internal class AndroidStorage(private val context: Context) : Storage {
-
-    private companion object {
-        /**
-         * Defines the key for storing the last notified version code in DataStore.
-         */
-        val LAST_NOTIFIED_VERSION_KEY = longPreferencesKey("PrinceOfVersions_LastNotifiedUpdate")
-    }
-
     /**
      * Retrieves the last saved version from DataStore asynchronously.
      *
@@ -51,5 +43,12 @@ internal class AndroidStorage(private val context: Context) : Storage {
         context.dataStore.edit { settings ->
             settings[LAST_NOTIFIED_VERSION_KEY] = version
         }
+    }
+
+    private companion object {
+        /**
+         * Defines the key for storing the last notified version code in DataStore.
+         */
+        val LAST_NOTIFIED_VERSION_KEY = longPreferencesKey("PrinceOfVersions_LastNotifiedUpdate")
     }
 }
