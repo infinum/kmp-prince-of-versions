@@ -16,49 +16,8 @@ internal data class CheckResult<T> private constructor(
     val updateVersion: T,
     val notificationType: NotificationType?,
     val metadata: Map<String, String>,
-    val info: UpdateInfo<T>
+    val info: UpdateInfo<T>,
 ) {
-
-    companion object {
-
-        fun <T> mandatoryUpdate(
-            version: T,
-            metadata: Map<String, String>,
-            updateInfo: UpdateInfo<T>,
-        ): CheckResult<T> = CheckResult(
-            status = UpdateStatus.MANDATORY,
-            updateVersion = version,
-            notificationType = null,
-            metadata = metadata,
-            info = updateInfo
-        )
-
-        fun <T> optionalUpdate(
-            version: T,
-            notificationType: NotificationType,
-            metadata: Map<String, String>,
-            updateInfo: UpdateInfo<T>,
-        ): CheckResult<T> = CheckResult(
-            status = UpdateStatus.OPTIONAL,
-            updateVersion = version,
-            notificationType = notificationType,
-            metadata = metadata,
-            info = updateInfo
-        )
-
-        fun <T> noUpdate(
-            version: T,
-            metadata: Map<String, String>,
-            updateInfo: UpdateInfo<T>,
-        ): CheckResult<T> = CheckResult(
-            status = UpdateStatus.NO_UPDATE,
-            updateVersion = version,
-            notificationType = null,
-            metadata = metadata,
-            info = updateInfo
-        )
-    }
-
     /**
      * Checks if the result indicates that an update (either optional or mandatory) is available.
      * @return True if an update is available, false otherwise.
@@ -72,8 +31,11 @@ internal data class CheckResult<T> private constructor(
      * @throws UnsupportedOperationException if no update is available.
      */
     fun isOptional(): Boolean =
-        if (hasUpdate()) status == UpdateStatus.OPTIONAL
-        else throw UnsupportedOperationException("There is no update available.")
+        if (hasUpdate()) {
+            status == UpdateStatus.OPTIONAL
+        } else {
+            throw UnsupportedOperationException("There is no update available.")
+        }
 
     /**
      * Safely returns the notification type for an optional update.
@@ -81,6 +43,49 @@ internal data class CheckResult<T> private constructor(
      * @throws UnsupportedOperationException if the update is not optional.
      */
     fun requireNotificationType(): NotificationType? =
-        if (isOptional()) notificationType
-        else throw UnsupportedOperationException("There is no optional update available.")
+        if (isOptional()) {
+            notificationType
+        } else {
+            throw UnsupportedOperationException("There is no optional update available.")
+        }
+
+    companion object {
+
+        fun <T> mandatoryUpdate(
+            version: T,
+            metadata: Map<String, String>,
+            updateInfo: UpdateInfo<T>,
+        ): CheckResult<T> = CheckResult(
+            status = UpdateStatus.MANDATORY,
+            updateVersion = version,
+            notificationType = null,
+            metadata = metadata,
+            info = updateInfo,
+        )
+
+        fun <T> optionalUpdate(
+            version: T,
+            notificationType: NotificationType,
+            metadata: Map<String, String>,
+            updateInfo: UpdateInfo<T>,
+        ): CheckResult<T> = CheckResult(
+            status = UpdateStatus.OPTIONAL,
+            updateVersion = version,
+            notificationType = notificationType,
+            metadata = metadata,
+            info = updateInfo,
+        )
+
+        fun <T> noUpdate(
+            version: T,
+            metadata: Map<String, String>,
+            updateInfo: UpdateInfo<T>,
+        ): CheckResult<T> = CheckResult(
+            status = UpdateStatus.NO_UPDATE,
+            updateVersion = version,
+            notificationType = null,
+            metadata = metadata,
+            info = updateInfo,
+        )
+    }
 }

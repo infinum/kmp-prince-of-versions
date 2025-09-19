@@ -31,7 +31,7 @@ public data class PrinceOfVersionsComponents internal constructor(
         private var versionProvider: ApplicationVersionProvider? = null
         private var versionComparator: VersionComparator = AndroidDefaultVersionComparator()
         private var requirementCheckers: Map<String, RequirementChecker> = mapOf(
-            SystemVersionRequirementChecker.KEY to SystemVersionRequirementChecker()
+            SystemVersionRequirementChecker.KEY to SystemVersionRequirementChecker(),
         )
 
         /**
@@ -96,7 +96,7 @@ public data class PrinceOfVersionsComponents internal constructor(
          */
         public fun build(): PrinceOfVersionsComponents {
             val configurationParser = this.configurationParser ?: AndroidConfigurationParser(
-                RequirementsProcessor(this.requirementCheckers)
+                RequirementsProcessor(this.requirementCheckers),
             )
 
             val versionProvider = requireNotNull(this.versionProvider) {
@@ -124,9 +124,8 @@ public data class PrinceOfVersionsComponents internal constructor(
          * @return A configured [PrinceOfVersionsComponents] instance.
          */
         public fun build(context: Context): PrinceOfVersionsComponents {
-
             val configurationParser = this.configurationParser ?: AndroidConfigurationParser(
-                RequirementsProcessor(this.requirementCheckers)
+                RequirementsProcessor(this.requirementCheckers),
             )
             val storage = this.storage ?: AndroidStorage(context)
             val versionProvider = this.versionProvider ?: AndroidApplicationVersionProvider(context)
@@ -136,7 +135,7 @@ public data class PrinceOfVersionsComponents internal constructor(
                 versionProvider = versionProvider,
                 requirementCheckers = this.requirementCheckers,
                 configurationParser = configurationParser,
-                storage = storage
+                storage = storage,
             )
         }
     }

@@ -17,5 +17,5 @@ public enum class UpdateStatus {
     /**
      * Indicates that a new, mandatory update is available.
      */
-    MANDATORY
+    MANDATORY,
 }

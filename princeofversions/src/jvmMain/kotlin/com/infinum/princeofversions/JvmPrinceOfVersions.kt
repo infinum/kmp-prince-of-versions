@@ -116,5 +116,5 @@ public suspend fun PrinceOfVersions.checkForUpdatesFromUrl(
         username = username,
         password = password,
         networkTimeout = networkTimeout,
-    )
+    ),
 )

@@ -17,7 +17,7 @@ public typealias ApplicationVersionProvider = BaseApplicationVersionProvider<Str
  */
 internal class PropertiesApplicationVersionProvider(
     private val versionFilePath: String = "/version.properties",
-    private val versionKey: String = "application.version"
+    private val versionKey: String = "application.version",
 ) : ApplicationVersionProvider {
 
     private val applicationVersion: String by lazy {

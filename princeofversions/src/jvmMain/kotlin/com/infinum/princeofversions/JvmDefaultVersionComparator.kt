@@ -57,7 +57,7 @@ internal class JvmDefaultVersionComparator : VersionComparator {
             }
             part.toLongOrNull()
                 ?: throw IllegalArgumentException(
-                    "Version string contains non-numeric parts. Invalid version: '$version'"
+                    "Version part '$part' is not numeric in version: '$version'",
                 )
         }
     }

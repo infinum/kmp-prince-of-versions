@@ -3,7 +3,6 @@ package com.infinum.princeofversions
 import android.content.Context
 import com.infinum.princeofversions.PrinceOfVersionsBase.Companion.DEFAULT_NETWORK_TIMEOUT
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
 
 /**
  * Represents the main interface for using the library.
@@ -135,5 +134,5 @@ public suspend fun PrinceOfVersions.checkForUpdatesFromUrl(
         username = username,
         password = password,
         networkTimeout = networkTimeout,
-    )
+    ),
 )

@@ -12,5 +12,5 @@ public enum class NotificationType {
     /**
      * Describes that update should be notified every time
      */
-    ALWAYS
+    ALWAYS,
 }
