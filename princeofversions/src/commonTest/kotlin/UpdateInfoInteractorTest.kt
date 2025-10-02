@@ -51,7 +51,7 @@ class UpdateInfoInteractorTest {
             installedVersion = appConfig.version,
             notificationFrequency = config.optionalNotificationType,
         )
-        val expected = CheckResult.Companion.mandatoryUpdate(config.mandatoryVersion!!, config.metadata, expectedInfo)
+        val expected = CheckResult.mandatoryUpdate(config.mandatoryVersion!!, config.metadata, expectedInfo)
 
         assertEquals(expected, result)
     }
@@ -77,7 +77,7 @@ class UpdateInfoInteractorTest {
             installedVersion = appConfig.version,
             notificationFrequency = config.optionalNotificationType,
         )
-        val expected = CheckResult.Companion.noUpdate(appConfig.version, config.metadata, expectedInfo)
+        val expected = CheckResult.noUpdate(appConfig.version, config.metadata, expectedInfo)
 
         assertEquals(expected, result)
     }
@@ -103,7 +103,7 @@ class UpdateInfoInteractorTest {
             installedVersion = appConfig.version,
             notificationFrequency = config.optionalNotificationType,
         )
-        val expected = CheckResult.Companion.noUpdate(appConfig.version, config.metadata, expectedInfo)
+        val expected = CheckResult.noUpdate(appConfig.version, config.metadata, expectedInfo)
 
         assertEquals(expected, result)
     }
@@ -131,7 +131,7 @@ class UpdateInfoInteractorTest {
         )
         // When both mandatory and optional updates are available, and optional > mandatory,
         // we should notify about the optional version but as a mandatory update
-        val expected = CheckResult.Companion.mandatoryUpdate(config.optionalVersion!!, config.metadata, expectedInfo)
+        val expected = CheckResult.mandatoryUpdate(config.optionalVersion!!, config.metadata, expectedInfo)
 
         assertEquals(expected, result)
     }
@@ -157,7 +157,7 @@ class UpdateInfoInteractorTest {
             installedVersion = appConfig.version,
             notificationFrequency = config.optionalNotificationType,
         )
-        val expected = CheckResult.Companion.mandatoryUpdate(config.mandatoryVersion!!, config.metadata, expectedInfo)
+        val expected = CheckResult.mandatoryUpdate(config.mandatoryVersion!!, config.metadata, expectedInfo)
 
         assertEquals(expected, result)
     }
@@ -186,7 +186,7 @@ class UpdateInfoInteractorTest {
             installedVersion = appConfig.version,
             notificationFrequency = config.optionalNotificationType,
         )
-        val expected = CheckResult.Companion.optionalUpdate(
+        val expected = CheckResult.optionalUpdate(
             config.optionalVersion!!,
             NotificationType.ONCE,
             config.metadata,
@@ -217,7 +217,7 @@ class UpdateInfoInteractorTest {
             installedVersion = appConfig.version,
             notificationFrequency = config.optionalNotificationType,
         )
-        val expected = CheckResult.Companion.noUpdate(appConfig.version, config.metadata, expectedInfo)
+        val expected = CheckResult.noUpdate(appConfig.version, config.metadata, expectedInfo)
 
         assertEquals(expected, result)
     }
