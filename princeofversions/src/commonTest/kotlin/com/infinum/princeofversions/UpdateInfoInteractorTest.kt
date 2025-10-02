@@ -1,12 +1,9 @@
-import com.infinum.princeofversions.BasePrinceOfVersionsConfig
-import com.infinum.princeofversions.CheckResult
-import com.infinum.princeofversions.NotificationType
-import com.infinum.princeofversions.UpdateInfo
-import com.infinum.princeofversions.UpdateInfoInteractorImpl
-import mocks.MockApplicationConfiguration
-import mocks.MockConfigurationParser
-import mocks.MockLoader
-import mocks.MockVersionComparator
+package com.infinum.princeofversions
+
+import com.infinum.princeofversions.mocks.MockApplicationConfiguration
+import com.infinum.princeofversions.mocks.MockConfigurationParser
+import com.infinum.princeofversions.mocks.MockLoader
+import com.infinum.princeofversions.mocks.MockVersionComparator
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith

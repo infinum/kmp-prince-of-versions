@@ -1,4 +1,4 @@
-package mocks
+package com.infinum.princeofversions.mocks
 
 import com.infinum.princeofversions.Loader
 

@@ -1,7 +1,5 @@
-import com.infinum.princeofversions.CheckResult
-import com.infinum.princeofversions.NotificationType
-import com.infinum.princeofversions.UpdateInfo
-import com.infinum.princeofversions.UpdateStatus
+package com.infinum.princeofversions
+
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith

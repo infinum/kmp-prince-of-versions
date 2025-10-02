@@ -1,12 +1,7 @@
-import com.infinum.princeofversions.BaseUpdateResult
-import com.infinum.princeofversions.CheckForUpdatesUseCaseImpl
-import com.infinum.princeofversions.CheckResult
-import com.infinum.princeofversions.NotificationType
-import com.infinum.princeofversions.UpdateInfo
-import com.infinum.princeofversions.UpdateInfoInteractor
-import com.infinum.princeofversions.UpdateStatus
-import mocks.MockLoader
-import mocks.MockStorage
+package com.infinum.princeofversions
+
+import com.infinum.princeofversions.mocks.MockLoader
+import com.infinum.princeofversions.mocks.MockStorage
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -144,7 +139,7 @@ class CheckForUpdatesUseCaseTest {
     private class MockUpdateInfoInteractor<T> : UpdateInfoInteractor<T> {
         private var checkResult: CheckResult<T>? = null
 
-        override suspend fun invoke(loader: com.infinum.princeofversions.Loader): CheckResult<T> {
+        override suspend fun invoke(loader: Loader): CheckResult<T> {
             return checkResult ?: throw IllegalStateException("CheckResult not set")
         }
 

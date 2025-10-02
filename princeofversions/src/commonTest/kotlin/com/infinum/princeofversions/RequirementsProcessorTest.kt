@@ -1,5 +1,5 @@
-import com.infinum.princeofversions.RequirementChecker
-import com.infinum.princeofversions.RequirementsProcessor
+package com.infinum.princeofversions
+
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertFalse
