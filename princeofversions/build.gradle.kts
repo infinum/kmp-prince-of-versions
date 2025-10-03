@@ -43,6 +43,10 @@ kotlin {
             implementation(libs.kotlin.test)
             implementation(libs.kotlinx.coroutines.test)
         }
+        androidUnitTest.dependencies {
+            implementation(libs.mockwebserver)
+            implementation(libs.json)
+        }
     }
 
     targets.configureEach {
@@ -66,9 +70,15 @@ android {
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()
     }
+
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
 }
 
-dependencies{
+dependencies {
     detektPlugins(rootProject.libs.detekt.formatting)
 }
 
