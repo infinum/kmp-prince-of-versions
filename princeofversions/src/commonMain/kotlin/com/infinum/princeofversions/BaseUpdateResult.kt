@@ -17,5 +17,5 @@ package com.infinum.princeofversions
 public data class BaseUpdateResult<T>(
     public val version: T,
     public val status: UpdateStatus,
-    public val metadata: Map<String, String> = emptyMap(),
+    public val metadata: Map<String, String?> = emptyMap(),
 )
