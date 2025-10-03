@@ -155,7 +155,7 @@ internal class AndroidConfigurationParser(
     private fun parseRequirements(requirementsJson: JSONObject): Map<String, String?> {
         val requirements = mutableMapOf<String, String?>()
         for (key in requirementsJson.keys()) {
-                requirements[key] = if (requirementsJson.isNull(key)) null else requirementsJson[key].toString()
+            requirements[key] = if (requirementsJson.isNull(key)) null else requirementsJson[key].toString()
         }
         return requirements
     }
