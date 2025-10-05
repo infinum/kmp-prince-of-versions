@@ -29,12 +29,12 @@ kotlin {
     jvm()
 
     sourceSets {
-        jvmMain.dependencies {
-            implementation(libs.json)
-        }
         androidMain.dependencies {
             implementation(libs.androidx.datastore.preferences)
             implementation(libs.androidx.core.ktx)
+        }
+        jvmMain.dependencies {
+            implementation(libs.json)
         }
         commonMain.dependencies {
             implementation(libs.kotlinx.coroutines.core)
