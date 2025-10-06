@@ -6,9 +6,9 @@
       "notification_type": "ALWAYS"
     }
   },
-  "android": {
+  "jvm": {
     "required_version": null,
-    "last_version_available": 245,
+    "last_version_available": "2.4.5",
     "notify_last_version_frequency": "ONCE"
   }
 }

@@ -6,12 +6,8 @@
       "notification_type": "ALWAYS"
     }
   },
-  "android": {
-    "required_version": 123,
-    "last_version_available": 245
-  },
-  "android2": {
-    "required_version": 123,
-    "last_version_available": 245
+  "jvm": {
+    "required_version": "1.2.3",
+    "last_version_available": "2.4.5"
   }
 }

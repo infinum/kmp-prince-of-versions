@@ -5,8 +5,8 @@
       "notification_type": "ALWAYS"
     }
   },
-  "android": {
-    "last_version_available": 245,
+  "jvm": {
+    "last_version_available": "2.4.5",
     "notify_last_version_frequency": "ONCE"
   }
 }
