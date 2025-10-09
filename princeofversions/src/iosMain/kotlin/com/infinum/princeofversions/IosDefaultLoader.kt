@@ -45,32 +45,67 @@ internal class IosDefaultLoader(
 
         val session = NSURLSession.sessionWithConfiguration(config)
         val task = session.dataTaskWithRequest(request) { data, response, error ->
-            when {
-                error != null -> {
-                    cont.resumeWithException(IoException(error.localizedDescription ?: "Network error"))
+            try {
+                when {
+                    error != null -> {
+                        cont.resumeWithException(IoException(error.localizedDescription ?: "Network error"))
+                    }
+                    response !is NSHTTPURLResponse -> {
+                        cont.resumeWithException(IoException("No HTTP response"))
+                    }
+                    response.statusCode.toInt() !in 200..299 -> {
+                        val msg = NSHTTPURLResponse.localizedStringForStatusCode(response.statusCode)
+                        cont.resumeWithException(IoException("HTTP ${response.statusCode}: $msg"))
+                    }
+                    else -> {
+                        val body = when {
+                            data == null || data.length.toLong() == 0L -> ""
+                            else -> decodeBody(data, response as? NSHTTPURLResponse)
+                        }
+                        cont.resume(body)
+                    }
                 }
-                response !is NSHTTPURLResponse -> {
-                    cont.resumeWithException(IoException("No HTTP response"))
-                }
-                response.statusCode.toInt() !in 200..299 -> {
-                    val msg = NSHTTPURLResponse.localizedStringForStatusCode(response.statusCode)
-                    cont.resumeWithException(IoException("HTTP ${response.statusCode}: $msg"))
-                }
-                else -> {
-                    val body = data?.let { it.toUtf8String() } ?: ""
-                    cont.resume(body)
-                }
+            } finally {
+                // ✅ Tidy up the per-request session
+                session.finishTasksAndInvalidate()
             }
         }
 
-        cont.invokeOnCancellation { task.cancel() }
+        cont.invokeOnCancellation {
+            // ✅ Cancel the task and tear down the session immediately
+            task.cancel()
+            session.invalidateAndCancel()
+        }
+
         task.resume()
+
     }
 }
 
 /** NSData -> UTF-8 string (empty if decoding fails). */
-private fun NSData.toUtf8String(): String =
-    NSString.create(this, NSUTF8StringEncoding)?.toString() ?: ""
+//private fun NSData.toUtf8String(): String =
+//    NSString.create(this, NSUTF8StringEncoding)?.toString() ?: ""
+
+private fun decodeBody(
+    data: NSData,
+    response: NSHTTPURLResponse?
+): String {
+    // 1) Try UTF-8
+    NSString.create(data, NSUTF8StringEncoding)?.toString()?.let { return it }
+
+    // 2) Fallback: ISO-8859-1
+    NSString.create(data, NSISOLatin1StringEncoding)?.toString()?.let { return it }
+
+    // 3) Log and fail clearly
+    val headersDesc = response?.allHeaderFields?.toString() ?: "<no headers>"
+    NSLog(
+        "PrinceOfVersions: failed to decode body. status=%ld, bytes=%ld, headers=%@",
+        response?.statusCode ?: -1L,
+        data.length.toLong(),
+        headersDesc
+    )
+    throw IoException("Failed to decode HTTP body (unsupported encoding).")
+}
 
 /** iOS actual for factory */
 internal actual fun provideDefaultLoader(
