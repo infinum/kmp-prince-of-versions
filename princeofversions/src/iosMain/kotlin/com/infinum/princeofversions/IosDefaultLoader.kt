@@ -30,7 +30,6 @@ internal class IosDefaultLoader(
             setHTTPMethod("GET")
             setTimeoutInterval(timeoutSeconds)
 
-            // Basic auth header, if provided
             if (username != null && password != null) {
                 val creds = "$username:$password"
                 val auth = "Basic " + Base64.encode(creds.encodeToByteArray())
@@ -66,13 +65,11 @@ internal class IosDefaultLoader(
                     }
                 }
             } finally {
-                // ✅ Tidy up the per-request session
                 session.finishTasksAndInvalidate()
             }
         }
 
         cont.invokeOnCancellation {
-            // ✅ Cancel the task and tear down the session immediately
             task.cancel()
             session.invalidateAndCancel()
         }
@@ -82,21 +79,14 @@ internal class IosDefaultLoader(
     }
 }
 
-/** NSData -> UTF-8 string (empty if decoding fails). */
-//private fun NSData.toUtf8String(): String =
-//    NSString.create(this, NSUTF8StringEncoding)?.toString() ?: ""
-
 private fun decodeBody(
     data: NSData,
     response: NSHTTPURLResponse?
 ): String {
-    // 1) Try UTF-8
     NSString.create(data, NSUTF8StringEncoding)?.toString()?.let { return it }
 
-    // 2) Fallback: ISO-8859-1
     NSString.create(data, NSISOLatin1StringEncoding)?.toString()?.let { return it }
 
-    // 3) Log and fail clearly
     val headersDesc = response?.allHeaderFields?.toString() ?: "<no headers>"
     NSLog(
         "PrinceOfVersions: failed to decode body. status=%ld, bytes=%ld, headers=%@",
@@ -107,7 +97,6 @@ private fun decodeBody(
     throw IoException("Failed to decode HTTP body (unsupported encoding).")
 }
 
-/** iOS actual for factory */
 internal actual fun provideDefaultLoader(
     url: String,
     username: String?,

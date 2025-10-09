@@ -13,12 +13,11 @@ internal class SystemVersionRequirementChecker : RequirementChecker {
     override fun checkRequirements(value: String?): Boolean {
         val required = value?.let(::parse) ?: return false
         val current = currentOs()
-        return compareTriples(current, required) >= 0 // current >= required
+        return compareTriples(current, required) >= 0
     }
 
     @OptIn(ExperimentalForeignApi::class)
     private fun currentOs(): Triple<Int, Int, Int> {
-        // NSProcessInfo.processInfo.operatingSystemVersion is a C struct; use useContents to read fields.
         val os = NSProcessInfo.processInfo.operatingSystemVersion
         return os.useContents {
             Triple(majorVersion.toInt(), minorVersion.toInt(), patchVersion.toInt())
