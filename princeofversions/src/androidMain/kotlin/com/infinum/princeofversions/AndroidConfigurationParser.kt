@@ -30,8 +30,8 @@ internal class AndroidConfigurationParser(
         val mandatoryVersion: Long? = null,
         val optionalVersion: Long? = null,
         val optionalNotificationType: NotificationType = NotificationType.ONCE,
-        val updateMetadata: Map<String, String> = emptyMap(),
-        val requirements: Map<String, String> = emptyMap(),
+        val updateMetadata: Map<String, String?> = emptyMap(),
+        val requirements: Map<String, String?> = emptyMap(),
     )
 
     override fun parse(value: String): PrinceOfVersionsConfig {
@@ -57,7 +57,7 @@ internal class AndroidConfigurationParser(
 
     private fun handleAndroidJsonArray(
         android: JSONArray,
-        rootMeta: Map<String, String>,
+        rootMeta: Map<String, String?>,
     ): PrinceOfVersionsConfig {
         for (i in 0 until android.length()) {
             val update = android.getJSONObject(i)
@@ -82,7 +82,7 @@ internal class AndroidConfigurationParser(
 
     private fun handleAndroidJsonObject(
         android: JSONObject,
-        rootMeta: Map<String, String>,
+        rootMeta: Map<String, String?>,
     ): PrinceOfVersionsConfig {
         val parsedData = parseJsonUpdate(android)
             ?: throw RequirementsNotSatisfiedException(rootMeta)
@@ -114,7 +114,7 @@ internal class AndroidConfigurationParser(
         )
     }
 
-    private fun parseAndCheckRequirements(update: JSONObject): Map<String, String>? {
+    private fun parseAndCheckRequirements(update: JSONObject): Map<String, String?>? {
         val requirements = update.optJSONObject(REQUIREMENTS)?.let { parseRequirements(it) } ?: emptyMap()
         if (requirements.isNotEmpty() && !requirementsProcessor.areRequirementsSatisfied(requirements)) {
             return null
@@ -152,23 +152,19 @@ internal class AndroidConfigurationParser(
         }
     }
 
-    private fun parseRequirements(requirementsJson: JSONObject): Map<String, String> {
-        val requirements = mutableMapOf<String, String>()
+    private fun parseRequirements(requirementsJson: JSONObject): Map<String, String?> {
+        val requirements = mutableMapOf<String, String?>()
         for (key in requirementsJson.keys()) {
-            if (!requirementsJson.isNull(key)) {
-                requirements[key] = requirementsJson[key].toString()
-            }
+            requirements[key] = if (requirementsJson.isNull(key)) null else requirementsJson[key].toString()
         }
         return requirements
     }
 
-    internal fun jsonObjectToMap(jsonObject: JSONObject?): Map<String, String> {
-        val map = mutableMapOf<String, String>()
+    internal fun jsonObjectToMap(jsonObject: JSONObject?): Map<String, String?> {
+        val map = mutableMapOf<String, String?>()
         if (jsonObject == null) return map
         for (key in jsonObject.keys()) {
-            if (!jsonObject.isNull(key)) {
-                map[key] = jsonObject[key].toString()
-            }
+            map[key] = if (jsonObject.isNull(key)) null else jsonObject[key].toString()
         }
         return map
     }
