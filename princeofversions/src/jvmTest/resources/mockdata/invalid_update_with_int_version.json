@@ -6,7 +6,7 @@
   },
   "jvm": {
     "required_version": "1.2.3",
-    "last_version_available": "245abc",
+    "last_version_available": 245,
     "notify_last_version_frequency": "ONCE"
   }
 }

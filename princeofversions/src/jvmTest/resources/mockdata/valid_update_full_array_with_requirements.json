@@ -11,14 +11,14 @@
     "last_version_available": "2.4.5",
     "notify_last_version_frequency": "ONCE",
     "requirements": {
-      "required_os_version": 14
+      "required_jvm_version": 8
     }
   },{
     "required_version": "1.2.3",
     "last_version_available": "2.4.6",
     "notify_last_version_frequency": "ONCE",
     "requirements": {
-      "required_os_version": 13
+      "required_jvm_version": 11
     }
   }]
 }
