@@ -10,8 +10,8 @@ import platform.Foundation.NSJSONSerialization
 import platform.Foundation.NSNull
 import platform.Foundation.NSString
 import platform.Foundation.NSUTF8StringEncoding
-import platform.Foundation.dataUsingEncoding
 import platform.Foundation.create
+import platform.Foundation.dataUsingEncoding
 
 // String versions on iOS (same as JVM)
 public typealias ConfigurationParser = BaseConfigurationParser<String>
@@ -36,7 +36,7 @@ internal class IosConfigurationParser(
 
     override fun parse(value: String): PrinceOfVersionsConfig {
         val data = value.toNSDataUtf8() ?: error("Invalid UTF-8 input")
-        val rootAny = NSJSONSerialization.JSONObjectWithData(data, /* options */ 0uL, /* error */ null)
+        val rootAny = NSJSONSerialization.JSONObjectWithData(data, 0uL, null)
             ?: error("Invalid JSON")
         val root = rootAny as? NSDictionary ?: error("Root JSON must be an object")
         return parseRoot(root)
@@ -54,8 +54,11 @@ internal class IosConfigurationParser(
         val iosData = data.opt(iosKey)
         return when (iosData) {
             is NSArray -> handleIos2Array(iosData, rootMeta)
-            is NSDictionary -> if (iosKey == IOS_KEY) handleNestedIosObject(iosData, rootMeta)
-            else handleIos2Object(iosData, rootMeta)
+            is NSDictionary -> if (iosKey == IOS_KEY) {
+                handleNestedIosObject(iosData, rootMeta)
+            } else {
+                handleIos2Object(iosData, rootMeta)
+            }
             else -> throw IllegalArgumentException("Unsupported type for '$iosKey' key.")
         }
     }
@@ -163,21 +166,24 @@ internal class IosConfigurationParser(
         return v.toString()
     }
 
-    private fun NSDictionary.toStringMap(): Map<String, String> = buildMap {
-        val enumerator = this@toStringMap.keyEnumerator()
+    private fun NSDictionary.toStringMap(): Map<String, String> {
+        val dict = this
+        val out = mutableMapOf<String, String>()
+        val enumerator = dict.keyEnumerator()
         while (true) {
             val kAny = enumerator.nextObject() ?: break
-            val v = this@toStringMap.objectForKey(kAny)
-            if (v != null && v !is NSNull) put(kAny.toString(), v.toString())
+            val v = dict.objectForKey(kAny)
+            if (v != null && v !is NSNull) out[kAny.toString()] = v.toString()
         }
+        return out
     }
 
     private fun String.toNSDataUtf8() =
         NSString.create(string = this).dataUsingEncoding(NSUTF8StringEncoding)
 
     private companion object {
-        private const val IOS2_KEY = "ios2"       // flat
-        private const val IOS_KEY = "ios"         // nested
+        private const val IOS2_KEY = "ios2" // flat
+        private const val IOS_KEY = "ios" // nested
         private const val MINIMUM_VERSION = "required_version"
         private const val LATEST_VERSION = "last_version_available"
         private const val NOTIFY_FLAT = "notify_last_version_frequency"

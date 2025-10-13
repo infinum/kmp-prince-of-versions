@@ -1,13 +1,27 @@
 package com.infinum.princeofversions
 
-import kotlinx.cinterop.BetaInteropApi
-import kotlin.time.Duration
-import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
-import platform.Foundation.*
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
+import kotlin.time.Duration
+import kotlinx.cinterop.BetaInteropApi
+import kotlinx.coroutines.suspendCancellableCoroutine
+import platform.Foundation.NSData
+import platform.Foundation.NSError
+import platform.Foundation.NSHTTPURLResponse
+import platform.Foundation.NSMutableURLRequest
+import platform.Foundation.NSString
+import platform.Foundation.NSURL
+import platform.Foundation.NSURLResponse
+import platform.Foundation.NSURLSession
+import platform.Foundation.NSURLSessionConfiguration
+import platform.Foundation.NSUTF8StringEncoding
+import platform.Foundation.create
+import platform.Foundation.dataTaskWithRequest
+import platform.Foundation.setHTTPMethod
+import platform.Foundation.setValue
 
 internal class IosDefaultLoader(
     private val url: String,
@@ -23,80 +37,93 @@ internal class IosDefaultLoader(
     override suspend fun load(): String = suspendCancellableCoroutine { cont ->
         val nsUrl = NSURL.URLWithString(url)
         if (nsUrl == null) {
-            cont.resumeWithException(IllegalArgumentException(message = "Invalid URL: $url"))
-            return@suspendCancellableCoroutine
-        }
-
-        val request = platform.Foundation.NSMutableURLRequest.requestWithURL(nsUrl).apply {
-            setHTTPMethod("GET")
-            setTimeoutInterval(timeoutSeconds)
-
-            if (username != null && password != null) {
-                val creds = "$username:$password"
-                val auth = "Basic " + Base64.encode(creds.encodeToByteArray())
-                setValue(auth, forHTTPHeaderField = "Authorization")
-            }
-        }
-
-        val config = NSURLSessionConfiguration.defaultSessionConfiguration().apply {
-            timeoutIntervalForRequest = timeoutSeconds
-            timeoutIntervalForResource = timeoutSeconds
-        }
-
-        val session = NSURLSession.sessionWithConfiguration(config)
-        val task = session.dataTaskWithRequest(request) { data, response, error ->
-            try {
-                when {
-                    error != null -> {
-                        cont.resumeWithException(IllegalArgumentException(error.localizedDescription ?: "Network error"))
-                    }
-                    response !is NSHTTPURLResponse -> {
-                        cont.resumeWithException(IllegalArgumentException("No HTTP response"))
-                    }
-                    response.statusCode.toInt() !in 200..299 -> {
-                        val msg = NSHTTPURLResponse.localizedStringForStatusCode(response.statusCode)
-                        cont.resumeWithException(IllegalArgumentException("HTTP ${response.statusCode}: $msg"))
-                    }
-                    else -> {
-                        val body = when {
-                            data == null || data.length.toLong() == 0L -> ""
-                            else -> decodeBody(data, response as? NSHTTPURLResponse)
-                        }
-                        cont.resume(body)
-                    }
+            cont.resumeWithException(IoException("Invalid URL: $url"))
+        } else {
+            val request = NSMutableURLRequest.requestWithURL(nsUrl).apply {
+                setHTTPMethod("GET")
+                setTimeoutInterval(timeoutSeconds)
+                if (username != null && password != null) {
+                    val creds = "$username:$password"
+                    val auth = "Basic " + Base64.encode(creds.encodeToByteArray())
+                    setValue(auth, forHTTPHeaderField = "Authorization")
                 }
-            } finally {
-                session.finishTasksAndInvalidate()
             }
+
+            val config = NSURLSessionConfiguration.defaultSessionConfiguration().apply {
+                timeoutIntervalForRequest = timeoutSeconds
+                timeoutIntervalForResource = timeoutSeconds
+            }
+
+            val session = NSURLSession.sessionWithConfiguration(config)
+
+            val task = session.dataTaskWithRequest(request) { data, response, error ->
+                handleTaskCallback(data, response, error, cont, session)
+            }
+
+            cont.invokeOnCancellation {
+                task.cancel()
+                session.invalidateAndCancel()
+            }
+
+            task.resume()
         }
-
-        cont.invokeOnCancellation {
-            task.cancel()
-            session.invalidateAndCancel()
-        }
-
-        task.resume()
-
     }
-}
 
-@BetaInteropApi
-private fun decodeBody(
-    data: NSData,
-    response: NSHTTPURLResponse?
-): String {
-    NSString.create(data, NSUTF8StringEncoding)?.toString()?.let { return it }
+    private fun handleTaskCallback(
+        data: NSData?,
+        response: NSURLResponse?,
+        error: NSError?,
+        cont: Continuation<String>,
+        session: NSURLSession,
+    ) {
+        fun fail(msg: String) {
+            cont.resumeWithException(IoException(msg))
+            session.finishTasksAndInvalidate()
+        }
+        fun succeed(body: String) {
+            cont.resume(body)
+            session.finishTasksAndInvalidate()
+        }
 
-    NSString.create(data, NSISOLatin1StringEncoding)?.toString()?.let { return it }
+        val failure = buildFailureMessage(error, response)
+        if (failure != null) {
+            fail(failure)
+        } else {
+            succeed(decodeBody(data))
+        }
+    }
 
-    val headersDesc = response?.allHeaderFields?.toString() ?: "<no headers>"
-    NSLog(
-        "PrinceOfVersions: failed to decode body. status=%ld, bytes=%ld, headers=%@",
-        response?.statusCode ?: -1L,
-        data.length.toLong(),
-        headersDesc
-    )
-    throw IllegalArgumentException("Failed to decode HTTP body (unsupported encoding).")
+    /** Returns a human-readable failure message or null if the response is OK (2xx). */
+    private fun buildFailureMessage(
+        error: NSError?,
+        response: NSURLResponse?,
+    ): String? {
+        if (error != null) return error.localizedDescription
+
+        val http = response as? NSHTTPURLResponse ?: return "No HTTP response"
+        val code = http.statusCode.toInt()
+        if (code !in STATUS_CODE_200..STATUS_CODE_299) {
+            val msg = NSHTTPURLResponse.localizedStringForStatusCode(http.statusCode)
+            return "HTTP $code: $msg"
+        }
+        return null
+    }
+
+    /** UTF-8 decode, empty string if no body. */
+    @OptIn(BetaInteropApi::class)
+    private fun decodeBody(
+        data: NSData?,
+    ): String =
+        if (data == null || data.length.toLong() == 0L) {
+            ""
+        } else {
+            NSString.create(data, NSUTF8StringEncoding)?.toString().orEmpty()
+        }
+
+    companion object {
+        private const val STATUS_CODE_200 = 200
+        private const val STATUS_CODE_299 = 299
+    }
 }
 
 internal actual fun provideDefaultLoader(
