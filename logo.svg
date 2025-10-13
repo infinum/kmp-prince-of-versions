@@ -1,0 +1,13 @@
+<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Shield Background -->
+    <path d="M10 15C10 10 10 7.5 12.5 5C15 2.5 17.5 2.5 20 2.5H80C82.5 2.5 85 2.5 87.5 5C90 7.5 90 10 90 15V55C90 75 90 85 75 92.5L50 97.5L25 92.5C10 85 10 75 10 55V15Z" fill="#6366f1"/>
+
+    <!-- Crown (Moved up) -->
+    <path d="M35 25 L30 40 L50 32 L70 40 L65 25 H35Z" fill="#f59e0b"/>
+    <circle cx="32.5" cy="22" r="4" fill="#f59e0b"/>
+    <circle cx="50" cy="20" r="4" fill="#f59e0b"/>
+    <circle cx="67.5" cy="22" r="4" fill="#f59e0b"/>
+
+    <!-- Download Arrow (Adjusted for space) -->
+    <path d="M50 50 V 80 M50 80 L40 70 M50 80 L60 70" stroke="white" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
