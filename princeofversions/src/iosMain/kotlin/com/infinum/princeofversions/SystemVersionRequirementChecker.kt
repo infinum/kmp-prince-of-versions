@@ -32,11 +32,8 @@ internal class SystemVersionRequirementChecker : RequirementChecker {
         return Triple(major, minor, patch)
     }
 
-    private fun compareTriples(a: Triple<Int, Int, Int>, b: Triple<Int, Int, Int>): Int {
-        if (a.first != b.first) return a.first - b.first
-        if (a.second != b.second) return a.second - b.second
-        return a.third - b.third
-    }
+    private fun compareTriples(a: Triple<Int, Int, Int>, b: Triple<Int, Int, Int>): Int =
+        compareValuesBy(a, b, { it.first }, { it.second }, { it.third })
 
     companion object {
         const val KEY = "required_os_version"

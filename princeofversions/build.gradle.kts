@@ -42,9 +42,6 @@ kotlin {
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
-        iosMain.dependencies {
-            implementation(libs.kotlinx.serialization.json)
-        }
     }
 
     targets.configureEach {

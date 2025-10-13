@@ -1,5 +1,6 @@
 package com.infinum.princeofversions
 
+import kotlinx.cinterop.BetaInteropApi
 import kotlin.time.Duration
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
@@ -16,13 +17,13 @@ internal class IosDefaultLoader(
 ) : Loader {
 
     private val timeoutSeconds: Double =
-        (networkTimeout.inWholeMilliseconds.toDouble() / 1000.0).coerceAtLeast(0.0)
+        networkTimeout.inWholeSeconds.toDouble()
 
     @OptIn(ExperimentalEncodingApi::class)
     override suspend fun load(): String = suspendCancellableCoroutine { cont ->
         val nsUrl = NSURL.URLWithString(url)
         if (nsUrl == null) {
-            cont.resumeWithException(IoException("Invalid URL: $url"))
+            cont.resumeWithException(IllegalArgumentException(message = "Invalid URL: $url"))
             return@suspendCancellableCoroutine
         }
 
@@ -47,14 +48,14 @@ internal class IosDefaultLoader(
             try {
                 when {
                     error != null -> {
-                        cont.resumeWithException(IoException(error.localizedDescription ?: "Network error"))
+                        cont.resumeWithException(IllegalArgumentException(error.localizedDescription ?: "Network error"))
                     }
                     response !is NSHTTPURLResponse -> {
-                        cont.resumeWithException(IoException("No HTTP response"))
+                        cont.resumeWithException(IllegalArgumentException("No HTTP response"))
                     }
                     response.statusCode.toInt() !in 200..299 -> {
                         val msg = NSHTTPURLResponse.localizedStringForStatusCode(response.statusCode)
-                        cont.resumeWithException(IoException("HTTP ${response.statusCode}: $msg"))
+                        cont.resumeWithException(IllegalArgumentException("HTTP ${response.statusCode}: $msg"))
                     }
                     else -> {
                         val body = when {
@@ -79,6 +80,7 @@ internal class IosDefaultLoader(
     }
 }
 
+@BetaInteropApi
 private fun decodeBody(
     data: NSData,
     response: NSHTTPURLResponse?
@@ -94,7 +96,7 @@ private fun decodeBody(
         data.length.toLong(),
         headersDesc
     )
-    throw IoException("Failed to decode HTTP body (unsupported encoding).")
+    throw IllegalArgumentException("Failed to decode HTTP body (unsupported encoding).")
 }
 
 internal actual fun provideDefaultLoader(

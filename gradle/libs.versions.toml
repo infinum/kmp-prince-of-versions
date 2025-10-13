@@ -20,7 +20,6 @@ kotlin = "2.2.0"
 kotlinx-coroutines = "1.10.2"
 prince-of-versions = "1.0.0"
 core = "1.17.0"
-kotlinx-serialization = "1.6.3"
 
 [libraries]
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
@@ -40,7 +39,6 @@ kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-c
 kotlinx-coroutinesSwing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
 androidx-core = { group = "androidx.core", name = "core", version.ref = "core" }
 json = { module = "org.json:json", version.ref = "json"}
-kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization"}
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
