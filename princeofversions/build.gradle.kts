@@ -47,6 +47,10 @@ kotlin {
             implementation(libs.mockwebserver)
             implementation(libs.json)
         }
+        jvmTest.dependencies {
+            implementation(libs.mockwebserver)
+            implementation(libs.json)
+        }
     }
 
     targets.configureEach {
