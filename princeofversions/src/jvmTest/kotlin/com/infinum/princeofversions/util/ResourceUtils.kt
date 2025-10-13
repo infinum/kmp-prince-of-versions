@@ -4,7 +4,7 @@ import java.io.InputStream
 
 /**
  * Utility methods for accessing resources bundled with test APK.
- * Resources should be placed under /resources folder in androidUnitTest flavour.
+ * Resources should be placed under /resources folder in the jvmTest source set..
  */
 object ResourceUtils {
 
