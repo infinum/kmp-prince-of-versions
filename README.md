@@ -211,8 +211,11 @@ val customPrinceOfVersions = PrinceOfVersions(context) {
     // Custom configuration parser
     configurationParser = MyCustomConfigurationParser()
     
-    // Custom requirement checker
-    withRequirementCheckers(true) // Keep default requirement checking
+    // Custom requirement checkers
+    withRequirementCheckers(
+        mapOf("custom_key" to MyCustomRequirementChecker()),
+        keepDefaultCheckers = true
+    )
     
     // Custom storage implementation
     storage = MyCustomStorage()
