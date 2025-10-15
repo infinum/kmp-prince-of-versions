@@ -33,8 +33,6 @@ Prince of Versions KMP is a Kotlin Multiplatform library that handles app update
 
 ## Table of contents
 
-- [Description](#description)
-- [Table of contents](#table-of-contents)
 - [Getting started](#getting-started)
   - [Installation](#installation)
     - [Kotlin Multiplatform](#kotlin-multiplatform)
