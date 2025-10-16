@@ -33,6 +33,8 @@ Prince of Versions KMP is a Kotlin Multiplatform library that handles app update
 
 ## Table of contents
 
+- [Description](#description)
+- [Table of contents](#table-of-contents)
 - [Getting started](#getting-started)
   - [Installation](#installation)
     - [Kotlin Multiplatform](#kotlin-multiplatform)
@@ -81,6 +83,24 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation("com.infinum.princeofversions:princeofversions:1.0.0")
+        }
+    }
+}
+```
+
+or if you want to use the library in only a subset of platform modules:
+
+```kotlin
+kotlin {
+    sourceSets {
+        androidMain.dependencies {
+            implementation("com.infinum.princeofversions:princeofversions:1.0.0")
+        }
+        jvmMain.dependencies {
+            implementation("com.infinum.princeofversions:princeofversions:1.0.0")
+        }
+        iosMain.dependencies {
+            // e.g. iOS uses a different solution for detecting updates
         }
     }
 }
