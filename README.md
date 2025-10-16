@@ -19,7 +19,7 @@
     Add project badges (if needed) to this part of the file.
 -->
 
-[![Quality checks](https://github.com/infinum/kmp-prince-of-versions/actions/workflows/quality_checks.yml/badge.svg)](https://github.com/infinum/kmp-prince-of-versions/actions/workflows/quality_checks.yml)
+[![Quality checks](https://github.com/infinum/kmp-prince-of-versions/actions/workflows/quality_checks.yml/badge.svg?branch=main)](https://github.com/infinum/kmp-prince-of-versions/actions/workflows/quality_checks.yml)
 
 ## Description
 
