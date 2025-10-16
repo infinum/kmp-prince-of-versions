@@ -23,7 +23,7 @@
 
 ## Description
 
-Prince of Versions KMP is a Kotlin Multiplatform library that handles app update checks by fetching remote configurations. It returns update results with version information, status, and metadata to help you implement update flows across Android, JVM and iOS platforms. The library offers extensive customization options for update info fetching to fit your specific needs.
+Prince of Versions KMP is a Kotlin Multiplatform library that handles app update checks by fetching update configurations. It returns update results with version information, status, and metadata to help you implement update flows across Android, JVM and iOS platforms. The library offers extensive customization options for update info fetching to fit your specific needs.
 
 <!--
     Provide a detailed explanation of the project, its purpose, and its goals.
