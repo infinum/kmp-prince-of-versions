@@ -27,7 +27,7 @@ public data class PrinceOfVersionsComponents internal constructor(
         }
 
         /**
-         * @param checkers test
+         * @param checkers A map of requirement checkers, where each key is a string identifier for a requirement.
          * @param keepDefaultCheckers If true, merges with defaults (OS version). If false, replaces them.
          */
         public fun withRequirementCheckers(

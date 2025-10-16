@@ -170,10 +170,11 @@ internal class IosConfigurationParser(
         val dict = this
         val out = mutableMapOf<String, String>()
         val enumerator = dict.keyEnumerator()
-        while (true) {
-            val kAny = enumerator.nextObject() ?: break
-            val v = dict.objectForKey(kAny)
-            if (v != null && v !is NSNull) out[kAny.toString()] = v.toString()
+        var key = enumerator.nextObject()
+        while (key != null) {
+            val value = dict.objectForKey(key)
+            if (value != null && value !is NSNull) out[key.toString()] = value.toString()
+            key = enumerator.nextObject()
         }
         return out
     }

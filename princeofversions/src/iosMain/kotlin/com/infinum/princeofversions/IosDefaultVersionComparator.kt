@@ -7,22 +7,22 @@ internal class IosDefaultVersionComparator : VersionComparator {
     private data class Parts(val major: Int, val minor: Int, val patch: Int, val build: Int)
 
     // Matches: "1", "1.2", "1.2.3", "1.2.3-45" (with optional surrounding whitespace)
-    private val re = Regex("""^\s*(\d+)(?:\.(\d+))?(?:\.(\d+))?(?:-(\d+))?\s*$""")
+    private val regex = Regex("""^\s*(\d+)(?:\.(\d+))?(?:\.(\d+))?(?:-(\d+))?\s*$""")
 
     override fun compare(firstVersion: String, secondVersion: String): Int {
-        val a = parse(firstVersion)
-        val b = parse(secondVersion)
-        return compareValuesBy(a, b, { it.major }, { it.minor }, { it.patch }, { it.build })
+        val parsedFirstVersion = parse(firstVersion)
+        val parsedSecondVersion = parse(secondVersion)
+        return compareValuesBy(parsedFirstVersion, parsedSecondVersion, { it.major }, { it.minor }, { it.patch }, { it.build })
     }
 
     private fun parse(raw: String): Parts {
-        val m = re.matchEntire(raw)
+        val matches = regex.matchEntire(raw)
             ?: throw IllegalArgumentException("Invalid version string: '$raw'")
 
-        val major = m.groupValues[GROUP_MAJOR].toInt()
-        val minor = m.groupValues.getOrNull(GROUP_MINOR)?.takeIf { it.isNotEmpty() }?.toInt() ?: DEFAULT_NUM
-        val patch = m.groupValues.getOrNull(GROUP_PATCH)?.takeIf { it.isNotEmpty() }?.toInt() ?: DEFAULT_NUM
-        val build = m.groupValues.getOrNull(GROUP_BUILD)?.takeIf { it.isNotEmpty() }?.toInt() ?: DEFAULT_NUM
+        val major = matches.groupValues[GROUP_MAJOR].toInt()
+        val minor = matches.groupValues.getOrNull(GROUP_MINOR)?.takeIf { it.isNotEmpty() }?.toInt() ?: DEFAULT_NUM
+        val patch = matches.groupValues.getOrNull(GROUP_PATCH)?.takeIf { it.isNotEmpty() }?.toInt() ?: DEFAULT_NUM
+        val build = matches.groupValues.getOrNull(GROUP_BUILD)?.takeIf { it.isNotEmpty() }?.toInt() ?: DEFAULT_NUM
 
         return Parts(major, minor, patch, build)
     }

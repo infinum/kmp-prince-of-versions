@@ -31,7 +31,7 @@ internal class IosDefaultLoader(
 ) : Loader {
 
     private val timeoutSeconds: Double =
-        networkTimeout.inWholeSeconds.toDouble()
+        (networkTimeout.inWholeMilliseconds.toDouble() / MILLIS_PER_SECOND).coerceAtLeast(MIN_TIMEOUT_SECONDS)
 
     @OptIn(ExperimentalEncodingApi::class)
     override suspend fun load(): String = suspendCancellableCoroutine { cont ->
@@ -76,13 +76,16 @@ internal class IosDefaultLoader(
         cont: Continuation<String>,
         session: NSURLSession,
     ) {
+        fun cleanupSession(session: NSURLSession) {
+            session.finishTasksAndInvalidate()
+        }
         fun fail(msg: String) {
             cont.resumeWithException(IoException(msg))
-            session.finishTasksAndInvalidate()
+            cleanupSession(session)
         }
         fun succeed(body: String) {
             cont.resume(body)
-            session.finishTasksAndInvalidate()
+            cleanupSession(session)
         }
 
         val failure = buildFailureMessage(error, response)
@@ -121,6 +124,8 @@ internal class IosDefaultLoader(
         }
 
     companion object {
+        private const val MILLIS_PER_SECOND = 1000.0
+        private const val MIN_TIMEOUT_SECONDS = 0.0
         private const val STATUS_CODE_200 = 200
         private const val STATUS_CODE_299 = 299
     }
