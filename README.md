@@ -62,6 +62,7 @@ Prince of Versions KMP is a Kotlin Multiplatform library that handles app update
     - [Complete Examples](#complete-examples)
     - [Backward Compatibility](#backward-compatibility)
     - [Error Handling](#error-handling)
+- [Requirements](#requirements)
 - [Contributing](#contributing)
 - [License](#license)
 - [Credits](#credits)
@@ -500,6 +501,12 @@ To support both legacy and current versions of Prince of Versions:
 - Invalid version formats or missing required fields will result in parsing exceptions
 - // TODO - Update once iOS implementation is completed.
 
+## Requirements
+
+The library requires the following tool versions:
+
+- Android minimum SDK level 24
+- Java version 17
 
 ## Contributing
 
