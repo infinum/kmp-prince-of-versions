@@ -103,7 +103,7 @@ internal class IosDefaultLoader(
     ): String? {
         if (error != null) return error.localizedDescription
 
-        val http = response as? NSHTTPURLResponse ?: return "No HTTP response"
+        val http = response as? NSHTTPURLResponse ?: return "Expected HTTP URL response, but received a non-HTTP response."
         val code = http.statusCode.toInt()
         if (code !in STATUS_CODE_200..STATUS_CODE_299) {
             val msg = NSHTTPURLResponse.localizedStringForStatusCode(http.statusCode)

@@ -31,9 +31,9 @@ internal class SystemVersionRequirementChecker : RequirementChecker {
     private fun parseVersion(input: String): Version {
         val components = input.split(SEP_DOT)
         return Version(
-            major = components.getOrElse(INDEX_MAJOR) { DEFAULT_COMPONENT }.toIntOrNull() ?: DEFAULT_COMPONENT,
-            minor = components.getOrElse(INDEX_MINOR) { DEFAULT_COMPONENT }.toIntOrNull() ?: DEFAULT_COMPONENT,
-            patch = components.getOrElse(INDEX_PATCH) { DEFAULT_COMPONENT }.toIntOrNull() ?: DEFAULT_COMPONENT,
+            major = components.getOrElse(INDEX_MAJOR) { DEFAULT_COMPONENT_STR }.toIntOrNull() ?: DEFAULT_COMPONENT_INT,
+            minor = components.getOrElse(INDEX_MINOR) { DEFAULT_COMPONENT_STR }.toIntOrNull() ?: DEFAULT_COMPONENT_INT,
+            patch = components.getOrElse(INDEX_PATCH) { DEFAULT_COMPONENT_STR }.toIntOrNull() ?: DEFAULT_COMPONENT_INT,
         )
     }
 
@@ -45,15 +45,16 @@ internal class SystemVersionRequirementChecker : RequirementChecker {
         private const val INDEX_MAJOR = 0
         private const val INDEX_MINOR = 1
         private const val INDEX_PATCH = 2
-        private const val DEFAULT_COMPONENT = "0"
+        private const val DEFAULT_COMPONENT_INT = 0
+        private const val DEFAULT_COMPONENT_STR = "0"
     }
 }
 
 /** Simple semantic version holder for (major.minor.patch). */
 private data class Version(
-    val major: Comparable<Nothing>,
-    val minor: Comparable<Nothing>,
-    val patch: Comparable<Nothing>,
+    val major: Int,
+    val minor: Int,
+    val patch: Int,
 ) : Comparable<Version> {
     override fun compareTo(other: Version): Int =
         compareValuesBy(this, other, Version::major, Version::minor, Version::patch)

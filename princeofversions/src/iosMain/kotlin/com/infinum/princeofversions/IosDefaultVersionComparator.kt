@@ -12,7 +12,16 @@ internal class IosDefaultVersionComparator : VersionComparator {
     override fun compare(firstVersion: String, secondVersion: String): Int {
         val parsedFirstVersion = parse(firstVersion)
         val parsedSecondVersion = parse(secondVersion)
-        return compareValuesBy(parsedFirstVersion, parsedSecondVersion, { it.major }, { it.minor }, { it.patch }, { it.build })
+        return compareValuesBy(
+            a = parsedFirstVersion,
+            b = parsedSecondVersion,
+            selectors = arrayOf(
+                { it.major },
+                { it.minor },
+                { it.patch },
+                { it.build },
+            ),
+        )
     }
 
     private fun parse(raw: String): Parts {
