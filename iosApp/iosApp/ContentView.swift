@@ -1,33 +1,49 @@
 import SwiftUI
 import PrinceOfVersions
 
-struct ContentView: View {
-    @State private var showContent = false
-    var body: some View {
-        VStack {
-            Button("Click me!") {
-                withAnimation {
-                    showContent = !showContent
-                }
-            }
+private let UPDATE_URL = "https://pastebin.com/raw/0MfYmWGu"
 
-            if showContent {
-                VStack(spacing: 16) {
-                    Image(systemName: "swift")
-                        .font(.system(size: 200))
-                        .foregroundColor(.accentColor)
-                    Text("SwiftUI")
+struct ContentView: View {
+    @StateObject private var vm = CommonUsageViewModel()
+
+    var body: some View {
+        NavigationView {
+            VStack(spacing: 12) {
+                Button("Check for updates") {
+                    vm.check(url: UPDATE_URL, slow: false)
                 }
-                .transition(.move(edge: .top).combined(with: .opacity))
+                .buttonStyle(.borderedProminent)
+
+                Button("Check (simulate slow request)") {
+                    vm.check(url: UPDATE_URL, slow: true)
+                }
+                .buttonStyle(.bordered)
+
+                Button("Cancel") {
+                    vm.cancel()
+                }
+                .buttonStyle(.bordered)
+                .tint(.red)
+
+                if vm.isLoading {
+                    ProgressView().padding(.top, 8)
+                }
+
+                if let last = vm.lastMessage {
+                    Text(last)
+                        .font(.footnote)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                        .padding(.top, 8)
+                }
+
+                Spacer()
+            }
+            .padding(16)
+            .navigationTitle("Common Usage")
+            .alert(isPresented: $vm.showAlert) {
+                Alert(title: Text("Update check"), message: Text(vm.alertMessage), dismissButton: .default(Text("OK")))
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .padding()
-    }
-}
-
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
     }
 }

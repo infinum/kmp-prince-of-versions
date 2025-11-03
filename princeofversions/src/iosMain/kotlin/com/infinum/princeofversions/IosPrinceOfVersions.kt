@@ -1,5 +1,6 @@
 package com.infinum.princeofversions
 
+import com.infinum.princeofversions.PrinceOfVersionsBase.Companion.DEFAULT_NETWORK_TIMEOUT
 import kotlin.time.Duration
 
 /**
@@ -58,3 +59,20 @@ private fun createPrinceOfVersions(
         )
         return PrinceOfVersionsImpl(checkForUpdatesUseCase = checkForUpdatesUseCase)
     }
+
+/**
+ * Starts a check for an update, loading the configuration from a URL (iOS actual).
+ */
+public suspend fun PrinceOfVersions.checkForUpdatesFromUrl(
+    url: String,
+    username: String? = null,
+    password: String? = null,
+    networkTimeout: Duration = DEFAULT_NETWORK_TIMEOUT,
+): UpdateResult = checkForUpdates(
+    source = provideDefaultLoader(
+        url = url,
+        username = username,
+        password = password,
+        networkTimeout = networkTimeout,
+    ),
+)
