@@ -7,6 +7,6 @@ public data class BasePrinceOfVersionsConfig<T>(
     val mandatoryVersion: T?,
     val optionalVersion: T?,
     val optionalNotificationType: NotificationType,
-    val metadata: Map<String, String>,
-    val requirements: Map<String, String>,
+    val metadata: Map<String, String?>,
+    val requirements: Map<String, String?>,
 )

@@ -6,7 +6,7 @@ package com.infinum.princeofversions
 internal data class UpdateInfo<T>(
     val requiredVersion: T?,
     val lastVersionAvailable: T?,
-    val requirements: Map<String, String>,
+    val requirements: Map<String, String?>,
     val installedVersion: T,
     val notificationFrequency: NotificationType,
 ) {

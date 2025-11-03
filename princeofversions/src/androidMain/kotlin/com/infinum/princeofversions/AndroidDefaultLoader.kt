@@ -1,9 +1,9 @@
 package com.infinum.princeofversions
 
-import android.util.Base64
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
+import kotlin.io.encoding.Base64
 import kotlin.time.Duration
 
 /**
@@ -35,8 +35,7 @@ internal class AndroidDefaultLoader(
             if (username != null && password != null) {
                 val credentials = "$username:$password"
                 val basicAuth = "Basic ${
-                    Base64.encodeToString(credentials.toByteArray(Charsets.UTF_8), Base64.NO_WRAP)
-                }"
+                    Base64.encode(credentials.encodeToByteArray())}"
                 connection.setRequestProperty("Authorization", basicAuth)
             }
 

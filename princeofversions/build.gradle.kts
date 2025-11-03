@@ -29,18 +29,27 @@ kotlin {
     jvm()
 
     sourceSets {
-        jvmMain.dependencies {
-            implementation(libs.json)
-        }
         androidMain.dependencies {
             implementation(libs.androidx.datastore.preferences)
             implementation(libs.androidx.core.ktx)
+        }
+        jvmMain.dependencies {
+            implementation(libs.json)
         }
         commonMain.dependencies {
             implementation(libs.kotlinx.coroutines.core)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+            implementation(libs.kotlinx.coroutines.test)
+        }
+        androidUnitTest.dependencies {
+            implementation(libs.mockwebserver)
+            implementation(libs.json)
+        }
+        jvmTest.dependencies {
+            implementation(libs.mockwebserver)
+            implementation(libs.json)
         }
     }
 
@@ -67,7 +76,7 @@ android {
     }
 }
 
-dependencies{
+dependencies {
     detektPlugins(rootProject.libs.detekt.formatting)
 }
 

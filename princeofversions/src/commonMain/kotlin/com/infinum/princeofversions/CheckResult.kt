@@ -15,7 +15,7 @@ internal data class CheckResult<T> private constructor(
     val status: UpdateStatus,
     val updateVersion: T,
     val notificationType: NotificationType?,
-    val metadata: Map<String, String>,
+    val metadata: Map<String, String?>,
     val info: UpdateInfo<T>,
 ) {
     /**
@@ -53,7 +53,7 @@ internal data class CheckResult<T> private constructor(
 
         fun <T> mandatoryUpdate(
             version: T,
-            metadata: Map<String, String>,
+            metadata: Map<String, String?>,
             updateInfo: UpdateInfo<T>,
         ): CheckResult<T> = CheckResult(
             status = UpdateStatus.MANDATORY,
@@ -66,7 +66,7 @@ internal data class CheckResult<T> private constructor(
         fun <T> optionalUpdate(
             version: T,
             notificationType: NotificationType,
-            metadata: Map<String, String>,
+            metadata: Map<String, String?>,
             updateInfo: UpdateInfo<T>,
         ): CheckResult<T> = CheckResult(
             status = UpdateStatus.OPTIONAL,
@@ -78,7 +78,7 @@ internal data class CheckResult<T> private constructor(
 
         fun <T> noUpdate(
             version: T,
-            metadata: Map<String, String>,
+            metadata: Map<String, String?>,
             updateInfo: UpdateInfo<T>,
         ): CheckResult<T> = CheckResult(
             status = UpdateStatus.NO_UPDATE,
