@@ -125,7 +125,7 @@ internal class IosDefaultLoader(
 
     companion object {
         private const val MILLIS_PER_SECOND = 1000.0
-        private const val MIN_TIMEOUT_SECONDS = 0.0
+        private const val MIN_TIMEOUT_SECONDS = 1.0
         private const val STATUS_CODE_200 = 200
         private const val STATUS_CODE_299 = 299
     }
