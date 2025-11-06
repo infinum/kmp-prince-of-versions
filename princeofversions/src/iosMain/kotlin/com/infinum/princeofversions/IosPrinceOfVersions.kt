@@ -40,7 +40,7 @@ public suspend fun PrinceOfVersions.checkForUpdates(
     ),
 )
 
-private fun createPrinceOfVersions(
+internal fun createPrinceOfVersions(
     princeOfVersionsComponents: PrinceOfVersionsComponents,
 ): PrinceOfVersions =
     with(princeOfVersionsComponents) {

@@ -8,22 +8,20 @@ class PrinceOfVersionsIosTest {
 
     @Test
     fun `factory creates instance`() {
-        val pov = PrinceOfVersions()
+        val pov = testPrinceOfVersionsWithInfo()
         assertNotNull(pov)
         assertIs<PrinceOfVersionsImpl>(pov)
     }
 
     @Test
     fun `propagates loader error`() = runTest {
-        val pov = PrinceOfVersions()
-        assertFailsWith<IoException> {
-            pov.checkForUpdates(source = FakeLoaderError(IoException("boom")))
-        }
+        val pov = testPrinceOfVersionsWithInfo()
+        assertFailsWith<IoException> { pov.checkForUpdates(source = FakeLoaderError(IoException("boom"))) }
     }
 
     @Test
     fun `invalid URL throws IoException via iOS loader`() = runTest {
-        val pov = PrinceOfVersions()
+        val pov = testPrinceOfVersionsWithInfo()
         assertFailsWith<IoException> {
             pov.checkForUpdates(
                 url = "not a url",
@@ -36,13 +34,33 @@ class PrinceOfVersionsIosTest {
 
     @Test
     fun `both versions null throws IllegalStateException`() = runTest {
+        val pov = testPrinceOfVersionsWithInfo()
         val json = """{ "ios2": { "meta": { "note": "no versions present" } } }"""
-        val pov = PrinceOfVersions()
-        assertFailsWith<IllegalStateException> {
-            pov.checkForUpdates(source = FakeLoaderSuccess(json))
+        assertFailsWith<IllegalStateException> { pov.checkForUpdates(source = FakeLoaderSuccess(json)) }
+    }
+
+    internal fun testPrinceOfVersionsWithInfo(
+        short: String = "1.0.0",
+        buildNum: String = "1"
+    ): PrinceOfVersions {
+        val fakeInfo = object : InfoDictionaryProvider {
+            override fun infoDictionary(): Map<String, Any?> = mapOf(
+                "CFBundleShortVersionString" to short,
+                "CFBundleVersion" to buildNum
+            )
         }
+
+        val appVersionProvider: ApplicationVersionProvider = IosApplicationVersionProvider(fakeInfo)
+
+        val components = PrinceOfVersionsComponents
+            .Builder()
+            .withVersionProvider(appVersionProvider)
+            .build()
+
+        return createPrinceOfVersions(components)
     }
 }
+
 
 /* -------- helpers -------- */
 
