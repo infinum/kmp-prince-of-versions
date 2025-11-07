@@ -1,21 +1,28 @@
+//
+//  CommonUsageView.swift
+//  iosApp
+//
+//  Created by Filip Stojanovski on 6.11.25.
+//
+
 import SwiftUI
 import PrinceOfVersions
 
-private let UPDATE_URL = "https://pastebin.com/raw/0MfYmWGu"
+private let updateUrl = "https://pastebin.com/raw/0MfYmWGu"
 
-struct ContentView: View {
+struct CommonUsageView: View {
     @StateObject private var vm = CommonUsageViewModel()
 
     var body: some View {
         NavigationView {
             VStack(spacing: 12) {
                 Button("Check for updates") {
-                    vm.check(url: UPDATE_URL, slow: false)
+                    vm.check(url: updateUrl, slow: false)
                 }
                 .buttonStyle(.borderedProminent)
 
                 Button("Check (simulate slow request)") {
-                    vm.check(url: UPDATE_URL, slow: true)
+                    vm.check(url: updateUrl, slow: true)
                 }
                 .buttonStyle(.bordered)
 

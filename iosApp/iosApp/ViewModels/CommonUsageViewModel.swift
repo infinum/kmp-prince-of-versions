@@ -6,7 +6,7 @@ import Foundation
 import SwiftUI
 import PrinceOfVersions
 
-private let DELAY_MS: UInt64 = 3_000
+private let delayInMilliseconds: UInt64 = 3_000
 
 @MainActor
 final class CommonUsageViewModel: ObservableObject {
@@ -27,7 +27,7 @@ final class CommonUsageViewModel: ObservableObject {
             guard let self else { return }
             do {
                 if slow {
-                    try await Task.sleep(nanoseconds: DELAY_MS * 1_000_000)
+                    try await Task.sleep(nanoseconds: delayInMilliseconds * 1_000_000)
                 }
 
                 let result = try await IosPrinceOfVersionsKt.self.checkForUpdatesFromUrl(
@@ -35,7 +35,7 @@ final class CommonUsageViewModel: ObservableObject {
                     url: url,
                     username: nil,
                     password: nil,
-                    networkTimeout: Int64(DELAY_MS)
+                    networkTimeout: Int64(delayInMilliseconds)
                 )
                 self.show(message: self.format(result: result))
             } catch is CancellationError {
