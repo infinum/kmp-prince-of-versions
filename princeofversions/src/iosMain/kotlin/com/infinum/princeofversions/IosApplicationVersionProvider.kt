@@ -13,3 +13,9 @@ internal class IosApplicationVersionProvider : ApplicationVersionProvider {
         return "$short-$build"
     }
 }
+
+public class HardcodedVersionProviderIos(
+    private val current: String = "1.2.3",
+) : ApplicationVersionProvider {
+    override fun getVersion(): String = current
+}
