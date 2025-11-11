@@ -13,7 +13,6 @@ import SwiftUI
 enum DemoRoute: String, CaseIterable, Identifiable {
     case commonUsage = "Common Usage"
     case customParser = "Custom Configuration Parser"
-    case streamLoader = "Stream Loader"
     case customChecker = "Custom Requirement Checker"
     case customStorage = "Custom Storage"
     case customVersionLogic = "Custom Version Logic"
@@ -32,7 +31,6 @@ struct MainMenuView: View {
                 switch route {
                 case .commonUsage:        CommonUsageView()
                 case .customParser:       CustomParserView()
-                case .streamLoader:       StreamLoaderView()
                 case .customChecker:      CustomCheckerView()
                 case .customStorage:      CustomStorageView()
                 case .customVersionLogic: CustomVersionLogicView()

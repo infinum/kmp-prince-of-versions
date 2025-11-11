@@ -8,7 +8,7 @@
 import SwiftUI
 import PrinceOfVersions
 
-private let updateUrl = "https://pastebin.com/raw/0MfYmWGu"
+private let updateUrl = "https://pastebin.com/raw/KgAZQUb5"
 
 struct CommonUsageView: View {
     @StateObject private var vm = CommonUsageViewModel()

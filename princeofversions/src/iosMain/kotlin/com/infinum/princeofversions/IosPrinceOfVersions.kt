@@ -44,7 +44,7 @@ public suspend fun PrinceOfVersions.checkForUpdates(
     ),
 )
 
-private fun createPrinceOfVersions(
+internal fun createPrinceOfVersions(
     princeOfVersionsComponents: PrinceOfVersionsComponents,
 ): PrinceOfVersions =
     with(princeOfVersionsComponents) {
@@ -126,7 +126,7 @@ public fun princeOfVersionsWithCustomChecker(
     val components = PrinceOfVersionsComponents.Builder()
         .withRequirementCheckers(mapOf(key to checker), keepDefaultCheckers)
         .build()
-    return createPrinceOfVersions(components) // ensure createPrinceOfVersions is internal or public in same file
+    return createPrinceOfVersions(components)
 }
 
 /**

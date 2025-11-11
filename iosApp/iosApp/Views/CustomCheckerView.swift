@@ -8,7 +8,7 @@
 import SwiftUI
 import PrinceOfVersions
 
-private let updateUrl = "https://pastebin.com/raw/0MfYmWGu"
+private let updateUrl = "https://pastebin.com/raw/KgAZQUb5"
 private let delayMilliseconds: UInt64 = 5_000
 private let checkerKey = "requiredNumberOfLetters"
 
@@ -41,12 +41,12 @@ final class CustomCheckerViewModel: ObservableObject {
             do {
                 if isSlow { try await Task.sleep(nanoseconds: delayMilliseconds * 1_000_000) }
 
-                let result = try await IosPrinceOfVersionsKt.checkForUpdatesFromUrlMillis(
+                let result = try await IosPrinceOfVersionsKt.checkForUpdatesFromUrl(
                     pov,
                     url: updateUrl,
                     username: nil,
                     password: nil,
-                    networkTimeoutMillis: Int64(delayMilliseconds)
+                    networkTimeout: Int64(delayMilliseconds)
                 )
                 self.show(message: self.format(result: result))
             } catch is CancellationError {

@@ -21,3 +21,13 @@ internal class IosStorage : Storage {
         private const val KEY_LAST_NOTIFIED_VERSION = "last_notified_version"
     }
 }
+
+// iOS-visible convenience for Swift/ObjC to pass a custom Storage implementation.
+public fun princeOfVersionsWithCustomStorage(
+    storage: Storage,
+): PrinceOfVersions {
+    val components = PrinceOfVersionsComponents.Builder()
+        .withStorage(storage)
+        .build()
+    return createPrinceOfVersions(components)
+}

@@ -1,12 +1,15 @@
 //
-// Created by Filip Stojanovski on 3.11.25.
+//  CommonUsageViewModel.swift
+//  iosApp
+//
+//  Created by Filip Stojanovski on 3.11.25.
 //
 
 import Foundation
 import SwiftUI
 import PrinceOfVersions
 
-private let delayInMilliseconds: UInt64 = 3_000
+private let delayInMilliseconds: UInt64 = 5_000
 
 @MainActor
 final class CommonUsageViewModel: ObservableObject {
@@ -30,7 +33,7 @@ final class CommonUsageViewModel: ObservableObject {
                     try await Task.sleep(nanoseconds: delayInMilliseconds * 1_000_000)
                 }
 
-                let result = try await IosPrinceOfVersionsKt.self.checkForUpdatesFromUrl(
+                let result = try await IosPrinceOfVersionsKt.checkForUpdatesFromUrl(
                     pov,
                     url: url,
                     username: nil,
@@ -52,7 +55,7 @@ final class CommonUsageViewModel: ObservableObject {
         task = nil
         isLoading = false
     }
-    
+
     private func show(message: String) {
         lastMessage = message
         alertMessage = message
