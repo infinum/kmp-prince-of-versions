@@ -22,31 +22,57 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		B99700CA2DC9B8D800C7335B /* Exceptions for "iosApp" folder in "iosApp" target */ = {
+		C1065BAC2EBCCAEF00F71F5A /* Exceptions for "iosApp" folder in "iosApp" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
 			target = B9DA97B02DC1472C00A4DA20 /* iosApp */;
 		};
+		C1D3171C2EBDF93500A2149A /* Exceptions for "iosAppTests" folder in "iosApp" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				CustomVersionLogicObjcTests.m,
+				iosAppTests.swift,
+				POVTestStringLoader.m,
+				ThresholdChecker.m,
+				VersionProviderObjcTests.m,
+			);
+			target = B9DA97B02DC1472C00A4DA20 /* iosApp */;
+		};
+		C1D3171D2EBDF93500A2149A /* Exceptions for "iosAppTests" folder in "iosAppTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				CustomVersionLogicObjcTests.m,
+				iosAppTests.swift,
+				POVTestStringLoader.m,
+				ThresholdChecker.m,
+				VersionProviderObjcTests.m,
+			);
+			target = C11A5C302EBB5541005F2C74 /* iosAppTests */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		B9DA97B32DC1472C00A4DA20 /* iosApp */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				B99700CA2DC9B8D800C7335B /* Exceptions for "iosApp" folder in "iosApp" target */,
-			);
-			path = iosApp;
-			sourceTree = "<group>";
-		};
 		B9DA98002DC14AA900A4DA20 /* Configuration */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Configuration;
 			sourceTree = "<group>";
 		};
-		C11A5C322EBB5541005F2C74 /* iosAppTests */ = {
+		C1065BA02EBCCAEF00F71F5A /* iosApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				C1065BAC2EBCCAEF00F71F5A /* Exceptions for "iosApp" folder in "iosApp" target */,
+			);
+			path = iosApp;
+			sourceTree = "<group>";
+		};
+		C1D317192EBDF93500A2149A /* iosAppTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				C1D3171C2EBDF93500A2149A /* Exceptions for "iosAppTests" folder in "iosApp" target */,
+				C1D3171D2EBDF93500A2149A /* Exceptions for "iosAppTests" folder in "iosAppTests" target */,
+			);
 			path = iosAppTests;
 			sourceTree = "<group>";
 		};
@@ -74,8 +100,8 @@
 			isa = PBXGroup;
 			children = (
 				B9DA98002DC14AA900A4DA20 /* Configuration */,
-				B9DA97B32DC1472C00A4DA20 /* iosApp */,
-				C11A5C322EBB5541005F2C74 /* iosAppTests */,
+				C1065BA02EBCCAEF00F71F5A /* iosApp */,
+				C1D317192EBDF93500A2149A /* iosAppTests */,
 				B9DA97B22DC1472C00A4DA20 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -106,7 +132,8 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				B9DA97B32DC1472C00A4DA20 /* iosApp */,
+				C1065BA02EBCCAEF00F71F5A /* iosApp */,
+				C1D317192EBDF93500A2149A /* iosAppTests */,
 			);
 			name = iosApp;
 			packageProductDependencies = (
@@ -127,9 +154,6 @@
 			);
 			dependencies = (
 				C11A5C362EBB5541005F2C74 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				C11A5C322EBB5541005F2C74 /* iosAppTests */,
 			);
 			name = iosAppTests;
 			packageProductDependencies = (

@@ -1,6 +1,8 @@
 package com.infinum.princeofversions
 
+import com.infinum.princeofversions.PrinceOfVersionsBase.Companion.DEFAULT_NETWORK_TIMEOUT
 import kotlin.time.Duration
+import kotlinx.coroutines.CancellationException
 
 /**
  * Represents the main interface for using the library.
@@ -58,3 +60,93 @@ internal fun createPrinceOfVersions(
         )
         return PrinceOfVersionsImpl(checkForUpdatesUseCase = checkForUpdatesUseCase)
     }
+
+/**
+ * Starts a check for an update, loading the configuration from a URL (iOS actual).
+ */
+@Throws(
+    IoException::class,
+    RequirementsNotSatisfiedException::class,
+    ConfigurationException::class,
+    CancellationException::class,
+)
+public suspend fun PrinceOfVersions.checkForUpdatesFromUrl(
+    url: String,
+    username: String? = null,
+    password: String? = null,
+    networkTimeout: Duration = DEFAULT_NETWORK_TIMEOUT,
+): UpdateResult = try {
+    checkForUpdates(
+        source = provideDefaultLoader(
+            url = url,
+            username = username,
+            password = password,
+            networkTimeout = networkTimeout,
+        ),
+    )
+} catch (e: CancellationException) {
+    throw e
+} catch (e: IllegalStateException) {
+    throw ConfigurationException(e.message ?: "Invalid configuration", e)
+} catch (e: RequirementsNotSatisfiedException) {
+    throw e
+} catch (e: IoException) {
+    throw e
+} catch (t: Throwable) {
+    throw ConfigurationException(t.message ?: "Unexpected error", t)
+}
+
+// Add a Swift-friendly overload that takes milliseconds
+public class ConfigurationException(message: String, cause: Throwable? = null) : Exception(message, cause)
+
+@Throws(
+    IoException::class,
+    RequirementsNotSatisfiedException::class,
+    ConfigurationException::class,
+    CancellationException::class,
+)
+public suspend fun PrinceOfVersions.checkForUpdatesBridged(
+    source: Loader,
+): UpdateResult = try {
+    checkForUpdates(source)
+} catch (e: CancellationException) {
+    throw e
+} catch (e: IllegalStateException) {
+    // unify any internal IllegalState into a ConfigurationException for iOS
+    throw ConfigurationException(e.message ?: "Invalid configuration", e)
+} catch (e: RequirementsNotSatisfiedException) {
+    throw e
+} catch (e: IoException) {
+    throw e
+} catch (t: Throwable) {
+    throw ConfigurationException(t.message ?: "Unexpected error", t)
+}
+
+/**
+ * Convenience for Swift: build PoV with a single custom checker.
+ */
+public fun princeOfVersionsWithCustomChecker(
+    key: String,
+    checker: RequirementChecker,
+    keepDefaultCheckers: Boolean = true,
+): PrinceOfVersions {
+    val components = PrinceOfVersionsComponents.Builder()
+        .withRequirementCheckers(mapOf(key to checker), keepDefaultCheckers)
+        .build()
+    return createPrinceOfVersions(components) // ensure createPrinceOfVersions is internal or public in same file
+}
+
+/**
+ * Convenience for Swift: build PoV with many custom checkers.
+ * In Swift you can pass an array of KotlinPair<String, RequirementChecker>.
+ */
+public fun princeOfVersionsWithCustomCheckers(
+    pairs: Array<kotlin.Pair<String, RequirementChecker>>,
+    keepDefaultCheckers: Boolean = true,
+): PrinceOfVersions {
+    val map = pairs.toMap()
+    val components = PrinceOfVersionsComponents.Builder()
+        .withRequirementCheckers(map, keepDefaultCheckers)
+        .build()
+    return createPrinceOfVersions(components)
+}
