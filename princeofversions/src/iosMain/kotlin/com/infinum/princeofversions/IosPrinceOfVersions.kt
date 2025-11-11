@@ -133,7 +133,7 @@ public fun princeOfVersionsWithCustomChecker(
     val components = PrinceOfVersionsComponents.Builder()
         .withRequirementCheckers(mapOf(key to checker), keepDefaultCheckers)
         .build()
-    return createPrinceOfVersions(components) // ensure createPrinceOfVersions is internal or public in same file
+    return createPrinceOfVersions(components)
 }
 
 /**
