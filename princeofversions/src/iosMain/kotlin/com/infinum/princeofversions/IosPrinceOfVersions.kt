@@ -1,10 +1,10 @@
 package com.infinum.princeofversions
 
 import com.infinum.princeofversions.PrinceOfVersionsBase.Companion.DEFAULT_NETWORK_TIMEOUT
-import kotlinx.coroutines.CancellationException
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
+import kotlinx.coroutines.CancellationException
 
 /**
  * Represents the main interface for using the library.
@@ -81,13 +81,13 @@ public suspend fun PrinceOfVersions.checkForUpdatesFromUrl(
 )
 
 // Add a Swift-friendly overload that takes milliseconds
-public class ConfigurationException(message: String) : Exception(message)
+public class ConfigurationException(message: String, cause: Throwable? = null) : Exception(message, cause)
 
 @Throws(
     IoException::class,
     RequirementsNotSatisfiedException::class,
     ConfigurationException::class,
-    CancellationException::class
+    CancellationException::class,
 )
 public suspend fun PrinceOfVersions.checkForUpdatesFromUrlMillis(
     url: String,
@@ -105,14 +105,14 @@ public suspend fun PrinceOfVersions.checkForUpdatesFromUrlMillis(
     )
 } catch (e: CancellationException) {
     throw e
-}catch (e: IllegalStateException) {
-    throw ConfigurationException(e.message ?: "Invalid configuration")
+} catch (e: IllegalStateException) {
+    throw ConfigurationException(e.message ?: "Invalid configuration", e)
 } catch (e: RequirementsNotSatisfiedException) {
     throw e
 } catch (e: IoException) {
     throw e
 } catch (t: Throwable) {
-    throw ConfigurationException(t.message ?: "Unexpected error")
+    throw ConfigurationException(t.message ?: "Unexpected error", t)
 }
 
 /**
