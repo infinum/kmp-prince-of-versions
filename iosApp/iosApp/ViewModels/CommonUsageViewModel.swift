@@ -30,7 +30,7 @@ final class CommonUsageViewModel: ObservableObject {
             guard let self else { return }
             do {
                 if slow {
-                    try await Task.sleep(nanoseconds: delayInMilliseconds * 1_000_000)
+                    try await Task.sleep(for: .seconds(5))
                 }
 
                 let result = try await IosPrinceOfVersionsKt.checkForUpdatesFromUrl(

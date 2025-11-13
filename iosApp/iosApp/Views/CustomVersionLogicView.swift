@@ -8,9 +8,6 @@
 import SwiftUI
 import PrinceOfVersions
 
-private let url = "https://pastebin.com/raw/KgAZQUb5"
-private let delayMs: UInt64 = 5_000
-
 @MainActor
 final class CustomVersionLogicViewModel: ObservableObject {
     @Published var isLoading = false
@@ -37,14 +34,14 @@ final class CustomVersionLogicViewModel: ObservableObject {
         task = Task { [weak self] in
             guard let self else { return }
             do {
-                if isSlow { try await Task.sleep(nanoseconds: delayMs * 1_000_000) }
+                if isSlow { try await Task.sleep(for: .seconds(5)) }
 
                 let update = try await IosPrinceOfVersionsKt.checkForUpdatesFromUrl(
                     pov,
-                    url: url,
+                    url: Constants.updateUrl,
                     username: nil,
                     password: nil,
-                    networkTimeout: Int64(20_000)
+                    networkTimeout: Int64(Constants.networkTimeout)
                 )
 
                 let status = String(describing: update.status)

@@ -8,8 +8,6 @@
 import SwiftUI
 import PrinceOfVersions
 
-private let updateUrl = "https://pastebin.com/raw/KgAZQUb5"
-
 struct CommonUsageView: View {
     @StateObject private var vm = CommonUsageViewModel()
 
@@ -17,12 +15,12 @@ struct CommonUsageView: View {
         NavigationView {
             VStack(spacing: 12) {
                 Button("Check for updates") {
-                    vm.check(url: updateUrl, slow: false)
+                    vm.check(url: Constants.updateUrl, slow: false)
                 }
                 .buttonStyle(.borderedProminent)
 
                 Button("Check (simulate slow request)") {
-                    vm.check(url: updateUrl, slow: true)
+                    vm.check(url: Constants.updateUrl, slow: true)
                 }
                 .buttonStyle(.bordered)
 

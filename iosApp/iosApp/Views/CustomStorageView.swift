@@ -8,9 +8,6 @@
 import SwiftUI
 import PrinceOfVersions
 
-private let demoURL = "https://pastebin.com/raw/KgAZQUb5"
-private let delayMs: UInt64 = 5_000
-
 @MainActor
 final class CustomStorageViewModel: ObservableObject {
     @Published var isLoading = false
@@ -29,14 +26,14 @@ final class CustomStorageViewModel: ObservableObject {
         task = Task { [weak self] in
             guard let self else { return }
             do {
-                if isSlow { try await Task.sleep(nanoseconds: delayMs * 1_000_000) }
+                if isSlow { try await Task.sleep(for: .seconds(5)) }
 
                 let result = try await IosPrinceOfVersionsKt.checkForUpdatesFromUrl(
                     pov,
-                    url: demoURL,
+                    url: Constants.updateUrl,
                     username: nil,
                     password: nil,
-                    networkTimeout: Int64(5_000)
+                    networkTimeout: Int64(Constants.networkTimeout)
                 )
 
                 let status = String(describing: result.status)
