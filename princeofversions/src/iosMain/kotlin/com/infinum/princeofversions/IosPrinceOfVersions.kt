@@ -15,8 +15,9 @@ public typealias PrinceOfVersions = PrinceOfVersionsBase<String>
  */
 public typealias UpdateResult = BaseUpdateResult<String>
 
-@Suppress("NotImplementedDeclaration")
-public fun PrinceOfVersions(): PrinceOfVersions = TODO("Not yet implemented")
+public fun PrinceOfVersions(): PrinceOfVersions = createPrinceOfVersions(
+    princeOfVersionsComponents = PrinceOfVersionsComponents.Builder().build(),
+)
 
 internal class PrinceOfVersionsImpl(
     private val checkForUpdatesUseCase: CheckForUpdatesUseCase<String>,
@@ -38,3 +39,22 @@ public suspend fun PrinceOfVersions.checkForUpdates(
         networkTimeout = networkTimeout,
     ),
 )
+
+private fun createPrinceOfVersions(
+    princeOfVersionsComponents: PrinceOfVersionsComponents,
+): PrinceOfVersions =
+    with(princeOfVersionsComponents) {
+        val applicationConfiguration = IosApplicationConfiguration(versionProvider = versionProvider)
+
+        val updateInfoInteractor = UpdateInfoInteractorImpl(
+            configurationParser = configurationParser,
+            appConfig = applicationConfiguration,
+            versionComparator = versionComparator,
+        )
+
+        val checkForUpdatesUseCase = CheckForUpdatesUseCaseImpl(
+            updateInfoInteractor = updateInfoInteractor,
+            storage = storage,
+        )
+        return PrinceOfVersionsImpl(checkForUpdatesUseCase = checkForUpdatesUseCase)
+    }

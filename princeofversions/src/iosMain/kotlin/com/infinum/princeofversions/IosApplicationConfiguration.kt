@@ -1,7 +1,7 @@
 package com.infinum.princeofversions
 
-internal class IosApplicationConfiguration : ApplicationConfiguration<String> {
-    @Suppress("NotImplementedDeclaration")
-    override val version: String
-        get() = TODO("Not yet implemented")
+internal class IosApplicationConfiguration(
+    versionProvider: ApplicationVersionProvider,
+) : ApplicationConfiguration<String> {
+    override val version: String = versionProvider.getVersion()
 }
