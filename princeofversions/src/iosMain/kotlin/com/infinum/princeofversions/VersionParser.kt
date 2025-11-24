@@ -10,6 +10,11 @@ internal object VersionParser {
     // Matches: "1", "1.2", "1.2.3", "1.2.3-45" (+ optional whitespace)
     private val regex = Regex("""^\s*(\d+)(?:\.(\d+))?(?:\.(\d+))?(?:-(\d+))?\s*$""")
 
+    private const val MAJOR = 1
+    private const val MINOR = 2
+    private const val PATCH = 3
+    private const val BUILD = 4
+
     /**
      * Strict parser for "1", "1.2", "1.2.3", "1.2.3-45".
      * Throws on invalid input.
@@ -24,10 +29,10 @@ internal object VersionParser {
                 ?.toInt()
                 ?: 0
 
-        val major = groupInt(1)
-        val minor = groupInt(2)
-        val patch = groupInt(3)
-        val build = groupInt(4)
+        val major = groupInt(MAJOR)
+        val minor = groupInt(MINOR)
+        val patch = groupInt(PATCH)
+        val build = groupInt(BUILD)
 
         return VersionWithBuild(
             version = Version(major, minor, patch),

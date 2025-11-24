@@ -31,7 +31,7 @@ public fun princeOfVersionsWithCustomVersionLogic(
 }
 
 public fun princeOfVersionsWithCustomParser(
-    parser: ConfigurationParser
+    parser: ConfigurationParser,
 ): PrinceOfVersions {
     val components = PrinceOfVersionsComponents.Builder()
         .withConfigurationParser(parser)

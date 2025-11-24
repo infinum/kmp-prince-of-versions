@@ -68,7 +68,7 @@ internal fun createPrinceOfVersions(
     IoException::class,
     RequirementsNotSatisfiedException::class,
     ConfigurationException::class,
-    CancellationException::class
+    CancellationException::class,
 )
 public suspend fun PrinceOfVersions.checkForUpdatesFromUrl(
     url: String,
