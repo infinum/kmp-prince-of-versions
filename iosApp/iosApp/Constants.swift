@@ -7,10 +7,6 @@
 
 import Foundation
 
-func isKotlin<T>(_ error: Error, _ type: T.Type) -> Bool {
-    (error as NSError).kotlinException is T
-}
-
 public enum Constants {
     static let commonUsageUrl = "https://pastebin.com/raw/rPZ4iRJB"
     static let updateUrl = "https://pastebin.com/raw/KgAZQUb5"
