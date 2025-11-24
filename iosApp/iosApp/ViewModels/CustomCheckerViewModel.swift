@@ -8,6 +8,21 @@
 import Foundation
 import PrinceOfVersions
 
+private let requirementKey = "requiredNumberOfLetters"
+private let threshold = 5
+private let updateUrl = "https://pastebin.com/raw/VMgd71VH"
+
+@objcMembers
+final class ExampleRequirementsChecker: NSObject, RequirementChecker {
+    
+    private let threshold = 5
+
+    func checkRequirements(value: String?) -> Bool {
+        let n = Int(value ?? "") ?? 0
+        return n >= threshold
+    }
+}
+
 @MainActor
 final class CustomCheckerViewModel: ObservableObject {
     @Published var isLoading = false
@@ -16,16 +31,13 @@ final class CustomCheckerViewModel: ObservableObject {
     @Published var lastMessage: String?
 
     private var task: Task<Void, Never>?
-    private var pov = IosPrinceOfVersionsKt.PrinceOfVersions()
-    private let checker = SystemVersionRequirementCheckerKt.makeSystemVersionRequirementChecker()
-
-    init() {
-        pov = IosPrinceOfVersionsKt.princeOfVersionsWithCustomChecker(
+    private lazy var pov: any PrinceOfVersionsBase = {
+        return IosPrinceOfVersionsKt.princeOfVersionsWithCustomChecker(
             key: Constants.checkerKey,
-            checker: checker,
+            checker: ExampleRequirementsChecker(),
             keepDefaultCheckers: true
         )
-    }
+    }()
 
     func check(isSlow: Bool) {
         cancel()
@@ -69,10 +81,10 @@ final class CustomCheckerViewModel: ObservableObject {
     }
 
     private func format(result: BaseUpdateResult<NSString>) -> String {
-        switch String(describing: result.status) {
-        case "MANDATORY": return "Update available (mandatory): \(result.version ?? "-")"
-        case "OPTIONAL":  return "Update available (optional): \(result.version ?? "-")"
-        default:          return "No update available"
+        switch result.status {
+        case .mandatory: return "Update available (mandatory): \(result.version ?? "-")"
+        case .optional: return "Update available (optional): \(result.version ?? "-")"
+        default:return "No update available"
         }
     }
 }

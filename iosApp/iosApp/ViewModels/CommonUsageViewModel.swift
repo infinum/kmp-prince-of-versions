@@ -19,7 +19,7 @@ final class CommonUsageViewModel: ObservableObject {
     @Published var lastMessage: String?
 
     private var task: Task<Void, Never>?
-    private let pov = IosPrinceOfVersionsKt.PrinceOfVersions()
+    private lazy var pov: any PrinceOfVersionsBase = IosPrinceOfVersionsKt.PrinceOfVersions()
 
     func check(url: String, slow: Bool) {
         cancel()
@@ -63,11 +63,10 @@ final class CommonUsageViewModel: ObservableObject {
     }
 
     private func format(result: BaseUpdateResult<NSString>) -> String {
-        let statusName = String(describing: result.status)
-        switch statusName {
-        case "MANDATORY": return "Update available (mandatory): \(result.version ?? "-")"
-        case "OPTIONAL":  return "Update available (optional): \(result.version ?? "-")"
-        default:          return "No update available"
+        switch result.status {
+        case .mandatory: return "Update available (mandatory): \(result.version ?? "-")"
+        case .optional: return "Update available (optional): \(result.version ?? "-")"
+        default:return "No update available"
         }
     }
 }

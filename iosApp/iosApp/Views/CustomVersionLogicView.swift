@@ -21,14 +21,22 @@ struct CustomVersionLogicView: View {
             Button("Cancel") { vm.cancel() }.buttonStyle(.bordered).tint(.red)
             if vm.isLoading { ProgressView().padding(.top, 8) }
             if let last = vm.lastMessage {
-                Text(last).font(.footnote).foregroundStyle(.secondary).multilineTextAlignment(.center).padding(.top, 8)
+                Text(last)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.top, 8)
             }
             Spacer()
         }
         .padding(16)
         .navigationTitle("Custom Version Logic")
         .alert(isPresented: $vm.showAlert) {
-            Alert(title: Text("Update check"), message: Text(vm.alertMessage), dismissButton: .default(Text("OK")))
+            Alert(
+                title: Text("Update check"),
+                message: Text(vm.alertMessage),
+                dismissButton: .default(Text("OK"))
+            )
         }
     }
 }

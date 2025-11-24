@@ -47,7 +47,11 @@ struct CommonUsageView: View {
             .padding(16)
             .navigationTitle("Common Usage")
             .alert(isPresented: $vm.showAlert) {
-                Alert(title: Text("Update check"), message: Text(vm.alertMessage), dismissButton: .default(Text("OK")))
+                Alert(
+                    title: Text("Update check"),
+                    message: Text(vm.alertMessage),
+                    dismissButton: .default(Text("OK"))
+                )
             }
         }
     }

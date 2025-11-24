@@ -8,6 +8,38 @@
 import Foundation
 import PrinceOfVersions
 
+final class HardcodedVersionProvider: BaseApplicationVersionProvider {
+    private let currentAppVersion = "1.2.3"
+
+    func getVersion() -> Any? {
+        return currentAppVersion
+    }
+}
+
+final class DeveloperBuildVersionComparator: BaseVersionComparator {
+    func compare(firstVersion: Any?, secondVersion: Any?) -> Int32 {
+        guard
+            let firstStr = firstVersion as? String,
+            let secondStr = secondVersion as? String,
+            let first = Int(firstStr),
+            let second = Int(secondStr)
+        else {
+            return 0
+        }
+
+        // Custom rule: never show an update for "dev builds" (versions ending in 0)
+        if second % 10 == 0 {
+            return -1 // treat as: no update available
+        }
+
+        // Standard: compare second vs first
+        if second > first { return 1 }
+        if second < first { return -1 }
+        return 0
+    }
+}
+
+
 @MainActor
 final class CustomVersionLogicViewModel: ObservableObject {
     @Published var isLoading = false
@@ -17,9 +49,8 @@ final class CustomVersionLogicViewModel: ObservableObject {
 
     private var task: Task<Void, Never>?
     private lazy var pov: any PrinceOfVersionsBase = {
-        let provider = HardcodedVersionProviderIos(current: "1.2.3")
-        let base = IosDefaultVersionComparatorKt.defaultIosVersionComparator()
-        let comparator = DevBuildVersionComparator(delegate: base)
+        let provider = HardcodedVersionProvider()
+        let comparator = DeveloperBuildVersionComparator()
         return IosDefaultVersionComparatorKt.princeOfVersionsWithCustomVersionLogic(
             provider: provider,
             comparator: comparator
