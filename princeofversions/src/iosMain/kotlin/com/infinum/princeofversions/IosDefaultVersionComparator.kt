@@ -29,3 +29,12 @@ public fun princeOfVersionsWithCustomVersionLogic(
         .build()
     return createPrinceOfVersions(components)
 }
+
+public fun princeOfVersionsWithCustomParser(
+    parser: ConfigurationParser
+): PrinceOfVersions {
+    val components = PrinceOfVersionsComponents.Builder()
+        .withConfigurationParser(parser)
+        .build()
+    return createPrinceOfVersions(components)
+}

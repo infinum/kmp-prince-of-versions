@@ -35,6 +35,3 @@ internal class SystemVersionRequirementChecker : RequirementChecker {
         const val KEY = "required_os_version"
     }
 }
-
-public fun makeSystemVersionRequirementChecker(): RequirementChecker =
-    SystemVersionRequirementChecker()

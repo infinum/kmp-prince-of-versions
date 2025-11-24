@@ -9,8 +9,6 @@ import Foundation
 import SwiftUI
 import PrinceOfVersions
 
-private let delayInMilliseconds: UInt64 = 5_000
-
 @MainActor
 final class CommonUsageViewModel: ObservableObject {
     @Published var isLoading = false
@@ -21,7 +19,7 @@ final class CommonUsageViewModel: ObservableObject {
     private var task: Task<Void, Never>?
     private lazy var pov: any PrinceOfVersionsBase = IosPrinceOfVersionsKt.PrinceOfVersions()
 
-    func check(url: String, slow: Bool) {
+    func check(slow: Bool) {
         cancel()
         isLoading = true
         lastMessage = nil
@@ -35,10 +33,10 @@ final class CommonUsageViewModel: ObservableObject {
 
                 let result = try await IosPrinceOfVersionsKt.checkForUpdatesFromUrl(
                     pov,
-                    url: url,
+                    url: Constants.commonUsageUrl,
                     username: nil,
                     password: nil,
-                    networkTimeout: Int64(delayInMilliseconds)
+                    networkTimeout: Int64(Constants.networkTimeout)
                 )
                 self.show(message: self.format(result: result))
             } catch is CancellationError {

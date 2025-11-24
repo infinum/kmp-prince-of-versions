@@ -8,21 +8,6 @@
 import Foundation
 import PrinceOfVersions
 
-private let requirementKey = "requiredNumberOfLetters"
-private let threshold = 5
-private let updateUrl = "https://pastebin.com/raw/VMgd71VH"
-
-@objcMembers
-final class ExampleRequirementsChecker: NSObject, RequirementChecker {
-    
-    private let threshold = 5
-
-    func checkRequirements(value: String?) -> Bool {
-        let n = Int(value ?? "") ?? 0
-        return n >= threshold
-    }
-}
-
 @MainActor
 final class CustomCheckerViewModel: ObservableObject {
     @Published var isLoading = false
@@ -51,7 +36,7 @@ final class CustomCheckerViewModel: ObservableObject {
 
                 let result = try await IosPrinceOfVersionsKt.checkForUpdatesFromUrl(
                     pov,
-                    url: Constants.updateUrl,
+                    url: Constants.customCheckerUrl,
                     username: nil,
                     password: nil,
                     networkTimeout: Int64(Constants.networkTimeout)
@@ -59,10 +44,16 @@ final class CustomCheckerViewModel: ObservableObject {
                 self.show(message: self.format(result: result))
             } catch is CancellationError {
                 self.show(message: "Update check cancelled")
-            } catch _ as RequirementsNotSatisfiedException {
-                self.show(message: "Requirements not met. (Custom checker failed)")
             } catch {
-                self.show(message: "Error: \(error.localizedDescription)")
+                if isKotlin(error, RequirementsNotSatisfiedException.self) {
+                    self.show(message: "Requirements not met. (Custom checker failed)")
+                } else if isKotlin(error, ConfigurationException.self) {
+                    self.show(message: "Bad configuration")
+                } else if isKotlin(error, IoException.self) {
+                    self.show(message: "Network / IO error")
+                } else {
+                    self.show(message: "Error: \((error as NSError).localizedDescription)")
+                }
             }
             self.isLoading = false
         }

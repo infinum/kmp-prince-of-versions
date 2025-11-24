@@ -48,21 +48,3 @@ struct CustomStorageView: View {
         }
     }
 }
-
-final class UserDefaultsStorageSwift: NSObject, BaseStorage {
-    private let key = "demo.last_notified_version"
-
-    func getLastSavedVersion(completionHandler: @escaping (Any?, Error?) -> Void) {
-        let value = UserDefaults.standard.string(forKey: key) as NSString?
-        completionHandler(value, nil)
-    }
-
-    func saveVersion(version: Any?, completionHandler: @escaping (Error?) -> Void) {
-        if let v = version as? NSString {
-            UserDefaults.standard.set(v as String, forKey: key)
-        } else {
-            UserDefaults.standard.removeObject(forKey: key)
-        }
-        completionHandler(nil)
-    }
-}

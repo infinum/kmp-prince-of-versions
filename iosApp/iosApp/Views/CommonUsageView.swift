@@ -15,12 +15,12 @@ struct CommonUsageView: View {
         NavigationView {
             VStack(spacing: 12) {
                 Button("Check for updates") {
-                    vm.check(url: Constants.updateUrl, slow: false)
+                    vm.check(slow: false)
                 }
                 .buttonStyle(.borderedProminent)
 
                 Button("Check (simulate slow request)") {
-                    vm.check(url: Constants.updateUrl, slow: true)
+                    vm.check(slow: true)
                 }
                 .buttonStyle(.bordered)
 

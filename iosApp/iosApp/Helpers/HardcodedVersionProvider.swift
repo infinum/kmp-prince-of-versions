@@ -6,3 +6,12 @@
 //
 
 import Foundation
+import PrinceOfVersions
+
+final class HardcodedVersionProvider: BaseApplicationVersionProvider {
+    private let currentAppVersion = "0.9.0"
+
+    func getVersion() -> Any? {
+        return currentAppVersion
+    }
+}

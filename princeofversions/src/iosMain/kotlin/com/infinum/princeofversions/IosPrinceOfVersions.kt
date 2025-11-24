@@ -1,6 +1,7 @@
 package com.infinum.princeofversions
 
 import com.infinum.princeofversions.PrinceOfVersionsBase.Companion.DEFAULT_NETWORK_TIMEOUT
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration
 
 /**
@@ -63,6 +64,12 @@ internal fun createPrinceOfVersions(
 /**
  * Starts a check for an update, loading the configuration from a URL (iOS actual).
  */
+@Throws(
+    IoException::class,
+    RequirementsNotSatisfiedException::class,
+    ConfigurationException::class,
+    CancellationException::class
+)
 public suspend fun PrinceOfVersions.checkForUpdatesFromUrl(
     url: String,
     username: String? = null,
