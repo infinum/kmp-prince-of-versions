@@ -19,7 +19,7 @@ final class CustomCheckerViewModel: ObservableObject {
     private lazy var pov: any PrinceOfVersionsBase = {
         return IosPrinceOfVersionsKt.princeOfVersionsWithCustomChecker(
             key: Constants.checkerKey,
-            checker: ExampleRequirementsChecker(),
+            checker: ExampleRequirementsChecker() as RequirementChecker,
             keepDefaultCheckers: true
         )
     }()
