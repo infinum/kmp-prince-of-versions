@@ -16,8 +16,9 @@ internal object VersionParser {
     private const val BUILD = 4
 
     /**
-     * Strict parser for "1", "1.2", "1.2.3", "1.2.3-45".
-     * Throws on invalid input.
+     * Strictly parses version strings like "1", "1.2", "1.2.3" and "1.2.3-45".
+     * Missing version segments default to 0, so "1-45" becomes "1.0.0-45".
+     * Throws [IllegalArgumentException] on invalid input.
      */
     fun parseWithBuild(raw: String): VersionWithBuild {
         val match = regex.matchEntire(raw)
