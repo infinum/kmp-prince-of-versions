@@ -7,9 +7,12 @@ public typealias ApplicationVersionProvider = BaseApplicationVersionProvider<Str
 internal class IosApplicationVersionProvider : ApplicationVersionProvider {
 
     override fun getVersion(): String {
-        val dictionary = NSBundle.mainBundle.infoDictionary
-        val short = dictionary?.get("CFBundleShortVersionString") as? String ?: "0.0.0"
-        val build = dictionary?.get("CFBundleVersion") as? String ?: "0"
+        val info = NSBundle.mainBundle.infoDictionary
+            ?: error("Info.plist not loaded (NSBundle.mainBundle.infoDictionary == null).")
+        val short = (info["CFBundleShortVersionString"] as? String)?.takeIf { it.isNotBlank() }
+            ?: error("CFBundleShortVersionString is missing or blank in Info.plist.")
+        val build = (info["CFBundleVersion"] as? String)?.takeIf { it.isNotBlank() }
+            ?: error("CFBundleVersion is missing or blank in Info.plist.")
         return "$short-$build"
     }
 }

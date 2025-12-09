@@ -14,6 +14,7 @@ import platform.Foundation.NSHTTPURLResponse
 import platform.Foundation.NSMutableURLRequest
 import platform.Foundation.NSString
 import platform.Foundation.NSURL
+import platform.Foundation.NSURLRequestReloadIgnoringLocalCacheData
 import platform.Foundation.NSURLResponse
 import platform.Foundation.NSURLSession
 import platform.Foundation.NSURLSessionConfiguration
@@ -42,6 +43,8 @@ internal class IosDefaultLoader(
             val request = NSMutableURLRequest.requestWithURL(nsUrl).apply {
                 setHTTPMethod("GET")
                 setTimeoutInterval(timeoutSeconds)
+                // Bypass local cache for this request
+                setCachePolicy(NSURLRequestReloadIgnoringLocalCacheData)
                 if (username != null && password != null) {
                     val creds = "$username:$password"
                     val auth = "Basic " + Base64.encode(creds.encodeToByteArray())
