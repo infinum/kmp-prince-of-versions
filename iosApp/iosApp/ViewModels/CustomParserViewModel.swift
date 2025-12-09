@@ -10,31 +10,47 @@ import PrinceOfVersions
 
 @MainActor
 final class CustomParserViewModel: ObservableObject {
-    @Published var inputJSON = Constants.JSON.demoIos2JSON
+    @Published var inputJSON = Constants.JSON.minimumVersion
     @Published var resultText = ""
     @Published var isLoading = false
     @Published var showAlert = false
     @Published var alertMessage = ""
 
-    private let checker = SystemVersionRequirementCheckerKt.makeSystemVersionRequirementChecker()
-    private lazy var pov: any PrinceOfVersionsBase = {
-        return IosPrinceOfVersionsKt.princeOfVersionsWithCustomChecker(
-            key: Constants.checkerKey,
-            checker: checker,
-            keepDefaultCheckers: true
-        )
-    }()
+    private lazy var pov: any PrinceOfVersionsBase = IosDefaultVersionComparatorKt.princeOfVersionsWithCustomParser(parser: MinimalConfigParser())
+
 
     func parseLocally() {
-        do {
-            let cfg = try IosConfigurationParserKt.parseWithIosParserForSample(json: inputJSON)
-            self.resultText = describe(config: cfg)
-        } catch _ as RequirementsNotSatisfiedException {
-            self.resultText = "❌ Requirements not satisfied"
-        } catch _ as ConfigurationException {
-            self.resultText = "❌ Bad configuration"
-        } catch {
-            self.resultText = "❌ Error: \(error.localizedDescription)"
+        isLoading = true
+        resultText = ""
+
+        let loader = StringLoader(payload: inputJSON)
+
+        pov.checkForUpdates(source: loader) { [weak self] result, error in
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                self.isLoading = false
+                
+                if let error = error as NSError? {
+                    if isKotlin(error, RequirementsNotSatisfiedException.self) {
+                        self.show(message: "Requirements not met. (Custom checker failed)")
+                    } else if isKotlin(error, ConfigurationException.self) {
+                        self.show(message: "Bad configuration")
+                    } else if isKotlin(error, IoException.self) {
+                        self.show(message: "Network / IO error")
+                    } else {
+                        self.show(message: "Error: \((error as NSError).localizedDescription)")
+                    }
+                }
+
+                guard let result else {
+                    self.show(message: "❌ Unknown error")
+                    return
+                }
+                
+                let status = String(describing: result.status)
+                let version = String(describing: result.version)
+                self.show(message: "✅ From JSON → status: \(status), version: \(version)\nmeta: \(result.metadata)")
+            }
         }
     }
 
@@ -45,24 +61,26 @@ final class CustomParserViewModel: ObservableObject {
             do {
                 let update = try await IosPrinceOfVersionsKt.checkForUpdatesFromUrl(
                     pov,
-                    url: Constants.customParserUrl,
+                    url: Constants.minimumUrl,
                     username: nil,
                     password: nil,
-                    networkTimeout: Int64(5_000)
+                    networkTimeout: Int64(Constants.networkTimeout)
                 )
                 let status = String(describing: update.status)
-                let version = update.version ?? "(nil)"
-                self.show("✅ From URL → status: \(status), version: \(version)\nmeta: \(update.metadata)")
+                let version = (update.version as String?) ?? "nil"
+                self.show(message: "✅ From URL → status: \(status), version: \(version)\nmeta: \(update.metadata)")
             } catch is CancellationError {
-                self.show("🔁 Cancelled")
-            } catch _ as RequirementsNotSatisfiedException {
-                self.show("❌ Requirements not satisfied")
-            } catch _ as ConfigurationException {
-                self.show("❌ Bad configuration")
-            } catch _ as IoException {
-                self.show("🌐 IO error")
+                self.show(message: "🔁 Cancelled")
             } catch {
-                self.show("❌ Error: \(error.localizedDescription)")
+                if isKotlin(error, RequirementsNotSatisfiedException.self) {
+                    self.show(message: "Requirements not met. (Custom checker failed)")
+                } else if isKotlin(error, ConfigurationException.self) {
+                    self.show(message: "Bad configuration")
+                } else if isKotlin(error, IoException.self) {
+                    self.show(message: "Network / IO error")
+                } else {
+                    self.show(message: "Error: \((error as NSError).localizedDescription)")
+                }
             }
             self.isLoading = false
         }
@@ -82,9 +100,10 @@ final class CustomParserViewModel: ObservableObject {
         """
     }
 
-    private func show(_ message: String) {
-        self.resultText = message
-        self.alertMessage = message
-        self.showAlert = true
+    private func show(message: String) {
+        resultText = message
+        alertMessage = message
+        showAlert = true
     }
 }
+
