@@ -55,7 +55,11 @@ struct CustomParserView: View {
         }
         .navigationTitle("Custom Parser")
         .alert(isPresented: $vm.showAlert) {
-            Alert(title: Text("Parser / URL result"), message: Text(vm.alertMessage), dismissButton: .default(Text("OK")))
+            Alert(
+                title: Text("Parser / URL result"),
+                message: Text(vm.alertMessage),
+                dismissButton: .default(Text("OK"))
+            )
         }
     }
 }
