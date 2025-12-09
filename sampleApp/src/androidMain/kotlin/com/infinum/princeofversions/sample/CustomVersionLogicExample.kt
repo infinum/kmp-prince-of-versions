@@ -58,7 +58,7 @@ class CustomVersionLogicExample : ComponentActivity() {
             if (secondVersion % 10 == 0L) {
                 return -1 // Treat as "no update available"
             }
-            return secondVersion.compareTo(firstVersion)
+            return firstVersion.compareTo(secondVersion)
         }
     }
 
