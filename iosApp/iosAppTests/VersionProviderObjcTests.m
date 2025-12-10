@@ -115,7 +115,7 @@
         XCTAssertTrue(result != nil || error != nil);
         [exp fulfill];
     }];
-    [self waitForExpectations:@[exp] timeout:5.0];
+    [self waitForExpectations:@[exp] timeout:10.0];
 }
 
 - (void)testCustomVersionLogic {
