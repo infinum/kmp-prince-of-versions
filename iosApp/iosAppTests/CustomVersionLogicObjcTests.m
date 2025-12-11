@@ -42,7 +42,7 @@
 }
 
 // A) Mandatory update: current < required_version
-- (void)testMandatoryUpdateWhenBelowRequiredVersion {
+- (void)test_checkForUpdates_shouldReturnMandatoryUpdate_whenBelowRequiredVersion {
     id<POVPrinceOfVersionsBase> pov = [self makePOVWithCurrent:@"1.2.2"];
 
     NSString *json =
@@ -77,7 +77,7 @@
 
 
 // C) Optional update: current == required, optional is higher ⇒ OPTIONAL ("1.3.0")
-- (void)testOptionalUpdateWhenBelowOptionalVersionOnly {
+- (void)test_checkForUpdates_shouldReturnOptionalUpdate_whenBelowOptionalVersionOnly {
     id<POVPrinceOfVersionsBase> pov = [self makePOVWithCurrent:@"1.2.3"];
 
     NSString *json =
@@ -105,7 +105,7 @@
 
 
 // D) No update: current == required == optional ⇒ NO_UPDATE, version echoes current
-- (void)testNoUpdateWhenUpToDate {
+- (void)test_checkForUpdates_shouldReturnNoUpdate_whenUpToDate {
     id<POVPrinceOfVersionsBase> pov = [self makePOVWithCurrent:@"1.2.3"];
 
     NSString *json =
@@ -133,7 +133,7 @@
 
 
 // E) Bad configuration: missing ios/ios2 ⇒ NSError (ConfigurationException bridged)
-- (void)testBadConfigurationYieldsError {
+- (void)test_checkForUpdates_shouldThrowConfigurationException_whenConfigurationIsMissing {
     id<POVPrinceOfVersionsBase> pov = [self makePOVWithCurrent:@"1.2.3"];
 
     NSString *badJson = @"{\"meta\":{\"only\":\"meta\"}}"; // no ios / ios2 sections

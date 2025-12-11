@@ -14,7 +14,7 @@
 
 @implementation VersionProviderObjcTests
 
-- (void)testReadsVersionFromHostInfoPlist {
+- (void)test_versionProvider_shouldReadVersionFromHostInfoPlist {
     POVTestHooks *hooks = POVTestHooks.shared;
     NSString *version = [hooks exposeAppVersionForUnitTests];
 
@@ -28,7 +28,7 @@
     return ke ? [ke description] : error.localizedDescription;
 }
 
-- (void)testInvalidURL_YieldsIoError {
+- (void)test_checkForUpdates_shouldYieldIoError_whenInvalidURL {
     id<POVPrinceOfVersionsBase> pov = [POVIosPrinceOfVersionsKt PrinceOfVersions];
 
     XCTestExpectation *exp = [self expectationWithDescription:@"io-error"];
@@ -48,7 +48,7 @@
     [self waitForExpectations:@[exp] timeout:5.0];
 }
 
-- (void)testRequirementsNotSatisfied_YieldsError {
+- (void)test_checkForUpdates_shouldYieldError_whenRequirementsNotSatisfied {
     ThresholdChecker *checker = [ThresholdChecker new];
 
     id<POVPrinceOfVersionsBase> pov =
@@ -75,7 +75,7 @@
     [self waitForExpectations:@[exp] timeout:5.0];
 }
 
-- (void)testBadConfig_YieldsConfigurationException {
+- (void)test_checkForUpdates_shouldYieldConfigurationException_whenBadConfig {
     id<POVPrinceOfVersionsBase> pov = [POVIosPrinceOfVersionsKt PrinceOfVersions];
 
     // Point to a JSON that definitely lacks the "ios" key
@@ -100,25 +100,7 @@
     [self waitForExpectations:@[exp] timeout:5.0];
 }
 
-- (void)testCompletesWithinTimeout {
-    id<POVPrinceOfVersionsBase> pov = [POVIosPrinceOfVersionsKt PrinceOfVersions];
-
-    XCTestExpectation *exp = [self expectationWithDescription:@"completes"];
-    [POVIosPrinceOfVersionsKt checkForUpdatesFromUrl:pov
-                                                       url:@"not a url"
-                                                  username:nil
-                                                  password:nil
-                                       networkTimeout:3000
-                                         completionHandler:^(POVBaseUpdateResult<NSString *> * _Nullable result,
-                                                             NSError * _Nullable error)
-    {
-        XCTAssertTrue(result != nil || error != nil);
-        [exp fulfill];
-    }];
-    [self waitForExpectations:@[exp] timeout:10.0];
-}
-
-- (void)testCustomVersionLogic {
+- (void)test_checkForUpdates_shouldWorkWithCustomVersionLogic {
     // 1) Provider + comparator
     POVHardcodedVersionProviderIos *provider =
         [[POVHardcodedVersionProviderIos alloc] initWithCurrent:@"1.2.3"];
