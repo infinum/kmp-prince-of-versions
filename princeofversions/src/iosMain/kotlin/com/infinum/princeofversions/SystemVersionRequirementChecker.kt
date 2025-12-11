@@ -29,27 +29,10 @@ internal class SystemVersionRequirementChecker : RequirementChecker {
         }
     }
 
-    private fun parseVersion(input: String): Version {
-        val components = input.split(SEP_DOT)
-        return Version(
-            major = components.getOrElse(INDEX_MAJOR) { DEFAULT_COMPONENT_STR }.toIntOrNull() ?: DEFAULT_COMPONENT_INT,
-            minor = components.getOrElse(INDEX_MINOR) { DEFAULT_COMPONENT_STR }.toIntOrNull() ?: DEFAULT_COMPONENT_INT,
-            patch = components.getOrElse(INDEX_PATCH) { DEFAULT_COMPONENT_STR }.toIntOrNull() ?: DEFAULT_COMPONENT_INT,
-        )
-    }
+    private fun parseVersion(input: String): Version =
+        VersionParser.parseDots(input) // reuse shared parser
 
     companion object {
         const val KEY = "required_os_version"
-
-        // Parsing helpers
-        private const val SEP_DOT = '.'
-        private const val INDEX_MAJOR = 0
-        private const val INDEX_MINOR = 1
-        private const val INDEX_PATCH = 2
-        private const val DEFAULT_COMPONENT_INT = 0
-        private const val DEFAULT_COMPONENT_STR = "0"
     }
 }
-
-public fun makeSystemVersionRequirementChecker(): RequirementChecker =
-    SystemVersionRequirementChecker()
