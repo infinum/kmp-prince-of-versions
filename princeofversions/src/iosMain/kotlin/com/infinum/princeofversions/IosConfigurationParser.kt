@@ -120,8 +120,8 @@ internal class IosConfigurationParser(
         val raw = json.objectForKey(NOTIFY_FLAT) ?: return NotificationType.ONCE
         if (raw is NSNull) return NotificationType.ONCE
 
-        require(raw is String) { "In update configuration $NOTIFY_FLAT should be String, but the actual value is $raw" }
-        return if (raw.equals(NOTIFY_ALWAYS, ignoreCase = true)) {
+        require(raw is NSString) { "In update configuration $NOTIFY_FLAT should be String, but the actual value is $raw" }
+        return if (raw.toString().equals(NOTIFY_ALWAYS, ignoreCase = true)) {
             NotificationType.ALWAYS
         } else {
             NotificationType.ONCE
