@@ -7,9 +7,6 @@
 
 import SwiftUI
 
-// MainMenuView.swift
-import SwiftUI
-
 enum DemoRoute: String, CaseIterable, Identifiable {
     case commonUsage = "Common Usage"
     case customParser = "Custom Configuration Parser"

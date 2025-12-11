@@ -1,7 +1,7 @@
 package com.infinum.princeofversions
 
 /** Simple semantic version holder for (major.minor.patch). */
-public data class Version(
+internal data class Version(
     val major: Int,
     val minor: Int,
     val patch: Int,
