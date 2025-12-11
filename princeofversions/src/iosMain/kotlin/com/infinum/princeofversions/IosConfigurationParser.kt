@@ -18,16 +18,6 @@ public typealias ConfigurationParser = BaseConfigurationParser<String>
 public typealias PrinceOfVersionsConfig = BasePrinceOfVersionsConfig<String>
 
 /**
- * Public helper: parse a JSON string using the *iOS parser* and return the config.
- * Throws ConfigurationException / RequirementsNotSatisfiedException for Swift to catch nicely.
- */
-@Throws(ConfigurationException::class, RequirementsNotSatisfiedException::class)
-public fun parseWithIosParserForSample(json: String): PrinceOfVersionsConfig {
-    val parser = IosConfigurationParser(RequirementsProcessor(emptyMap()))
-    return parser.parse(json)
-}
-
-/**
  * iOS parser using Foundation's NSJSONSerialization.
  * Prefers "ios2" (flat), falls back to "ios" (nested).
  */

@@ -1,5 +1,11 @@
 package com.infinum.princeofversions
 
+/**
+ * Compares two versions and returns an integer value.
+ *
+ * Implemented method should return zero if the values is equal, a positive number if firstVersion is greater than secondVersion,
+ * or a negative number if firstVersion is less than secondVersion.
+ */
 public typealias VersionComparator = BaseVersionComparator<Long>
 
 /**
