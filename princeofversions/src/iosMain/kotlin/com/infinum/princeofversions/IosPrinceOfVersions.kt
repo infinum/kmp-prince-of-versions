@@ -1,6 +1,9 @@
 package com.infinum.princeofversions
 
 import com.infinum.princeofversions.PrinceOfVersionsBase.Companion.DEFAULT_NETWORK_TIMEOUT
+import kotlinx.coroutines.NonCancellable.isActive
+import kotlinx.coroutines.delay
+import platform.Foundation.NSLog
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration
 
@@ -75,14 +78,19 @@ public suspend fun PrinceOfVersions.checkForUpdatesFromUrl(
     username: String? = null,
     password: String? = null,
     networkTimeout: Duration = DEFAULT_NETWORK_TIMEOUT,
-): UpdateResult = checkForUpdates(
-    source = provideDefaultLoader(
-        url = url,
-        username = username,
-        password = password,
-        networkTimeout = networkTimeout,
-    ),
-)
+): UpdateResult {
+    var i = 0
+    while (isActive) {
+        NSLog("Iteration: $i")
+        i++
+        delay(500L)
+    }
+    return UpdateResult(
+        version = "1",
+        status = UpdateStatus.NO_UPDATE
+    )
+}
+
 
 public class ConfigurationException(message: String, cause: Throwable? = null) : Exception(message, cause)
 
