@@ -64,7 +64,11 @@ final class CustomVersionLogicViewModel: ObservableObject {
         }
     }
 
-    func cancel() { task?.cancel(); task = nil; isLoading = false }
+    func cancel() {
+        task?.cancel()
+        task = nil
+        isLoading = false
+    }
 
     private func show(message: String) {
         lastMessage = message
