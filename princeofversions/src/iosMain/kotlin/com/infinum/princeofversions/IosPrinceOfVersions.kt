@@ -3,6 +3,8 @@ package com.infinum.princeofversions
 import com.infinum.princeofversions.PrinceOfVersionsBase.Companion.DEFAULT_NETWORK_TIMEOUT
 import kotlin.time.Duration
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.delay
+import platform.Foundation.NSLog
 
 /**
  * Represents the main interface for using the library.
@@ -17,7 +19,7 @@ public typealias PrinceOfVersions = PrinceOfVersionsBase<String>
  */
 public typealias UpdateResult = BaseUpdateResult<String>
 
-public fun PrinceOfVersions(): PrinceOfVersions = createPrinceOfVersions(
+public fun createPrinceOfVersions(): PrinceOfVersions = createPrinceOfVersions(
     princeOfVersionsComponents = PrinceOfVersionsComponents.Builder().build(),
 )
 
@@ -75,25 +77,17 @@ public suspend fun PrinceOfVersions.checkForUpdatesFromUrl(
     username: String? = null,
     password: String? = null,
     networkTimeout: Duration = DEFAULT_NETWORK_TIMEOUT,
-): UpdateResult = try {
-    checkForUpdates(
-        source = provideDefaultLoader(
-            url = url,
-            username = username,
-            password = password,
-            networkTimeout = networkTimeout,
-        ),
+): UpdateResult {
+    var i = 0
+    while (true) {
+        NSLog("Iteration: $i")
+        i++
+        delay(500L)
+    }
+    return UpdateResult(
+        version = "1",
+        status = UpdateStatus.NO_UPDATE
     )
-} catch (e: CancellationException) {
-    throw e
-} catch (e: IllegalStateException) {
-    throw ConfigurationException(e.message ?: "Invalid configuration", e)
-} catch (e: RequirementsNotSatisfiedException) {
-    throw e
-} catch (e: IoException) {
-    throw e
-} catch (t: Throwable) {
-    throw ConfigurationException(t.message ?: "Unexpected error", t)
 }
 
 // Add a Swift-friendly overload that takes milliseconds
