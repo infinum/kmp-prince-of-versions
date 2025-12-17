@@ -63,7 +63,7 @@
                                                            checker:checker
                                                keepDefaultCheckers:YES];
 
-    NSString *json = @"{\"ios2\":[{\"required_version\":\"1.0.0\",\"requirements\":{\"requiredNumberOfLetters\":\"3\"}}]}";
+    NSString *json = @"{\"ios2\":[{\"required_version\":\"999.0.0\",\"requirements\":{\"requiredNumberOfLetters\":\"3\"}}]}";
     POVTestStringLoader *loader = [[POVTestStringLoader alloc] initWithPayload:json];
 
     XCTestExpectation *exp = [self expectationWithDescription:@"requirements"];
