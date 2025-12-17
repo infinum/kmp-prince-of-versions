@@ -3,7 +3,7 @@ package com.infinum.princeofversions
 /**
  * This class handles requirement checking while JSON parsing
  */
-public fun interface RequirementChecker {
+public expect interface RequirementChecker {
     /**
      * This method is used to check if passed data requires specified requirements
      *
@@ -11,6 +11,5 @@ public fun interface RequirementChecker {
      * @return true or false depending if the data matched requirements
      * @throws Throwable in case of any error in parsing
      */
-    @Throws(Throwable::class)
     public fun checkRequirements(value: String?): Boolean
 }

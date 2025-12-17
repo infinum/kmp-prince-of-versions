@@ -1,5 +1,7 @@
 package com.infinum.princeofversions
 
+import com.infinum.princeofversions.PrinceOfVersionsBase.Companion.DEFAULT_NETWORK_TIMEOUT
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration
 
 /**
@@ -40,7 +42,7 @@ public suspend fun PrinceOfVersions.checkForUpdates(
     ),
 )
 
-private fun createPrinceOfVersions(
+internal fun createPrinceOfVersions(
     princeOfVersionsComponents: PrinceOfVersionsComponents,
 ): PrinceOfVersions =
     with(princeOfVersionsComponents) {
@@ -58,3 +60,57 @@ private fun createPrinceOfVersions(
         )
         return PrinceOfVersionsImpl(checkForUpdatesUseCase = checkForUpdatesUseCase)
     }
+
+/**
+ * Starts a check for an update, loading the configuration from a URL (iOS actual).
+ */
+@Throws(
+    IoException::class,
+    RequirementsNotSatisfiedException::class,
+    ConfigurationException::class,
+    CancellationException::class,
+)
+public suspend fun PrinceOfVersions.checkForUpdatesFromUrl(
+    url: String,
+    username: String? = null,
+    password: String? = null,
+    networkTimeout: Duration = DEFAULT_NETWORK_TIMEOUT,
+): UpdateResult = checkForUpdates(
+    source = provideDefaultLoader(
+        url = url,
+        username = username,
+        password = password,
+        networkTimeout = networkTimeout,
+    ),
+)
+
+public class ConfigurationException(message: String, cause: Throwable? = null) : Exception(message, cause)
+
+/**
+ * Convenience for Swift: build PoV with a single custom checker.
+ */
+public fun princeOfVersionsWithCustomChecker(
+    key: String,
+    checker: RequirementChecker,
+    keepDefaultCheckers: Boolean = true,
+): PrinceOfVersions {
+    val components = PrinceOfVersionsComponents.Builder()
+        .withRequirementCheckers(mapOf(key to checker), keepDefaultCheckers)
+        .build()
+    return createPrinceOfVersions(components)
+}
+
+/**
+ * Convenience for Swift: build PoV with many custom checkers.
+ * In Swift you can pass an array of KotlinPair<String, RequirementChecker>.
+ */
+public fun princeOfVersionsWithCustomCheckers(
+    pairs: Array<kotlin.Pair<String, RequirementChecker>>,
+    keepDefaultCheckers: Boolean = true,
+): PrinceOfVersions {
+    val map = pairs.toMap()
+    val components = PrinceOfVersionsComponents.Builder()
+        .withRequirementCheckers(map, keepDefaultCheckers)
+        .build()
+    return createPrinceOfVersions(components)
+}
