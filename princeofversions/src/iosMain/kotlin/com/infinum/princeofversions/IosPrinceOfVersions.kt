@@ -1,8 +1,8 @@
 package com.infinum.princeofversions
 
 import com.infinum.princeofversions.PrinceOfVersionsBase.Companion.DEFAULT_NETWORK_TIMEOUT
-import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration
+import kotlinx.coroutines.CancellationException
 
 /**
  * Represents the main interface for using the library.
@@ -75,16 +75,52 @@ public suspend fun PrinceOfVersions.checkForUpdatesFromUrl(
     username: String? = null,
     password: String? = null,
     networkTimeout: Duration = DEFAULT_NETWORK_TIMEOUT,
-): UpdateResult = checkForUpdates(
-    source = provideDefaultLoader(
-        url = url,
-        username = username,
-        password = password,
-        networkTimeout = networkTimeout,
-    ),
-)
+): UpdateResult = try {
+    checkForUpdates(
+        source = provideDefaultLoader(
+            url = url,
+            username = username,
+            password = password,
+            networkTimeout = networkTimeout,
+        ),
+    )
+} catch (e: CancellationException) {
+    throw e
+} catch (e: IllegalStateException) {
+    throw ConfigurationException(e.message ?: "Invalid configuration", e)
+} catch (e: RequirementsNotSatisfiedException) {
+    throw e
+} catch (e: IoException) {
+    throw e
+} catch (t: Throwable) {
+    throw ConfigurationException(t.message ?: "Unexpected error", t)
+}
 
+// Add a Swift-friendly overload that takes milliseconds
 public class ConfigurationException(message: String, cause: Throwable? = null) : Exception(message, cause)
+
+@Throws(
+    IoException::class,
+    RequirementsNotSatisfiedException::class,
+    ConfigurationException::class,
+    CancellationException::class,
+)
+public suspend fun PrinceOfVersions.checkForUpdatesBridged(
+    source: Loader,
+): UpdateResult = try {
+    checkForUpdates(source)
+} catch (e: CancellationException) {
+    throw e
+} catch (e: IllegalStateException) {
+    // unify any internal IllegalState into a ConfigurationException for iOS
+    throw ConfigurationException(e.message ?: "Invalid configuration", e)
+} catch (e: RequirementsNotSatisfiedException) {
+    throw e
+} catch (e: IoException) {
+    throw e
+} catch (t: Throwable) {
+    throw ConfigurationException(t.message ?: "Unexpected error", t)
+}
 
 /**
  * Convenience for Swift: build PoV with a single custom checker.
