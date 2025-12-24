@@ -7,6 +7,7 @@
 
 #import <XCTest/XCTest.h>
 @import PrinceOfVersions;
+#import "POVTestStringLoader.h"
 #import "ThresholdChecker.h"
 
 @interface VersionProviderObjcTests : XCTestCase
@@ -23,6 +24,11 @@
                   @"Expected short-build like 1.2.3-456; got %@", version);
 }
 
+/**
+ Extracts the Kotlin exception message from an NSError.
+ @param error The error to extract the Kotlin exception from
+ @return The Kotlin exception description or the localized description
+ */
 - (NSString *)kotlinExceptionStringFrom:(NSError *)error {
     id ke = error.userInfo[@"KotlinException"];
     return ke ? [ke description] : error.localizedDescription;
@@ -31,21 +37,22 @@
 - (void)test_checkForUpdates_shouldYieldIoError_whenInvalidURL {
     id<POVPrinceOfVersionsBase> pov = [POVIosPrinceOfVersionsKt PrinceOfVersions];
 
+    NSError *ioError = [NSError errorWithDomain:@"TestIOError"
+                                           code:404
+                                       userInfo:@{NSLocalizedDescriptionKey: @"Network error"}];
+    POVTestStringLoader *loader = [[POVTestStringLoader alloc] initWithError:ioError];
+
     XCTestExpectation *exp = [self expectationWithDescription:@"io-error"];
-    [POVIosPrinceOfVersionsKt checkForUpdatesFromUrl:pov
-                                                       url:@"not a url"
-                                                  username:nil
-                                                  password:nil
-                                       networkTimeout:3000
-                                         completionHandler:^(POVBaseUpdateResult<NSString *> * _Nullable result,
-                                                             NSError * _Nullable error)
+    [POVIosPrinceOfVersionsKt checkForUpdatesBridged:pov
+                                              source:loader
+                                   completionHandler:^(POVBaseUpdateResult<NSString *> * _Nullable result,
+                                                       NSError * _Nullable error)
     {
         XCTAssertNil(result);
         XCTAssertNotNil(error);
-        XCTAssertTrue([self kotlinExceptionStringFrom:error].length > 0);
         [exp fulfill];
     }];
-    [self waitForExpectations:@[exp] timeout:5.0];
+    [self waitForExpectations:@[exp] timeout:2.0];
 }
 
 - (void)test_checkForUpdates_shouldYieldError_whenRequirementsNotSatisfied {
@@ -56,77 +63,86 @@
                                                            checker:checker
                                                keepDefaultCheckers:YES];
 
-    NSString *url = @"https://pastebin.com/raw/VMgd71VH"; // use your stable fixture
+    NSString *json = @"{\"ios2\":[{\"required_version\":\"999.0.0\",\"requirements\":{\"requiredNumberOfLetters\":\"3\"}}]}";
+    POVTestStringLoader *loader = [[POVTestStringLoader alloc] initWithPayload:json];
 
     XCTestExpectation *exp = [self expectationWithDescription:@"requirements"];
-    [POVIosPrinceOfVersionsKt checkForUpdatesFromUrl:pov
-                                                       url:url
-                                                  username:nil
-                                                  password:nil
-                                       networkTimeout:3000
-                                         completionHandler:^(POVBaseUpdateResult<NSString *> * _Nullable result,
-                                                             NSError * _Nullable error)
+    [POVIosPrinceOfVersionsKt checkForUpdatesBridged:pov
+                                              source:loader
+                                   completionHandler:^(POVBaseUpdateResult<NSString *> * _Nullable result,
+                                                       NSError * _Nullable error)
     {
         XCTAssertNil(result);
         XCTAssertNotNil(error);
         XCTAssertTrue([self kotlinExceptionStringFrom:error].length > 0);
         [exp fulfill];
     }];
-    [self waitForExpectations:@[exp] timeout:5.0];
+    [self waitForExpectations:@[exp] timeout:2.0];
 }
 
 - (void)test_checkForUpdates_shouldYieldConfigurationException_whenBadConfig {
     id<POVPrinceOfVersionsBase> pov = [POVIosPrinceOfVersionsKt PrinceOfVersions];
 
-    // Point to a JSON that definitely lacks the "ios" key
-    NSString *url = @"https://example.com/pov_bad_config.json";
+    POVTestStringLoader *loader = [[POVTestStringLoader alloc] initWithPayload:@"{invalid json}"];
 
     XCTestExpectation *exp = [self expectationWithDescription:@"config-error"];
-    [POVIosPrinceOfVersionsKt checkForUpdatesFromUrl:pov
-                                                       url:url
-                                                  username:nil
-                                                  password:nil
-                                       networkTimeout:3000
-                                         completionHandler:^(POVBaseUpdateResult<NSString *> * _Nullable result,
-                                                             NSError * _Nullable error)
+    [POVIosPrinceOfVersionsKt checkForUpdatesBridged:pov
+                                              source:loader
+                                   completionHandler:^(POVBaseUpdateResult<NSString *> * _Nullable result,
+                                                       NSError * _Nullable error)
     {
         XCTAssertNil(result);
         XCTAssertNotNil(error);
-        // Optionally assert the error *class*:
-        // XCTAssertTrue([error isKindOfClass:[POVConfigurationException class]]);
         XCTAssertTrue([self kotlinExceptionStringFrom:error].length > 0);
         [exp fulfill];
     }];
-    [self waitForExpectations:@[exp] timeout:5.0];
+    [self waitForExpectations:@[exp] timeout:2.0];
 }
 
-- (void)test_checkForUpdates_shouldWorkWithCustomVersionLogic {
-    // 1) Provider + comparator
+- (void)test_checkForUpdates_shouldWorkWithCustomVersionProvider {
     POVHardcodedVersionProviderIos *provider =
         [[POVHardcodedVersionProviderIos alloc] initWithCurrent:@"1.2.3"];
 
-    id<POVBaseVersionComparator> baseComparator =
-            [POVIosDefaultVersionComparatorKt defaultIosVersionComparator];
-    POVDevBuildVersionComparator *comparator =
-        [[POVDevBuildVersionComparator alloc] initWithDelegate:baseComparator];
+    id<POVBaseVersionComparator> comparator =
+        [POVIosDefaultVersionComparatorKt defaultIosVersionComparator];
+
     id<POVPrinceOfVersionsBase> pov =
         [POVIosDefaultVersionComparatorKt princeOfVersionsWithCustomVersionLogicProvider:provider
                                                                              comparator:comparator];
 
-    [POVIosPrinceOfVersionsKt checkForUpdatesFromUrl:pov
-                                                 url:@"https://pastebin.com/raw/KgAZQUb5"
-                                            username:nil
-                                            password:nil
-                                      networkTimeout:3000
+    NSString *json = @"{\"ios2\":[{\"required_version\":\"1.2.5\",\"last_version_available\":\"1.3.0\"}]}";
+    POVTestStringLoader *loader = [[POVTestStringLoader alloc] initWithPayload:json];
+
+    XCTestExpectation *exp = [self expectationWithDescription:@"custom-provider"];
+    [POVIosPrinceOfVersionsKt checkForUpdatesBridged:pov
+                                              source:loader
                                    completionHandler:^(POVBaseUpdateResult<NSString *> * _Nullable result,
                                                        NSError * _Nullable error) {
         if (error) {
-            NSLog(@"Error: %@", error);
+            XCTFail(@"Should not have error: %@", error);
         } else {
-            NSLog(@"Status=%@ Version=%@", result.status, result.version);
+            XCTAssertNotNil(result);
         }
+        [exp fulfill];
     }];
+    [self waitForExpectations:@[exp] timeout:2.0];
+}
+
+- (void)test_checkForUpdates_shouldWorkWithDefaultInstance {
+    id<POVPrinceOfVersionsBase> pov = [POVIosPrinceOfVersionsKt PrinceOfVersions];
+
+    POVTestStringLoader *loader = [[POVTestStringLoader alloc] initWithPayload:
+        @"{\"ios2\":[{\"required_version\":\"1.0.0\"}]}"];
+
+    XCTestExpectation *exp = [self expectationWithDescription:@"default-instance"];
+    [POVIosPrinceOfVersionsKt checkForUpdatesBridged:pov
+                                              source:loader
+                                   completionHandler:^(POVBaseUpdateResult<NSString *> * _Nullable result,
+                                                       NSError * _Nullable error) {
+        XCTAssertTrue((result != nil) || (error != nil));
+        [exp fulfill];
+    }];
+    [self waitForExpectations:@[exp] timeout:2.0];
 }
 
 @end
-

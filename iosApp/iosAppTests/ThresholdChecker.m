@@ -8,8 +8,7 @@
 #import "ThresholdChecker.h"
 
 @implementation ThresholdChecker
-- (BOOL)checkRequirementsValue:(NSString * _Nullable)value
-                         error:(NSError * _Nullable * _Nullable)error {
+- (BOOL)checkRequirementsValue:(NSString * _Nullable)value {
     NSInteger number = value.integerValue;
     return number >= 5;
 }

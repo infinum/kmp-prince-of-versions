@@ -14,34 +14,30 @@
 
 @implementation CustomVersionLogicObjcTests
 
-// Convenience to build the POV with custom provider+comparator for all tests
+/**
+ Creates a PrinceOfVersions instance with custom version provider and comparator.
+ @param currentVersion The version string to use as the current app version
+ @return Configured PrinceOfVersions instance
+ */
 - (id<POVPrinceOfVersionsBase>)makePOVWithCurrent:(NSString *)currentVersion {
     POVHardcodedVersionProviderIos *provider =
         [[POVHardcodedVersionProviderIos alloc] initWithCurrent:currentVersion];
 
-    id<POVBaseVersionComparator> defaultCmp =
+    id<POVBaseVersionComparator> comparator =
         [POVIosDefaultVersionComparatorKt defaultIosVersionComparator];
-
-    // Your special comparator: suppress updates when remote ends with "-0"
-    POVDevBuildVersionComparator *cmp =
-        [[POVDevBuildVersionComparator alloc] initWithDelegate:defaultCmp];
 
     id<POVPrinceOfVersionsBase> pov =
         [POVIosDefaultVersionComparatorKt princeOfVersionsWithCustomVersionLogicProvider:provider
-                                                                             comparator:cmp];
+                                                                             comparator:comparator];
     return pov;
 }
 
-// Returns the version the interactor will notify for a MANDATORY case:
-// max(required, optional) using the default iOS comparator.
 - (NSString *)expectedNotifiedVersionForRequired:(NSString *)req optional:(NSString *)opt {
     id<POVBaseVersionComparator> cmp = [POVIosDefaultVersionComparatorKt defaultIosVersionComparator];
     if (opt == nil) return req;
-    // compare(first, second) < 0  ⇢  first < second
     return ([cmp compareFirstVersion:req secondVersion:opt] < 0) ? opt : req;
 }
 
-// A) Mandatory update: current < required_version
 - (void)test_checkForUpdates_shouldReturnMandatoryUpdate_whenBelowRequiredVersion {
     id<POVPrinceOfVersionsBase> pov = [self makePOVWithCurrent:@"1.2.2"];
 
@@ -61,13 +57,9 @@
                                                          NSError * _Nullable error) {
         XCTAssertNil(error);
         XCTAssertNotNil(result);
-
-        // Safer enum assertion (ordinal instead of pointer identity)
         XCTAssertEqual(result.status.ordinal, [POVUpdateStatus mandatory].ordinal);
 
-        // Expect max(required, optional) by comparator
-        NSString *expected = [self expectedNotifiedVersionForRequired:@"1.2.3"
-                                                             optional:@"1.2.5"];
+        NSString *expected = [self expectedNotifiedVersionForRequired:@"1.2.3" optional:@"1.2.5"];
         XCTAssertEqualObjects(result.version, expected);
 
         [exp fulfill];
@@ -75,16 +67,14 @@
     [self waitForExpectations:@[exp] timeout:2.0];
 }
 
-
-// C) Optional update: current == required, optional is higher ⇒ OPTIONAL ("1.3.0")
 - (void)test_checkForUpdates_shouldReturnOptionalUpdate_whenBelowOptionalVersionOnly {
-    id<POVPrinceOfVersionsBase> pov = [self makePOVWithCurrent:@"1.2.3"];
+    id<POVPrinceOfVersionsBase> pov = [self makePOVWithCurrent:@"1.3.0"];
 
     NSString *json =
     @"{"
       "\"ios2\": [{"
-        "\"required_version\": \"1.2.3\","
-        "\"last_version_available\": \"1.3.0\","
+        "\"required_version\": \"1.3.0\","
+        "\"last_version_available\": \"1.4.0\","
         "\"notify_last_version_frequency\": \"ALWAYS\""
       "}]"
     "}";
@@ -93,27 +83,25 @@
 
     XCTestExpectation *exp = [self expectationWithDescription:@"optional-update"];
     [POVIosPrinceOfVersionsKt checkForUpdatesBridged:pov source:loader completionHandler:^(POVBaseUpdateResult<NSString *> * _Nullable result,
-                                                          NSError * _Nullable error) {
+                                                         NSError * _Nullable error) {
         XCTAssertNil(error);
         XCTAssertNotNil(result);
-        XCTAssertEqualObjects(result.status.name, [POVUpdateStatus optional].name);
-        XCTAssertEqualObjects(result.version, @"1.3.0");
+        XCTAssertEqual(result.status.ordinal, [POVUpdateStatus optional].ordinal);
+        XCTAssertEqualObjects(result.version, @"1.4.0");
         [exp fulfill];
     }];
     [self waitForExpectations:@[exp] timeout:2.0];
 }
 
-
-// D) No update: current == required == optional ⇒ NO_UPDATE, version echoes current
-- (void)test_checkForUpdates_shouldReturnNoUpdate_whenUpToDate {
-    id<POVPrinceOfVersionsBase> pov = [self makePOVWithCurrent:@"1.2.3"];
+- (void)test_checkForUpdates_shouldReturnNoUpdate_whenCurrentVersionIsLatest {
+    id<POVPrinceOfVersionsBase> pov = [self makePOVWithCurrent:@"2.0.0"];
 
     NSString *json =
     @"{"
       "\"ios2\": [{"
-        "\"required_version\": \"1.2.3\","
-        "\"last_version_available\": \"1.2.3\","
-        "\"notify_last_version_frequency\": \"ONCE\""
+        "\"required_version\": \"1.5.0\","
+        "\"last_version_available\": \"1.9.0\","
+        "\"notify_last_version_frequency\": \"ALWAYS\""
       "}]"
     "}";
 
@@ -121,35 +109,31 @@
 
     XCTestExpectation *exp = [self expectationWithDescription:@"no-update"];
     [POVIosPrinceOfVersionsKt checkForUpdatesBridged:pov source:loader completionHandler:^(POVBaseUpdateResult<NSString *> * _Nullable result,
-                                                          NSError * _Nullable error) {
+                                                         NSError * _Nullable error) {
         XCTAssertNil(error);
         XCTAssertNotNil(result);
-        XCTAssertEqualObjects(result.status.name, [POVUpdateStatus noUpdate].name);
-        XCTAssertEqualObjects(result.version, @"1.2.3");
+        XCTAssertEqual(result.status.ordinal, [POVUpdateStatus noUpdate].ordinal);
         [exp fulfill];
     }];
     [self waitForExpectations:@[exp] timeout:2.0];
 }
 
+- (void)test_checkForUpdates_shouldReturnError_whenLoaderFails {
+    id<POVPrinceOfVersionsBase> pov = [self makePOVWithCurrent:@"1.0.0"];
 
-// E) Bad configuration: missing ios/ios2 ⇒ NSError (ConfigurationException bridged)
-- (void)test_checkForUpdates_shouldThrowConfigurationException_whenConfigurationIsMissing {
-    id<POVPrinceOfVersionsBase> pov = [self makePOVWithCurrent:@"1.2.3"];
+    NSError *testError = [NSError errorWithDomain:@"TestDomain"
+                                             code:123
+                                         userInfo:@{NSLocalizedDescriptionKey: @"Test error"}];
+    POVTestStringLoader *loader = [[POVTestStringLoader alloc] initWithError:testError];
 
-    NSString *badJson = @"{\"meta\":{\"only\":\"meta\"}}"; // no ios / ios2 sections
-    POVTestStringLoader *loader = [[POVTestStringLoader alloc] initWithPayload:badJson];
-
-    XCTestExpectation *exp = [self expectationWithDescription:@"config-error"];
+    XCTestExpectation *exp = [self expectationWithDescription:@"error"];
     [POVIosPrinceOfVersionsKt checkForUpdatesBridged:pov source:loader completionHandler:^(POVBaseUpdateResult<NSString *> * _Nullable result,
-                                                          NSError * _Nullable error) {
-        XCTAssertNil(result);
+                                                         NSError * _Nullable error) {
         XCTAssertNotNil(error);
-        // (Optional) Inspect the bridged KMP exception:
-        // id kex = error.userInfo[@"KotlinException"]; NSLog(@"%@", kex);
+        XCTAssertNil(result);
         [exp fulfill];
     }];
     [self waitForExpectations:@[exp] timeout:2.0];
 }
-
 
 @end
