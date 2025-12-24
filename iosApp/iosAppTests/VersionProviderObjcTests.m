@@ -8,6 +8,7 @@
 #import <XCTest/XCTest.h>
 @import PrinceOfVersions;
 #import "POVTestStringLoader.h"
+#import "POVTestVersionProvider.h"
 #import "ThresholdChecker.h"
 
 @interface VersionProviderObjcTests : XCTestCase
@@ -16,8 +17,10 @@
 @implementation VersionProviderObjcTests
 
 - (void)test_versionProvider_shouldReadVersionFromHostInfoPlist {
-    POVTestHooks *hooks = POVTestHooks.shared;
-    NSString *version = [hooks exposeAppVersionForUnitTests];
+    // Read version directly from test app's Info.plist
+    NSString *shortVersion = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
+    NSString *buildVersion = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"];
+    NSString *version = [NSString stringWithFormat:@"%@-%@", shortVersion, buildVersion];
 
     XCTAssertTrue(version.length > 0);
     XCTAssertTrue([version containsString:@"-"],
@@ -43,10 +46,9 @@
     POVTestStringLoader *loader = [[POVTestStringLoader alloc] initWithError:ioError];
 
     XCTestExpectation *exp = [self expectationWithDescription:@"io-error"];
-    [POVIosPrinceOfVersionsKt checkForUpdatesBridged:pov
-                                              source:loader
-                                   completionHandler:^(POVBaseUpdateResult<NSString *> * _Nullable result,
-                                                       NSError * _Nullable error)
+    [pov checkForUpdatesSource:loader
+                 completionHandler:^(POVBaseUpdateResult<id> * _Nullable result,
+                                     NSError * _Nullable error)
     {
         XCTAssertNil(result);
         XCTAssertNotNil(error);
@@ -67,10 +69,9 @@
     POVTestStringLoader *loader = [[POVTestStringLoader alloc] initWithPayload:json];
 
     XCTestExpectation *exp = [self expectationWithDescription:@"requirements"];
-    [POVIosPrinceOfVersionsKt checkForUpdatesBridged:pov
-                                              source:loader
-                                   completionHandler:^(POVBaseUpdateResult<NSString *> * _Nullable result,
-                                                       NSError * _Nullable error)
+    [pov checkForUpdatesSource:loader
+                 completionHandler:^(POVBaseUpdateResult<id> * _Nullable result,
+                                     NSError * _Nullable error)
     {
         XCTAssertNil(result);
         XCTAssertNotNil(error);
@@ -86,10 +87,9 @@
     POVTestStringLoader *loader = [[POVTestStringLoader alloc] initWithPayload:@"{invalid json}"];
 
     XCTestExpectation *exp = [self expectationWithDescription:@"config-error"];
-    [POVIosPrinceOfVersionsKt checkForUpdatesBridged:pov
-                                              source:loader
-                                   completionHandler:^(POVBaseUpdateResult<NSString *> * _Nullable result,
-                                                       NSError * _Nullable error)
+    [pov checkForUpdatesSource:loader
+                 completionHandler:^(POVBaseUpdateResult<id> * _Nullable result,
+                                     NSError * _Nullable error)
     {
         XCTAssertNil(result);
         XCTAssertNotNil(error);
@@ -100,8 +100,7 @@
 }
 
 - (void)test_checkForUpdates_shouldWorkWithCustomVersionProvider {
-    POVHardcodedVersionProviderIos *provider =
-        [[POVHardcodedVersionProviderIos alloc] initWithCurrent:@"1.2.3"];
+    POVTestVersionProvider *provider = [[POVTestVersionProvider alloc] initWithVersion:@"1.2.3"];
 
     id<POVBaseVersionComparator> comparator =
         [POVIosDefaultVersionComparatorKt defaultIosVersionComparator];
@@ -114,10 +113,9 @@
     POVTestStringLoader *loader = [[POVTestStringLoader alloc] initWithPayload:json];
 
     XCTestExpectation *exp = [self expectationWithDescription:@"custom-provider"];
-    [POVIosPrinceOfVersionsKt checkForUpdatesBridged:pov
-                                              source:loader
-                                   completionHandler:^(POVBaseUpdateResult<NSString *> * _Nullable result,
-                                                       NSError * _Nullable error) {
+    [pov checkForUpdatesSource:loader
+                 completionHandler:^(POVBaseUpdateResult<id> * _Nullable result,
+                                     NSError * _Nullable error) {
         if (error) {
             XCTFail(@"Should not have error: %@", error);
         } else {
@@ -135,10 +133,9 @@
         @"{\"ios2\":[{\"required_version\":\"1.0.0\"}]}"];
 
     XCTestExpectation *exp = [self expectationWithDescription:@"default-instance"];
-    [POVIosPrinceOfVersionsKt checkForUpdatesBridged:pov
-                                              source:loader
-                                   completionHandler:^(POVBaseUpdateResult<NSString *> * _Nullable result,
-                                                       NSError * _Nullable error) {
+    [pov checkForUpdatesSource:loader
+                 completionHandler:^(POVBaseUpdateResult<id> * _Nullable result,
+                                     NSError * _Nullable error) {
         XCTAssertTrue((result != nil) || (error != nil));
         [exp fulfill];
     }];

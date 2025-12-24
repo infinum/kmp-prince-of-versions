@@ -35,10 +35,12 @@ internal class IosConfigurationParser(
     )
 
     override fun parse(value: String): PrinceOfVersionsConfig {
-        val data = value.toNSDataUtf8() ?: error("Invalid UTF-8 input")
+        val data = value.toNSDataUtf8()
+            ?: throw ConfigurationException("Invalid UTF-8 input")
         val rootAny = NSJSONSerialization.JSONObjectWithData(data, 0uL, null)
-            ?: error("Invalid JSON")
-        val root = rootAny as? NSDictionary ?: error("Root JSON must be an object")
+            ?: throw ConfigurationException("Invalid JSON")
+        val root = rootAny as? NSDictionary
+            ?: throw ConfigurationException("Root JSON must be an object")
         return parseRoot(root)
     }
 
@@ -48,7 +50,7 @@ internal class IosConfigurationParser(
         val iosKey = when {
             data.hasKey(IOS2_KEY) -> IOS2_KEY
             data.hasKey(IOS_KEY) -> IOS_KEY
-            else -> error("Config resource does not contain ios key")
+            else -> throw ConfigurationException("Config resource does not contain ios key")
         }
 
         val iosData = data.opt(iosKey)
@@ -80,7 +82,9 @@ internal class IosConfigurationParser(
                 )
             }
         }
-        require(n > 0) { "JSON doesn't contain any feasible update. Check JSON update format!" }
+        if (n == 0) {
+            throw ConfigurationException("JSON doesn't contain any feasible update. Check JSON update format!")
+        }
         throw RequirementsNotSatisfiedException(rootMeta)
     }
 
@@ -110,7 +114,9 @@ internal class IosConfigurationParser(
         val raw = json.objectForKey(NOTIFY_FLAT) ?: return NotificationType.ONCE
         if (raw is NSNull) return NotificationType.ONCE
 
-        require(raw is NSString) { "In update configuration $NOTIFY_FLAT should be String, but the actual value is $raw" }
+        if (raw !is NSString) {
+            throw ConfigurationException("In update configuration $NOTIFY_FLAT should be String, but the actual value is $raw")
+        }
         return if (raw.toString().equals(NOTIFY_ALWAYS, ignoreCase = true)) {
             NotificationType.ALWAYS
         } else {

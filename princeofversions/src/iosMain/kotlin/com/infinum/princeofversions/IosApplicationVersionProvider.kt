@@ -2,11 +2,11 @@ package com.infinum.princeofversions
 
 import platform.Foundation.NSBundle
 
-public interface IosInfoPlist {
-    public fun string(key: String): String?
+internal interface IosInfoPlist {
+    fun string(key: String): String?
 }
 
-public class RealIosInfoPlist(
+internal class RealIosInfoPlist(
     private val bundle: NSBundle = NSBundle.mainBundle(),
 ) : IosInfoPlist {
     override fun string(key: String): String? =
@@ -30,7 +30,7 @@ internal class IosApplicationVersionProvider(
     }
 }
 
-public class HardcodedVersionProviderIos(
+internal class HardcodedVersionProviderIos(
     private val current: String = "1.2.3",
 ) : ApplicationVersionProvider {
     override fun getVersion(): String = current

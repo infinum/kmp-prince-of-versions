@@ -11,6 +11,7 @@ import PrinceOfVersions
 final class StringLoader: NSObject, Loader {
     let payload: String
     init(payload: String) { self.payload = payload }
+
     func load(completionHandler: @escaping (String?, Error?) -> Void) {
         completionHandler(payload, nil)
     }
