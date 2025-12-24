@@ -17,7 +17,7 @@ public typealias PrinceOfVersions = PrinceOfVersionsBase<String>
  */
 public typealias UpdateResult = BaseUpdateResult<String>
 
-public fun PrinceOfVersions(): PrinceOfVersions = createPrinceOfVersions(
+public fun createPrinceOfVersions(): PrinceOfVersions = createPrinceOfVersions(
     princeOfVersionsComponents = PrinceOfVersionsComponents.Builder().build(),
 )
 

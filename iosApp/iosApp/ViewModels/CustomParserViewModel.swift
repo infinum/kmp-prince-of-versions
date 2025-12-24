@@ -25,32 +25,26 @@ final class CustomParserViewModel: ObservableObject {
 
         let loader = StringLoader(payload: inputJSON)
 
-        pov.checkForUpdates(source: loader) { [weak self] result, error in
-            Task { @MainActor [weak self] in
-                guard let self else { return }
-                self.isLoading = false
-                
-                if let error = error as NSError? {
-                    if isKotlin(error, RequirementsNotSatisfiedException.self) {
-                        self.show(message: "Requirements not met. (Custom checker failed)")
-                    } else if isKotlin(error, ConfigurationException.self) {
-                        self.show(message: "Bad configuration")
-                    } else if isKotlin(error, IoException.self) {
-                        self.show(message: "Network / IO error")
-                    } else {
-                        self.show(message: "Error: \((error as NSError).localizedDescription)")
-                    }
-                }
-
-                guard let result else {
-                    self.show(message: "❌ Unknown error")
-                    return
-                }
-                
+        Task {
+            do {
+                let result = try await pov.checkForUpdates(source: loader)
                 let status = String(describing: result.status)
                 let version = String(describing: result.version)
                 self.show(message: "✅ From JSON → status: \(status), version: \(version)\nmeta: \(result.metadata)")
+            } catch is CancellationError {
+                self.show(message: "🔁 Cancelled")
+            } catch {
+                if isKotlin(error, RequirementsNotSatisfiedException.self) {
+                    self.show(message: "Requirements not met. (Custom checker failed)")
+                } else if isKotlin(error, ConfigurationException.self) {
+                    self.show(message: "Bad configuration")
+                } else if isKotlin(error, IoException.self) {
+                    self.show(message: "Network / IO error")
+                } else {
+                    self.show(message: "Error: \((error as NSError).localizedDescription)")
+                }
             }
+            self.isLoading = false
         }
     }
 
