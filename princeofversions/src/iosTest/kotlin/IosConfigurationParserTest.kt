@@ -22,7 +22,7 @@ class IosConfigurationParserTest {
     @Test
     fun invalidUpdateNoIosKey() {
         val json = """{ "meta": { "x": "1" } }"""
-        val exception = assertFailsWith<IllegalStateException> {
+        val exception = assertFailsWith<ConfigurationException> {
             parser().parse(json)
         }
         assertEquals("Config resource does not contain ios key", exception.message)
@@ -30,14 +30,14 @@ class IosConfigurationParserTest {
 
     @Test
     fun invalidUpdateNotJson() {
-        assertFailsWith<IllegalStateException> {
+        assertFailsWith<ConfigurationException> {
             parser().parse("not-json at all")
         }
     }
 
     @Test
     fun malformedJson() {
-        assertFailsWith<IllegalStateException> {
+        assertFailsWith<ConfigurationException> {
             parser().parse("{")
         }
     }
@@ -94,7 +94,7 @@ class IosConfigurationParserTest {
         val json = """
             { "ios2": { "notify_last_version_frequency": 123 } }
         """.trimIndent()
-        assertFailsWith<IllegalArgumentException> {
+        assertFailsWith<ConfigurationException> {
             parser().parse(json)
         }
     }
