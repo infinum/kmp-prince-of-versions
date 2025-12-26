@@ -17,7 +17,7 @@ final class CommonUsageViewModel: ObservableObject {
     @Published var lastMessage: String?
 
     private var task: Task<Void, Never>?
-    private lazy var pov: any PrinceOfVersionsBase = IosPrinceOfVersionsKt.PrinceOfVersions()
+    private lazy var pov: any PrinceOfVersionsBase = IosPrinceOfVersionsKt.createPrinceOfVersions()
 
     func check(slow: Bool) {
         cancel()

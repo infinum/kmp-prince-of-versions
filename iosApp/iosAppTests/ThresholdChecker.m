@@ -5,6 +5,7 @@
 //  Created by Filip Stojanovski on 7.11.25.
 //
 
+#import <Foundation/Foundation.h>
 #import "ThresholdChecker.h"
 
 @implementation ThresholdChecker

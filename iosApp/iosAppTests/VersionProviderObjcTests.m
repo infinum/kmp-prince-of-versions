@@ -38,7 +38,7 @@
 }
 
 - (void)test_checkForUpdates_shouldYieldIoError_whenInvalidURL {
-    id<POVPrinceOfVersionsBase> pov = [POVIosPrinceOfVersionsKt PrinceOfVersions];
+    id<POVPrinceOfVersionsBase> pov = [POVIosPrinceOfVersionsKt createPrinceOfVersions];
 
     NSError *ioError = [NSError errorWithDomain:@"TestIOError"
                                            code:404
@@ -82,7 +82,7 @@
 }
 
 - (void)test_checkForUpdates_shouldYieldConfigurationException_whenBadConfig {
-    id<POVPrinceOfVersionsBase> pov = [POVIosPrinceOfVersionsKt PrinceOfVersions];
+    id<POVPrinceOfVersionsBase> pov = [POVIosPrinceOfVersionsKt createPrinceOfVersions];
 
     POVTestStringLoader *loader = [[POVTestStringLoader alloc] initWithPayload:@"{invalid json}"];
 
@@ -127,7 +127,7 @@
 }
 
 - (void)test_checkForUpdates_shouldWorkWithDefaultInstance {
-    id<POVPrinceOfVersionsBase> pov = [POVIosPrinceOfVersionsKt PrinceOfVersions];
+    id<POVPrinceOfVersionsBase> pov = [POVIosPrinceOfVersionsKt createPrinceOfVersions];
 
     POVTestStringLoader *loader = [[POVTestStringLoader alloc] initWithPayload:
         @"{\"ios2\":[{\"required_version\":\"1.0.0\"}]}"];

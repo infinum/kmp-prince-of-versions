@@ -3,6 +3,7 @@
 //  iosAppTests
 //
 
+#import <Foundation/Foundation.h>
 #import "POVTestVersionProvider.h"
 
 @implementation POVTestVersionProvider
