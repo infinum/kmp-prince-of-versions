@@ -87,7 +87,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "com.infinum.princeofversions.sample"
-            packageVersion = libs.versions.prince.of.versions.get().toString()
+            packageVersion = "1.0.0" // JVM desktop apps must start from 1.0.0
         }
     }
 }

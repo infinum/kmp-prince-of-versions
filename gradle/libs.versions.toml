@@ -14,11 +14,12 @@ composeHotReload = "1.0.0-alpha11"
 composeMultiplatform = "1.8.2"
 datastorePreferences = "1.1.7"
 detekt = "1.23.8"
+gradle-maven-publish = "0.35.0"
 json = "20250517"
 junit = "4.13.2"
 kotlin = "2.2.0"
 kotlinx-coroutines = "1.10.2"
-prince-of-versions = "1.0.0"
+prince-of-versions = "0.1.0"
 core = "1.17.0"
 okhttp3-mockwebserver = "5.1.0"
 
@@ -50,4 +51,5 @@ composeHotReload = { id = "org.jetbrains.compose.hot-reload", version.ref = "com
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+gradle-maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "gradle-maven-publish" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
