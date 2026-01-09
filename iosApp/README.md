@@ -83,7 +83,7 @@ Basic update checking with async/await:
 ```swift
 import PrinceOfVersions
 
-let pov = IosPrinceOfVersionsKt.PrinceOfVersions()
+let pov = IosPrinceOfVersionsKt.createPrinceOfVersions()
 
 let result = try await IosPrinceOfVersionsKt.checkForUpdatesFromUrl(
     pov,
@@ -147,8 +147,20 @@ do {
 Custom version provider and comparator:
 
 ```swift
-// Hardcoded version for testing
-let provider = HardcodedVersionProviderIos(current: "1.2.3")
+// Create a simple mock version provider in Swift
+class MockVersionProvider: POVBaseApplicationVersionProvider {
+    private let version: String
+
+    init(version: String) {
+        self.version = version
+    }
+
+    func getVersion() -> String {
+        return version
+    }
+}
+
+let provider = MockVersionProvider(version: "1.2.3")
 
 // Get default comparator
 let baseComparator = IosDefaultVersionComparatorKt.defaultIosVersionComparator()
@@ -166,7 +178,7 @@ let result = try await IosPrinceOfVersionsKt.checkForUpdatesFromUrl(pov, ...)
 ```
 
 **Key Points:**
-- `HardcodedVersionProviderIos` - Useful for testing
+- Create mock version providers in Swift for testing
 - `DevBuildVersionComparator` - Example custom comparator
 - Compose version logic with delegation
 - Provider reads app version (can override for testing)
@@ -254,7 +266,7 @@ final class UpdateViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var message: String?
 
-    private let pov = IosPrinceOfVersionsKt.PrinceOfVersions()
+    private let pov = IosPrinceOfVersionsKt.createPrinceOfVersions()
     private var task: Task<Void, Never>?
 
     func checkForUpdates(url: String) {
@@ -368,9 +380,9 @@ final class VersionProviderHostTests: XCTestCase {
 The framework provides test utilities:
 
 - **TestHooks**: Expose internal functionality for testing
-- **HardcodedVersionProviderIos**: Mock version provider
 - **POVTestStringLoader**: Mock loader with hardcoded JSON
 - **DevBuildVersionComparator**: Example custom comparator
+- Create mock version providers in Swift for testing
 
 ## JSON Configuration Format
 
@@ -424,7 +436,7 @@ protocol UpdateCheckService {
 class PrinceOfVersionsService: UpdateCheckService {
     private let pov: any PrinceOfVersionsBase
 
-    init(pov: any PrinceOfVersionsBase = IosPrinceOfVersionsKt.PrinceOfVersions()) {
+    init(pov: any PrinceOfVersionsBase = IosPrinceOfVersionsKt.createPrinceOfVersions()) {
         self.pov = pov
     }
 
@@ -484,7 +496,7 @@ func checkWithRetry(maxAttempts: Int = 3) async throws -> BaseUpdateResult<NSStr
 2. **Use async/await** - Don't mix with completion handlers
 3. **Handle specific exceptions** - Catch `RequirementsNotSatisfiedException`, `IoException`, etc.
 4. **Timeout in milliseconds** - Remember: 60_000 = 60 seconds
-5. **Test with hardcoded versions** - Use `HardcodedVersionProviderIos`
+5. **Test with mock providers** - Create simple Swift mock classes for testing
 6. **Cancel tasks** - Always cancel ongoing tasks when views disappear
 7. **Wrap in service layer** - Hide Kotlin interop from your app code
 

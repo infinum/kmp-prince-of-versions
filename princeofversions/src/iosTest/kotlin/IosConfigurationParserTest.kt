@@ -157,11 +157,11 @@ class IosConfigurationParserTest {
             }
         """.trimIndent()
 
-        val extension = assertFailsWith<RequirementsNotSatisfiedException> {
+        val exception = assertFailsWith<RequirementsNotSatisfiedException> {
             parser(checkers).parse(json)
         }
         // it should carry root metadata
-        assertTrue(extension.metadata["x"] == "root")
+        assertTrue(exception.metadata["x"] == "root")
     }
 
     // -------------------- ios (nested) --------------------

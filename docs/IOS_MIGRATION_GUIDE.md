@@ -47,7 +47,7 @@ PrinceOfVersions.checkForUpdates(
 import PrinceOfVersions
 
 let url = "https://example.com/versions.json"
-let pov = IosPrinceOfVersionsKt.PrinceOfVersions()
+let pov = IosPrinceOfVersionsKt.createPrinceOfVersions()
 
 Task {
     do {
@@ -115,7 +115,7 @@ PrinceOfVersions.checkForUpdates(from: url) { response in
 
 **After:**
 ```swift
-let pov = IosPrinceOfVersionsKt.PrinceOfVersions()
+let pov = IosPrinceOfVersionsKt.createPrinceOfVersions()
 let result = try await IosPrinceOfVersionsKt.checkForUpdatesFromUrl(
     pov,
     url: urlString,
@@ -214,9 +214,22 @@ let pov = IosPrinceOfVersionsKt.princeOfVersionsWithCustomChecker(
 
 ### 6. Custom Version Comparison
 
-**After (using Kotlin helper classes):**
+**After (creating custom Swift version provider):**
 ```swift
-let provider = HardcodedVersionProviderIos(current: "1.2.3")
+// Create a simple mock version provider in Swift
+class MockVersionProvider: POVBaseApplicationVersionProvider {
+    private let version: String
+
+    init(version: String) {
+        self.version = version
+    }
+
+    func getVersion() -> String {
+        return version
+    }
+}
+
+let provider = MockVersionProvider(version: "1.2.3")
 let baseComparator = IosDefaultVersionComparatorKt.defaultIosVersionComparator()
 let customComparator = DevBuildVersionComparator(delegate: baseComparator)
 
@@ -297,7 +310,7 @@ final class UpdateCheckViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var updateMessage: String?
 
-    private let pov = IosPrinceOfVersionsKt.PrinceOfVersions()
+    private let pov = IosPrinceOfVersionsKt.createPrinceOfVersions()
 
     func checkForUpdates(url: String) async {
         isLoading = true
@@ -372,8 +385,12 @@ import PrinceOfVersions
 final class UpdateCheckTests: XCTestCase {
 
     func testMandatoryUpdate() async throws {
-        // Use test helper classes from Kotlin
-        let provider = HardcodedVersionProviderIos(current: "1.0.0")
+        // Create a simple mock version provider
+        class MockVersionProvider: POVBaseApplicationVersionProvider {
+            func getVersion() -> String { "1.0.0" }
+        }
+
+        let provider = MockVersionProvider()
         let comparator = IosDefaultVersionComparatorKt.defaultIosVersionComparator()
 
         let pov = IosDefaultVersionComparatorKt.princeOfVersionsWithCustomVersionLogic(
@@ -453,7 +470,7 @@ networkTimeout: 30_000  // 30 seconds in milliseconds
 3. **Wrap in a service layer** - Hide Kotlin interop details from your app
 4. **Handle all exception types** - Catch specific Kotlin exceptions
 5. **Use async/await** - Don't mix with completion handlers
-6. **Test with Kotlin helpers** - Use `HardcodedVersionProviderIos` for tests
+6. **Test with mock providers** - Create simple Swift mock classes for testing
 
 ## Example: Service Layer Pattern
 
@@ -472,7 +489,7 @@ struct UpdateResult {
 }
 
 final class PrinceOfVersionsUpdateService: UpdateCheckService {
-    private let pov = IosPrinceOfVersionsKt.PrinceOfVersions()
+    private let pov = IosPrinceOfVersionsKt.createPrinceOfVersions()
     private let timeout: Int64 = 60_000
 
     func checkForUpdates(from url: String) async throws -> UpdateResult {
