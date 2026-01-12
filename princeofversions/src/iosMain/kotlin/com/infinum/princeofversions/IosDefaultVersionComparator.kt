@@ -19,6 +19,17 @@ internal class IosDefaultVersionComparator : VersionComparator {
     }
 }
 
+public fun princeOfVersionsWithCustomParser(
+    parser: ConfigurationParser,
+): PrinceOfVersions {
+    val components = PrinceOfVersionsComponents.Builder()
+        .withConfigurationParser(parser)
+        .build()
+    return createPrinceOfVersions(components)
+}
+
+public fun defaultIosVersionComparator(): VersionComparator = IosDefaultVersionComparator()
+
 public fun princeOfVersionsWithCustomVersionLogic(
     provider: ApplicationVersionProvider,
     comparator: VersionComparator,
@@ -26,15 +37,6 @@ public fun princeOfVersionsWithCustomVersionLogic(
     val components = PrinceOfVersionsComponents.Builder()
         .withVersionProvider(provider)
         .withVersionComparator(comparator)
-        .build()
-    return createPrinceOfVersions(components)
-}
-
-public fun princeOfVersionsWithCustomParser(
-    parser: ConfigurationParser,
-): PrinceOfVersions {
-    val components = PrinceOfVersionsComponents.Builder()
-        .withConfigurationParser(parser)
         .build()
     return createPrinceOfVersions(components)
 }

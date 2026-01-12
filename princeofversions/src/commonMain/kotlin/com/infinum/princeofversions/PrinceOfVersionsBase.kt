@@ -18,6 +18,7 @@ public interface PrinceOfVersionsBase<T> {
      *
      * @return An [BaseUpdateResult] instance that contains the result of the update check.
      */
+    @Throws(Exception::class)
     public suspend fun checkForUpdates(
         source: Loader,
     ): BaseUpdateResult<T>

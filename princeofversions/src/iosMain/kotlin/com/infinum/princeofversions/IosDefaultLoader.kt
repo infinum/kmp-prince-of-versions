@@ -99,38 +99,38 @@ internal class IosDefaultLoader(
         }
     }
 
-    /** Returns a human-readable failure message or null if the response is OK (2xx). */
-    private fun buildFailureMessage(
-        error: NSError?,
-        response: NSURLResponse?,
-    ): String? {
-        if (error != null) return error.localizedDescription
-
-        val http = response as? NSHTTPURLResponse ?: return "Expected HTTP URL response, but received a non-HTTP response."
-        val code = http.statusCode.toInt()
-        if (code !in STATUS_CODE_200..STATUS_CODE_299) {
-            val msg = NSHTTPURLResponse.localizedStringForStatusCode(http.statusCode)
-            return "HTTP $code: $msg"
-        }
-        return null
-    }
-
-    /** UTF-8 decode, empty string if no body. */
-    @OptIn(BetaInteropApi::class)
-    private fun decodeBody(
-        data: NSData?,
-    ): String =
-        if (data == null || data.length.toLong() == 0L) {
-            ""
-        } else {
-            NSString.create(data, NSUTF8StringEncoding)?.toString().orEmpty()
-        }
-
     companion object {
         private const val MILLIS_PER_SECOND = 1000.0
         private const val MIN_TIMEOUT_SECONDS = 1.0
         private const val STATUS_CODE_200 = 200
         private const val STATUS_CODE_299 = 299
+
+        /** Returns a human-readable failure message or null if the response is OK (2xx). */
+        fun buildFailureMessage(
+            error: NSError?,
+            response: NSURLResponse?,
+        ): String? {
+            if (error != null) return error.localizedDescription
+
+            val http = response as? NSHTTPURLResponse ?: return "Expected HTTP URL response, but received a non-HTTP response."
+            val code = http.statusCode.toInt()
+            if (code !in STATUS_CODE_200..STATUS_CODE_299) {
+                val msg = NSHTTPURLResponse.localizedStringForStatusCode(http.statusCode)
+                return "HTTP $code: $msg"
+            }
+            return null
+        }
+
+        /** UTF-8 decode, empty string if no body. */
+        @OptIn(BetaInteropApi::class)
+        fun decodeBody(
+            data: NSData?,
+        ): String =
+            if (data == null || data.length.toLong() == 0L) {
+                ""
+            } else {
+                NSString.create(data, NSUTF8StringEncoding)?.toString().orEmpty()
+            }
     }
 }
 
