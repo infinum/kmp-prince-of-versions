@@ -11,7 +11,8 @@ import platform.Foundation.NSProcessInfo
 internal class SystemVersionRequirementChecker : RequirementChecker {
 
     override fun checkRequirements(value: String?): Boolean {
-        val required = value?.let(::parseVersion) ?: return false
+        if (value.isNullOrBlank()) return false
+        val required = parseVersion(value)
         val current = currentOs()
         return current >= required
     }

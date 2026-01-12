@@ -15,10 +15,14 @@ struct CustomVersionLogicView: View {
         VStack(spacing: 12) {
             Text("Custom Version Logic").font(.headline)
             HStack {
-                Button("Check") { vm.check(isSlow: false) }.buttonStyle(.borderedProminent)
-                Button("Check (slow)") { vm.check(isSlow: true) }.buttonStyle(.bordered)
+                Button("Check") { vm.check(isSlow: false) }
+                    .buttonStyle(.borderedProminent)
+                Button("Check (slow)") { vm.check(isSlow: true) }
+                    .buttonStyle(.bordered)
             }
-            Button("Cancel") { vm.cancel() }.buttonStyle(.bordered).tint(.red)
+            Button("Cancel") { vm.cancel() }
+                .buttonStyle(.bordered)
+                .tint(.red)
             if vm.isLoading { ProgressView().padding(.top, 8) }
             if let last = vm.lastMessage {
                 Text(last)
