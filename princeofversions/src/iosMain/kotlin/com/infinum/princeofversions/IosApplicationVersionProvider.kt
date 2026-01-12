@@ -2,12 +2,25 @@ package com.infinum.princeofversions
 
 import platform.Foundation.NSBundle
 
+internal interface IosInfoPlist {
+    fun string(key: String): String?
+}
+
+internal class RealIosInfoPlist(
+    private val bundle: NSBundle = NSBundle.mainBundle(),
+) : IosInfoPlist {
+    override fun string(key: String): String? =
+        bundle.objectForInfoDictionaryKey(key) as? String
+}
+
 public typealias ApplicationVersionProvider = BaseApplicationVersionProvider<String>
 
-internal class IosApplicationVersionProvider : ApplicationVersionProvider {
+internal class IosApplicationVersionProvider(
+    private val infoProvider: InfoDictionaryProvider = MainBundleInfoDictionaryProvider(),
+) : ApplicationVersionProvider {
 
     override fun getVersion(): String {
-        val info = NSBundle.mainBundle.infoDictionary
+        val info = infoProvider.infoDictionary()
             ?: error("Info.plist not loaded (NSBundle.mainBundle.infoDictionary == null).")
         val short = (info["CFBundleShortVersionString"] as? String)?.takeIf { it.isNotBlank() }
             ?: error("CFBundleShortVersionString is missing or blank in Info.plist.")

@@ -11,17 +11,15 @@ import PrinceOfVersions
 final class UserDefaultsStorage: NSObject, BaseStorage {
     private let key = "demo.last_notified_version"
 
-    func getLastSavedVersion(completionHandler: @escaping (Any?, Error?) -> Void) {
-        let value = UserDefaults.standard.string(forKey: key) as NSString?
-        completionHandler(value, nil)
+    func __getLastSavedVersion() async throws -> Any? {
+        return UserDefaults.standard.string(forKey: key) as NSString?
     }
 
-    func saveVersion(version: Any?, completionHandler: @escaping (Error?) -> Void) {
+    func __saveVersion(version: Any?) async throws {
         if let version = version as? NSString {
             UserDefaults.standard.set(version as String, forKey: key)
         } else {
             UserDefaults.standard.removeObject(forKey: key)
         }
-        completionHandler(nil)
     }
 }
