@@ -46,7 +46,7 @@ internal class AndroidDefaultLoader(
                 connection.disconnect()
             }
         } catch (e: IOException) {
-            throw IoException(e.message)
+            throw IoException(message = e.message, cause = e)
         }
     }
 }
