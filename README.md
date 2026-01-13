@@ -80,7 +80,7 @@ Add the dependency to your project from Maven Central:
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            implementation("com.infinum.princeofversions:princeofversions:1.0.0")
+            implementation("com.infinum:kmp-prince-of-versions:0.1.0")
         }
     }
 }
@@ -92,10 +92,10 @@ or if you want to use the library in only a subset of platform modules:
 kotlin {
     sourceSets {
         androidMain.dependencies {
-            implementation("com.infinum.princeofversions:princeofversions:1.0.0")
+            implementation("com.infinum:kmp-prince-of-versions:0.1.0")
         }
         jvmMain.dependencies {
-            implementation("com.infinum.princeofversions:princeofversions:1.0.0")
+            implementation("com.infinum:kmp-prince-of-versions:0.1.0")
         }
         iosMain.dependencies {
             // e.g. iOS uses a different solution for detecting updates
@@ -109,7 +109,7 @@ kotlin {
 ```kotlin
 // In your app's build.gradle.kts
 dependencies {
-    implementation("com.infinum.princeofversions:princeofversions:1.0.0")
+    implementation("com.infinum:kmp-prince-of-versions:0.1.0")
 }
 ```
 
@@ -118,7 +118,7 @@ dependencies {
 ```kotlin
 // In your build.gradle.kts
 dependencies {
-    implementation("com.infinum.princeofversions:princeofversions:1.0.0")
+    implementation("com.infinum:kmp-prince-of-versions:0.1.0")
 }
 ```
 
@@ -540,7 +540,7 @@ We appreciate your interest and look forward to your contributions.
 ## License
 
 ```text
-Copyright 2025 Infinum
+Copyright 2026 Infinum
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
