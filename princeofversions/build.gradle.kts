@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.detekt)
     alias(libs.plugins.skie)
+    alias(libs.plugins.gradle.maven.publish)
 }
 
 kotlin {
@@ -75,6 +76,16 @@ android {
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()
     }
+}
+
+val groupId: String by project
+
+mavenPublishing {
+    coordinates(
+        groupId = groupId,
+        artifactId = "kmp-prince-of-versions",
+        version = libs.versions.prince.of.versions.get()
+    )
 }
 
 dependencies {
