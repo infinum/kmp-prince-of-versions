@@ -27,24 +27,26 @@ internal class AndroidDefaultLoader(
      */
     private val networkTimeoutMilliseconds = networkTimeout.inWholeMilliseconds.toInt()
 
-    @Throws(IOException::class)
+    @Throws(IoException::class)
     override suspend fun load(): String {
-        val connection = URL(url).openConnection() as HttpURLConnection
         try {
-            // Apply Basic Authentication if credentials are provided
-            if (username != null && password != null) {
-                val credentials = "$username:$password"
-                val basicAuth = "Basic ${
-                    Base64.encode(credentials.encodeToByteArray())}"
-                connection.setRequestProperty("Authorization", basicAuth)
+            val connection = (URL(url).openConnection() as HttpURLConnection).apply {
+                connectTimeout = networkTimeoutMilliseconds
+                readTimeout = networkTimeoutMilliseconds
+
+                if (username != null && password != null) {
+                    val auth = Base64.encode("$username:$password".encodeToByteArray())
+                    setRequestProperty("Authorization", "Basic $auth")
+                }
             }
 
-            connection.connectTimeout = networkTimeoutMilliseconds
-            connection.readTimeout = networkTimeoutMilliseconds
-
-            return connection.inputStream.bufferedReader().use { it.readText() }
-        } finally {
-            connection.disconnect()
+            try {
+                return connection.inputStream.bufferedReader().use { it.readText() }
+            } finally {
+                connection.disconnect()
+            }
+        } catch (e: IOException) {
+            throw IoException(e.message)
         }
     }
 }
