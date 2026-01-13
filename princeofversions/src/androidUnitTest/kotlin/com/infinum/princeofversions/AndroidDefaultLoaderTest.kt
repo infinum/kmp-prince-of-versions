@@ -47,14 +47,14 @@ class AndroidDefaultLoaderTest {
     }
 
     @Test
-    fun `androidDefaultLoader should throw SocketTimeoutException when network timeout is exceeded`() = runTest {
+    fun `androidDefaultLoader should throw IoException when network timeout is exceeded`() = runTest {
         val androidLoader = AndroidDefaultLoader(
             url = mockWebServer.url("/").toString(),
             username = null,
             password = null,
             networkTimeout = 1.seconds
         )
-        assertFailsWith<SocketTimeoutException> {
+        assertFailsWith<IoException> {
             androidLoader.load()
         }
     }
@@ -94,7 +94,7 @@ class AndroidDefaultLoaderTest {
     }
 
     @Test
-    fun `androidDefaultLoader should throw IOException when server returns error response`() = runTest {
+    fun `androidDefaultLoader should throw IoException when server returns error response`() = runTest {
         val response = MockResponse().setResponseCode(404)
         mockWebServer.enqueue(response)
 
@@ -104,7 +104,7 @@ class AndroidDefaultLoaderTest {
             password = null,
             networkTimeout = 60.seconds
         )
-        assertFailsWith<IOException> {
+        assertFailsWith<IoException> {
             androidLoader.load()
         }
     }
@@ -133,7 +133,7 @@ class AndroidDefaultLoaderTest {
     }
 
     @Test
-    fun `androidDefaultLoader should throw IOException when server returns unauthorized response with wrong credentials`() = runTest {
+    fun `androidDefaultLoader should throw IoException when server returns unauthorized response with wrong credentials`() = runTest {
         val response = MockResponse().setResponseCode(401)
         mockWebServer.enqueue(response)
 
@@ -143,7 +143,7 @@ class AndroidDefaultLoaderTest {
             password = "wrongpass",
             networkTimeout = 60.seconds
         )
-        assertFailsWith<IOException> {
+        assertFailsWith<IoException> {
             androidLoader.load()
         }
     }
