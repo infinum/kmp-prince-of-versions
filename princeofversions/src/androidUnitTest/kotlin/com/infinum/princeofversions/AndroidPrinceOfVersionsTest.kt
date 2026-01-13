@@ -86,13 +86,13 @@ class AndroidPrinceOfVersionsTest {
     }
 
     @Test
-    fun `checkForUpdatesFromUrl should throw IOException when server returns error response`() = runTest {
+    fun `checkForUpdatesFromUrl should throw IoException when server returns error response`() = runTest {
         val components = createTestComponents()
         val princeOfVersions = PrinceOfVersions(components)
         val mockResponse = MockResponse().setResponseCode(404)
         mockWebServer.enqueue(mockResponse)
 
-        assertFailsWith<java.io.IOException> {
+        assertFailsWith<IoException> {
             princeOfVersions.checkForUpdatesFromUrl(mockWebServer.url("/").toString())
         }
     }

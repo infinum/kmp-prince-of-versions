@@ -11,7 +11,7 @@ public typealias VersionComparator = BaseVersionComparator<Long>
 /**
  * The default version comparator for Android, which compares two integer versions.
  */
-public class AndroidDefaultVersionComparator : VersionComparator {
+internal class AndroidDefaultVersionComparator : VersionComparator {
     /**
      * Compares two versions and returns an integer value.
      *
