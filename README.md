@@ -122,7 +122,25 @@ dependencies {
 }
 ```
 
-// TODO: iOS
+#### iOS (Swift Package Manager)
+
+For iOS projects, you can integrate the library using Swift Package Manager:
+
+```swift
+// In your Package.swift
+dependencies: [
+    .package(url: "https://github.com/infinum/kmp-prince-of-versions.git", from: "0.1.0")
+]
+```
+
+Or add it directly in Xcode:
+1. File → Add Package Dependencies
+2. Enter repository URL: `https://github.com/infinum/kmp-prince-of-versions.git`
+3. Select version `0.1.0` or later
+
+#### iOS (XCFramework)
+
+Download the prebuilt XCFramework from [Releases](https://github.com/infinum/kmp-prince-of-versions/releases) and add it to your Xcode project.
 
 ## Usage
 
@@ -132,7 +150,7 @@ The library provides platform-specific factory methods to create `PrinceOfVersio
 
 **Note**: You'll need to create an API endpoint on your server where the remote update configuration JSON will be hosted and made available for the library to fetch. If you need a more specific setup consult [Advanced Usage with Custom Components](#advanced-usage-with-custom-components)
 
-For complete working examples, see the sample apps: [Android/JVM sample app](sampleApp/) and [iOS sample app](iosApp/) which demonstrate usage across all platforms. Additional examples and edge cases can be found in the test suites: [common tests](princeofversions/src/commonTest/) and [Android tests](princeofversions/src/androidUnitTest/). // TODO: Link to iOS tests once they are written
+For complete working examples, see the sample apps: [Android/JVM sample app](sampleApp/) and [iOS sample app](iosApp/) which demonstrate usage across all platforms. Additional examples and edge cases can be found in the test suites: [common tests](princeofversions/src/commonTest/), [Android tests](princeofversions/src/androidUnitTest/), and [iOS tests](princeofversions/src/iosTest/).
 
 #### Android
 
@@ -169,25 +187,41 @@ In iOS, you'll need to create the instance in your iOS-specific code:
 // In your iOS module
 import PrinceOfVersions
 
-let princeOfVersions = PrinceOfVersionsCompanion().invoke()
+let princeOfVersions = IosPrinceOfVersionsKt.createPrinceOfVersions()
 
 // Use with async/await
 Task {
     do {
-        let result = try await princeOfVersions.checkForUpdatesFromUrl(
-            url: "https://your-server.com/update-config.json"
+        let result = try await IosPrinceOfVersionsKt.checkForUpdatesFromUrl(
+            princeOfVersions,
+            url: "https://your-server.com/update-config.json",
+            username: nil,
+            password: nil,
+            networkTimeout: 60_000  // milliseconds
         )
 
-        switch result.status {
-        case .mandatory:
+        switch String(describing: result.status) {
+        case "MANDATORY":
             // Handle required update
-        case .optional:
+            showUpdateDialog(version: result.version)
+        case "OPTIONAL":
             // Handle optional update
-        case .noUpdate:
+            showOptionalUpdateDialog(version: result.version)
+        default:
             // App is up to date
+            break
         }
+    } catch let error as RequirementsNotSatisfiedException {
+        // Device doesn't meet requirements (e.g., OS version)
+        print("Requirements not met: \(error)")
+    } catch let error as ConfigurationException {
+        // Configuration or JSON parsing error
+        print("Configuration error: \(error)")
+    } catch let error as IoException {
+        // Network error
+        print("Network error: \(error)")
     } catch {
-        // Handle error
+        print("Unexpected error: \(error)")
     }
 }
 ```
@@ -313,7 +347,7 @@ fun createAndroidUseCase(context: Context): YourUseCase<Long> {
 ```kotlin
 // Use case creation function
 fun createIosUseCase(): YourUseCase<String> {
-    val princeOfVersions = PrinceOfVersions()
+    val princeOfVersions = createPrinceOfVersions()
     return CheckForUpdatesUseCase(princeOfVersions)
 }
 ```
@@ -339,7 +373,8 @@ The library expects a JSON configuration that contains platform-specific update 
     "android": { /* Android configuration */ },
     "android2": { /* Alternative Android configuration */ },
     "jvm": { /* JVM/Desktop configuration */ },
-    // TODO: iOS
+    "ios": { /* iOS configuration (legacy format) */ },
+    "ios2": { /* iOS configuration (recommended) */ },
     "meta": {
         "title": "New Update Available",
         "description": "This update includes bug fixes and performance improvements."
@@ -351,8 +386,9 @@ The library expects a JSON configuration that contains platform-specific update 
 
 - **`android2`** - Primary Android configuration key (recommended)
 - **`android`** - Fallback Android configuration key (for backward compatibility)
-- **`jvm`** - JVM/Desktop configuration key 
-- // TODO: iOS
+- **`jvm`** - JVM/Desktop configuration key
+- **`ios2`** - Primary iOS configuration key (recommended)
+- **`ios`** - Fallback iOS configuration key (for backward compatibility)
 
 
 #### Configuration Properties
@@ -361,9 +397,11 @@ Each platform configuration can contain the following properties (all are option
 
 - **`required_version`** - The minimum version required for the app to function
   - Android: Long value (version code)
+  - iOS: String value (semantic version like "1.2.0")
   - JVM: String value (semantic version like "1.2.0")
 - **`last_version_available`** - The latest available version for optional updates
-  - Android: Long value (version code)  
+  - Android: Long value (version code)
+  - iOS: String value (semantic version like "1.2.0")
   - JVM: String value (semantic version like "1.2.0")
 - **`notify_last_version_frequency`** - How often to notify about optional updates
   - Values: `"ONCE"` (default) or `"ALWAYS"`
@@ -391,8 +429,9 @@ The `requirements` object can contain various conditions that must be met for th
 ```
 
 **Default Requirements:**
-- **`required_os_version`** - Minimum OS version required (Android only) // TODO: iOS
+- **`required_os_version`** - Minimum OS version required
     - Android: API level (e.g., "21" for Android 5.0)
+    - iOS: iOS version (e.g., "14.0" for iOS 14)
 - **`required_jvm_version`** - Minimum JVM version required (JVM only)
   - JVM: JVM version number (e.g., "8", "11", "17")
 
@@ -482,7 +521,27 @@ If there are conflicting keys, the selected configuration metadata takes precede
 }
 ```
 
-// TODO: iOS
+**iOS Configuration:**
+```json
+{
+    "ios2": {
+        "required_version": "1.2.0",
+        "last_version_available": "1.5.0",
+        "notify_last_version_frequency": "ONCE",
+        "requirements": {
+            "required_os_version": "14.0"
+        },
+        "meta": {
+            "release_notes_url": "https://example.com/release-notes",
+            "app_store_url": "https://apps.apple.com/app/id123456789"
+        }
+    },
+    "meta": {
+        "title": "Update Available",
+        "description": "Bug fixes and performance improvements"
+    }
+}
+```
 
 
 **Multi-Platform Configuration:**
@@ -493,13 +552,17 @@ If there are conflicting keys, the selected configuration metadata takes precede
         "last_version_available": 18,
         "notify_last_version_frequency": "ONCE"
     },
+    "ios2": {
+        "required_version": "1.2.0",
+        "last_version_available": "1.5.0",
+        "notify_last_version_frequency": "ONCE"
+    },
     "jvm": {
-        "required_version": "1.2.0", 
+        "required_version": "1.2.0",
         "last_version_available": "1.5.0",
         "notify_last_version_frequency": "ALWAYS"
     },
-  // TODO: iOS
-  "meta": {
+    "meta": {
         "title": "Update Available",
         "description": "Bug fixes and improvements",
         "release_notes": "https://example.com/release-notes"
@@ -510,23 +573,26 @@ If there are conflicting keys, the selected configuration metadata takes precede
 #### Backward Compatibility
 
 To support both legacy and current versions of Prince of Versions:
-- Use `android2` for new implementations
-- Keep `android` as a fallback for older versions
-- The library will prefer `android2` over `android` if both are present
+- Use `android2` for new Android implementations
+- Use `ios2` for new iOS implementations
+- Keep `android` and `ios` as fallbacks for older versions
+- The library will prefer `android2` over `android` and `ios2` over `ios` if both are present
 
 #### Error Handling
 
 - If no platform key is found, the parser will throw an error
 - If requirements are not satisfied for any configuration in an array, a `RequirementsNotSatisfiedException` is thrown
 - Invalid version formats or missing required fields will result in parsing exceptions
-- // TODO - Update once iOS implementation is completed.
+- On iOS, configuration errors are wrapped in `ConfigurationException` for Swift interop
+- Network errors are thrown as `IoException` across all platforms
 
 ## Requirements
 
 The library requires the following tool versions:
 
-- Android minimum SDK level 24
-- Java version 17
+- **Android**: Minimum SDK level 24
+- **iOS**: iOS 14.0+ / Xcode 15.0+
+- **JVM**: Java version 17+
 
 ## Contributing
 
