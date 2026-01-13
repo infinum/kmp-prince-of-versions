@@ -190,38 +190,53 @@ import PrinceOfVersions
 let princeOfVersions = IosPrinceOfVersionsKt.createPrinceOfVersions()
 
 // Use with async/await
+// Note: Kotlin extension functions are exposed as static methods in Swift
+// that take the instance as the first parameter
 Task {
     do {
         let result = try await IosPrinceOfVersionsKt.checkForUpdatesFromUrl(
-            princeOfVersions,
+            princeOfVersions,  // Instance passed as first parameter
             url: "https://your-server.com/update-config.json",
             username: nil,
             password: nil,
             networkTimeout: 60_000  // milliseconds
         )
 
-        switch String(describing: result.status) {
-        case "MANDATORY":
-            // Handle required update
-            showUpdateDialog(version: result.version)
-        case "OPTIONAL":
-            // Handle optional update
-            showOptionalUpdateDialog(version: result.version)
-        default:
+        switch result.status {
+        case .mandatory:
+            // Mandatory update - user must update to continue
+            // Implement your own logic to show a blocking dialog
+            print("Mandatory update required: \(result.version ?? "unknown")")
+            // Example: showForceUpdateDialog(version: result.version)
+        case .optional:
+            // Optional update - user can choose to update or dismiss
+            // Implement your own logic to show a dismissible notification
+            print("Optional update available: \(result.version ?? "unknown")")
+            // Example: showOptionalUpdateDialog(version: result.version)
+        case .noUpdate:
             // App is up to date
+            print("App is up to date")
+        default:
             break
         }
     } catch let error as RequirementsNotSatisfiedException {
         // Device doesn't meet requirements (e.g., OS version)
-        print("Requirements not met: \(error)")
+        print("Requirements not met")
+        // Access metadata to understand which requirements failed
+        if let metadata = error.metadata as? [String: String] {
+            print("Metadata: \(metadata)")
+        }
     } catch let error as ConfigurationException {
         // Configuration or JSON parsing error
-        print("Configuration error: \(error)")
+        print("Configuration error: \(error.message ?? "Unknown error")")
+        if let cause = error.cause {
+            print("Caused by: \(cause)")
+        }
     } catch let error as IoException {
         // Network error
-        print("Network error: \(error)")
+        print("Network error: \(error.message ?? "Connection failed")")
     } catch {
-        print("Unexpected error: \(error)")
+        print("Unexpected error: \(error.localizedDescription)")
     }
 }
 ```
@@ -532,8 +547,7 @@ If there are conflicting keys, the selected configuration metadata takes precede
             "required_os_version": "14.0"
         },
         "meta": {
-            "release_notes_url": "https://example.com/release-notes",
-            "app_store_url": "https://apps.apple.com/app/id123456789"
+            "release_notes_url": "https://example.com/release-notes"
         }
     },
     "meta": {
