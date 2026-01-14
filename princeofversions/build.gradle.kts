@@ -1,5 +1,6 @@
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -17,6 +18,8 @@ kotlin {
         }
     }
 
+    val xcFramework = XCFramework()
+
     listOf(
         iosX64(),
         iosArm64(),
@@ -25,6 +28,10 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "PrinceOfVersions"
             isStatic = true
+
+            binaryOptions["bundleId"] = "com.infinum.princeofversions"
+
+            xcFramework.add(this)
         }
     }
 
