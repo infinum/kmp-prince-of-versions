@@ -36,7 +36,7 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtimeCompose)
-            implementation(projects.princeofversions)
+            implementation("com.infinum:kmp-prince-of-versions:0.1.0")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
