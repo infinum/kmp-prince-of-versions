@@ -23,6 +23,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import com.infinum.princeofversions.Loader
 import com.infinum.princeofversions.PrinceOfVersions
+import com.infinum.princeofversions.RequirementsNotSatisfiedException
 import com.infinum.princeofversions.UpdateResult
 import com.infinum.princeofversions.UpdateStatus
 import java.net.URI
@@ -91,7 +92,7 @@ class AppState(
                     }
                     else -> {
                         val url = when (exampleName) {
-                            "Common Usage", "Custom Storage", "Custom Version Logic" -> "https://pastebin.com/raw/AFBCVbrL"
+                            "Common Usage", "Custom Storage", "Custom Version Logic" -> "https://pastebin.com/raw/SCyxsrK0"
                             "Custom Parser" -> "https://pastebin.com/raw/9CfSVzz4"
                             "Custom Checker" -> "https://pastebin.com/raw/fdXFhsRE"
                             else -> "https://pastebin.com/raw/VMgd71VH"
@@ -105,7 +106,11 @@ class AppState(
             } catch (t: Throwable) {
                 if (t !is CancellationException) {
                     t.printStackTrace()
-                    statusText = "Error: ${t.message}"
+                    statusText = if(t is RequirementsNotSatisfiedException) {
+                        "Requirements not satisfied."
+                    } else {
+                        "Error: ${t.message}"
+                    }
                 }
             }
         }
@@ -163,22 +168,29 @@ fun AppNavigationHost() {
     var currentScreen by remember { mutableStateOf<String?>(null) }
 
     MaterialTheme {
-        if (currentScreen == null) {
-            App(
-                onCommonUsageClick = { currentScreen = "Common Usage" },
-                onCustomParserClick = { currentScreen = "Custom Parser" },
-                onStreamLoaderClick = { currentScreen = "Stream Loader" },
-                onCustomCheckerClick = { currentScreen = "Custom Checker" },
-                onCustomStorageClick = { currentScreen = "Custom Storage" },
-                onCustomVersionLogicClick = { currentScreen = "Custom Version Logic" },
-            )
-        } else {
-            ExampleDetailsScreen(
-                exampleName = currentScreen!!,
-                onBackClick = {
-                    currentScreen = null
-                },
-            )
+        when (currentScreen) {
+            null -> {
+                App(
+                    onCommonUsageClick = { currentScreen = "Common Usage" },
+                    onCustomParserClick = { currentScreen = "Custom Parser" },
+                    onStreamLoaderClick = { currentScreen = "Stream Loader" },
+                    onCustomCheckerClick = { currentScreen = "Custom Checker" },
+                    onCustomStorageClick = { currentScreen = "Custom Storage" },
+                    onCustomVersionLogicClick = { currentScreen = "Custom Version Logic" },
+                    onJavaUsageClick = { currentScreen = "Java Usage" },
+                )
+            }
+            "Java Usage" -> {
+                JavaUsageExampleScreen(
+                    onBackClick = { currentScreen = null },
+                )
+            }
+            else -> {
+                ExampleDetailsScreen(
+                    exampleName = currentScreen!!,
+                    onBackClick = { currentScreen = null },
+                )
+            }
         }
     }
 }
