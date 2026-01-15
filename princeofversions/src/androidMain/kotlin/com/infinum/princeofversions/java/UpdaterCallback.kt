@@ -10,7 +10,7 @@ import com.infinum.princeofversions.BaseUpdateResult
 public interface UpdaterCallback<T> {
 
     /**
-     * Method is called when there is a new update available for the current application.
+     * Method is called when an update check completes successfully.
      *
      * @param result The result of the update check. Read `status` to find out if there is an update,
      * and if there is, read `updateVersion` to find out the version of the update.
