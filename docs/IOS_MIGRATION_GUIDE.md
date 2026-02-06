@@ -47,16 +47,16 @@ PrinceOfVersions.checkForUpdates(
 import PrinceOfVersions
 
 let url = "https://example.com/versions.json"
-let pov = IosPrinceOfVersionsKt.createPrinceOfVersions()
+let pov = IosPrinceOfVersionsKt.makePrinceOfVersions()
 
 Task {
     do {
-        let result = try await IosPrinceOfVersionsKt.checkForUpdatesFromUrl(
+        let result = try await IosPrinceOfVersionsKt.checkForUpdates(
             pov,
-            url: url,
+            from: url,
             username: nil,
             password: nil,
-            networkTimeout: 60_000
+            timeout: 60_000
         )
 
         switch String(describing: result.status) {
@@ -89,11 +89,23 @@ Task {
 pod 'PrinceOfVersions'  # ← Remove this
 ```
 
-**Add KMP framework:**
+**Add KMP framework via Swift Package Manager:**
+
+In Xcode:
+1. File → Add Package Dependencies
+2. Enter repository URL: `https://github.com/infinum/kmp-prince-of-versions.git`
+3. Under "Dependency Rule", select **Branch** and enter `main`
+
+Or in your `Package.swift`:
+```swift
+dependencies: [
+    .package(url: "https://github.com/infinum/kmp-prince-of-versions.git", branch: "main")
+]
 ```
-# Add the compiled Kotlin framework to your project
-# See main README for integration instructions
-```
+
+> **Note**: Version-based dependency rules are not yet available. Use the `main` branch until a new tagged release with SPM support is published.
+
+Alternatively, download the prebuilt XCFramework from [Releases](https://github.com/infinum/kmp-prince-of-versions/releases) and add it manually to your project.
 
 ### 2. Update Imports
 
@@ -115,13 +127,13 @@ PrinceOfVersions.checkForUpdates(from: url) { response in
 
 **After:**
 ```swift
-let pov = IosPrinceOfVersionsKt.createPrinceOfVersions()
-let result = try await IosPrinceOfVersionsKt.checkForUpdatesFromUrl(
+let pov = IosPrinceOfVersionsKt.makePrinceOfVersions()
+let result = try await IosPrinceOfVersionsKt.checkForUpdates(
     pov,
-    url: urlString,
+    from: urlString,
     username: nil,
     password: nil,
-    networkTimeout: 60_000  // milliseconds
+    timeout: 60_000  // milliseconds
 )
 ```
 
@@ -137,12 +149,12 @@ PrinceOfVersions.checkForUpdates(
 
 **After:**
 ```swift
-let result = try await IosPrinceOfVersionsKt.checkForUpdatesFromUrl(
+let result = try await IosPrinceOfVersionsKt.checkForUpdates(
     pov,
-    url: urlString,
+    from: urlString,
     username: "user",       // Basic auth
     password: "password",
-    networkTimeout: 60_000
+    timeout: 60_000
 )
 ```
 
@@ -193,20 +205,20 @@ class RegionChecker: RequirementChecker {
 }
 
 let checker = RegionChecker()
-let pov = IosPrinceOfVersionsKt.princeOfVersionsWithCustomChecker(
-    key: "region",
+let pov = IosPrinceOfVersionsKt.makePrinceOfVersions(
+    checkerKey: "region",
     checker: checker,
     keepDefaultCheckers: true
 )
 
-let result = try await IosPrinceOfVersionsKt.checkForUpdatesFromUrl(pov, ...)
+let result = try await IosPrinceOfVersionsKt.checkForUpdates(pov, from: url, ...)
 ```
 
 Or use Kotlin helper:
 ```swift
 let checker = SystemVersionRequirementCheckerKt.makeSystemVersionRequirementChecker()
-let pov = IosPrinceOfVersionsKt.princeOfVersionsWithCustomChecker(
-    key: "required_os_version",
+let pov = IosPrinceOfVersionsKt.makePrinceOfVersions(
+    checkerKey: "required_os_version",
     checker: checker,
     keepDefaultCheckers: true
 )
@@ -230,15 +242,15 @@ class MockVersionProvider: POVBaseApplicationVersionProvider {
 }
 
 let provider = MockVersionProvider(version: "1.2.3")
-let baseComparator = IosDefaultVersionComparatorKt.defaultIosVersionComparator()
+let baseComparator = IosDefaultVersionComparatorKt.makeDefaultVersionComparator()
 let customComparator = DevBuildVersionComparator(delegate: baseComparator)
 
-let pov = IosDefaultVersionComparatorKt.princeOfVersionsWithCustomVersionLogic(
-    provider: provider,
+let pov = IosDefaultVersionComparatorKt.makePrinceOfVersions(
+    versionProvider: provider,
     comparator: customComparator
 )
 
-let result = try await IosPrinceOfVersionsKt.checkForUpdatesFromUrl(pov, ...)
+let result = try await IosPrinceOfVersionsKt.checkForUpdates(pov, from: url, ...)
 ```
 
 ## Key Differences to Remember
@@ -265,7 +277,7 @@ networkTimeout: 30_000
 PrinceOfVersions.checkForUpdates(...) { response in }
 
 // After: async/await (better!)
-let result = try await IosPrinceOfVersionsKt.checkForUpdatesFromUrl(...)
+let result = try await IosPrinceOfVersionsKt.checkForUpdates(pov, from: url, ...)
 ```
 
 ### 4. Error Handling
@@ -310,19 +322,19 @@ final class UpdateCheckViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var updateMessage: String?
 
-    private let pov = IosPrinceOfVersionsKt.createPrinceOfVersions()
+    private let pov = IosPrinceOfVersionsKt.makePrinceOfVersions()
 
     func checkForUpdates(url: String) async {
         isLoading = true
         defer { isLoading = false }
 
         do {
-            let result = try await IosPrinceOfVersionsKt.checkForUpdatesFromUrl(
+            let result = try await IosPrinceOfVersionsKt.checkForUpdates(
                 pov,
-                url: url,
+                from: url,
                 username: nil,
                 password: nil,
-                networkTimeout: 60_000
+                timeout: 60_000
             )
 
             switch String(describing: result.status) {
@@ -391,10 +403,10 @@ final class UpdateCheckTests: XCTestCase {
         }
 
         let provider = MockVersionProvider()
-        let comparator = IosDefaultVersionComparatorKt.defaultIosVersionComparator()
+        let comparator = IosDefaultVersionComparatorKt.makeDefaultVersionComparator()
 
-        let pov = IosDefaultVersionComparatorKt.princeOfVersionsWithCustomVersionLogic(
-            provider: provider,
+        let pov = IosDefaultVersionComparatorKt.makePrinceOfVersions(
+            versionProvider: provider,
             comparator: comparator
         )
 
@@ -489,16 +501,16 @@ struct UpdateResult {
 }
 
 final class PrinceOfVersionsUpdateService: UpdateCheckService {
-    private let pov = IosPrinceOfVersionsKt.createPrinceOfVersions()
+    private let pov = IosPrinceOfVersionsKt.makePrinceOfVersions()
     private let timeout: Int64 = 60_000
 
     func checkForUpdates(from url: String) async throws -> UpdateResult {
-        let result = try await IosPrinceOfVersionsKt.checkForUpdatesFromUrl(
+        let result = try await IosPrinceOfVersionsKt.checkForUpdates(
             pov,
-            url: url,
+            from: url,
             username: nil,
             password: nil,
-            networkTimeout: timeout
+            timeout: timeout
         )
 
         let status = String(describing: result.status)

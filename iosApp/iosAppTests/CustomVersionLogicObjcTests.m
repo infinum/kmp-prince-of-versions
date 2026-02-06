@@ -24,16 +24,16 @@
     POVTestVersionProvider *provider = [[POVTestVersionProvider alloc] initWithVersion:currentVersion];
 
     id<POVBaseVersionComparator> comparator =
-        [POVIosDefaultVersionComparatorKt defaultIosVersionComparator];
+        [POVIosDefaultVersionComparatorKt makeDefaultVersionComparator];
 
     id<POVPrinceOfVersionsBase> pov =
-        [POVIosDefaultVersionComparatorKt princeOfVersionsWithCustomVersionLogicProvider:provider
-                                                                             comparator:comparator];
+        [POVIosDefaultVersionComparatorKt makePrinceOfVersionsVersionProvider:provider
+                                                                   comparator:comparator];
     return pov;
 }
 
 - (NSString *)expectedNotifiedVersionForRequired:(NSString *)req optional:(NSString *)opt {
-    id<POVBaseVersionComparator> cmp = [POVIosDefaultVersionComparatorKt defaultIosVersionComparator];
+    id<POVBaseVersionComparator> cmp = [POVIosDefaultVersionComparatorKt makeDefaultVersionComparator];
     if (opt == nil) return req;
     return ([cmp compareFirstVersion:req secondVersion:opt] < 0) ? opt : req;
 }
