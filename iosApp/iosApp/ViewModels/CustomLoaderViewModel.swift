@@ -16,7 +16,7 @@ final class CustomLoaderViewModel: ObservableObject {
     @Published var apiKey: String = "demo-api-key-12345"
 
     private var task: Task<Void, Never>?
-    private lazy var pov: any PrinceOfVersionsBase = IosPrinceOfVersionsKt.makePrinceOfVersions()
+    private lazy var pov: any PrinceOfVersionsBase = IosPrinceOfVersionsKt.createPrinceOfVersions()
 
     func check() {
         cancel()
