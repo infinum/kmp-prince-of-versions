@@ -1,8 +1,6 @@
 package com.infinum.princeofversions
 
-import kotlin.coroutines.Continuation
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
+import kotlinx.coroutines.CancellableContinuation
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.time.Duration
@@ -76,26 +74,22 @@ internal class IosDefaultLoader(
         data: NSData?,
         response: NSURLResponse?,
         error: NSError?,
-        cont: Continuation<String>,
+        cont: CancellableContinuation<String>,
         session: NSURLSession,
     ) {
-        fun cleanupSession(session: NSURLSession) {
-            session.finishTasksAndInvalidate()
-        }
-        fun fail(msg: String) {
-            cont.resumeWithException(IoException(msg))
-            cleanupSession(session)
-        }
-        fun succeed(body: String) {
-            cont.resume(body)
-            cleanupSession(session)
+        session.finishTasksAndInvalidate()
+
+        // Check if continuation is still active before resuming
+        // This prevents crashes when the coroutine was cancelled before the callback fired
+        if (!cont.isActive) {
+            return
         }
 
         val failure = buildFailureMessage(error, response)
         if (failure != null) {
-            fail(failure)
+            cont.resumeWithException(IoException(failure))
         } else {
-            succeed(decodeBody(data))
+            cont.resume(decodeBody(data))
         }
     }
 
