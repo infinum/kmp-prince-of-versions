@@ -79,13 +79,14 @@ internal class IosDefaultLoader(
         cont: CancellableContinuation<String>,
         session: NSURLSession,
     ) {
-        session.finishTasksAndInvalidate()
-
-        // Check if continuation is still active before resuming
-        // This prevents crashes when the coroutine was cancelled before the callback fired
+        // Check if continuation is still active before resuming and cleaning up the session.
+        // This prevents double invalidation when the coroutine was cancelled and the
+        // cancellation handler has already called session.invalidateAndCancel().
         if (!cont.isActive) {
             return
         }
+
+        session.finishTasksAndInvalidate()
 
         val failure = buildFailureMessage(error, response)
         if (failure != null) {
