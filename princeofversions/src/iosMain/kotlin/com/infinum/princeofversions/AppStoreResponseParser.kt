@@ -23,34 +23,48 @@ internal object AppStoreResponseParser {
      * Throws [ConfigurationException] on malformed JSON.
      */
     fun parse(jsonString: String): AppStoreVersionInfo? {
-        val data = NSString.create(string = jsonString).dataUsingEncoding(NSUTF8StringEncoding)
-            ?: throw ConfigurationException("Failed to encode App Store response as UTF-8")
-
-        val json = try {
-            NSJSONSerialization.JSONObjectWithData(data, options = 0u, error = null)
-        } catch (e: Exception) {
-            throw ConfigurationException("Failed to parse App Store JSON response", e)
-        } as? Map<*, *>
-            ?: throw ConfigurationException("App Store response is not a JSON object")
+        val json = deserialize(jsonString)
 
         val resultCount = (json["resultCount"] as? Number)?.toInt() ?: 0
         if (resultCount == 0) return null
 
-        val results = (json["results"] as? List<*>)
-            ?: throw ConfigurationException("App Store response missing 'results' array")
+        val firstResult = extractFirstResult(json)
 
-        val firstResult = (results.firstOrNull() as? Map<*, *>)
-            ?: throw ConfigurationException("App Store response 'results' array is empty or malformed")
+        val version = firstResult["version"] as? String
+            ?: configurationError("App Store result missing 'version' field")
 
-        val version = (firstResult["version"] as? String)
-            ?: throw ConfigurationException("App Store result missing 'version' field")
-
-        val releaseDate = (firstResult["currentVersionReleaseDate"] as? String)
-            ?: throw ConfigurationException("App Store result missing 'currentVersionReleaseDate' field")
+        val releaseDate = firstResult["currentVersionReleaseDate"] as? String
+            ?: configurationError("App Store result missing 'currentVersionReleaseDate' field")
 
         return AppStoreVersionInfo(
             version = version,
             currentVersionReleaseDate = releaseDate,
         )
+    }
+
+    private fun deserialize(jsonString: String): Map<*, *> {
+        val data = NSString.create(string = jsonString).dataUsingEncoding(NSUTF8StringEncoding)
+            ?: configurationError("Failed to encode App Store response as UTF-8")
+
+        val parsed = try {
+            NSJSONSerialization.JSONObjectWithData(data, options = 0u, error = null)
+        } catch (e: Exception) {
+            throw ConfigurationException("Failed to parse App Store JSON response", e)
+        }
+
+        return parsed as? Map<*, *>
+            ?: configurationError("App Store response is not a JSON object")
+    }
+
+    private fun extractFirstResult(json: Map<*, *>): Map<*, *> {
+        val results = json["results"] as? List<*>
+            ?: configurationError("App Store response missing 'results' array")
+
+        return results.firstOrNull() as? Map<*, *>
+            ?: configurationError("App Store response 'results' array is empty or malformed")
+    }
+
+    private fun configurationError(message: String): Nothing {
+        throw ConfigurationException(message)
     }
 }
