@@ -19,6 +19,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".JavaUsageExample"/>
         <activity android:name=".CommonUsageExample"/>
         <activity android:name=".StreamLoaderExample"/>
         <activity android:name=".CustomRequirementCheckerExample"/>
