@@ -98,6 +98,9 @@ jobs:
 
       - name: Run iOS integration tests (XCTest)
         run: |
+          # pipefail matters here: without it a failing xcrun is masked by a succeeding
+          # jq, and the step falls through to the misleading "no simulator" message.
+          set -eo pipefail
           # Resolve a simulator that actually exists on the runner image instead of
           # pinning a device name, which breaks whenever the image drops a model.
           # simctl does not return runtimes in version order, so sort explicitly and
@@ -122,7 +125,7 @@ jobs:
           xcodebuild test \
             -project iosApp/iosApp.xcodeproj \
             -scheme iosApp \
-            -destination "id=$UDID" \
+            -destination "platform=iOS Simulator,id=$UDID" \
             -only-testing:iosAppTests \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
