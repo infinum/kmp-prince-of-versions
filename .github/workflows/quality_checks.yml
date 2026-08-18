@@ -98,10 +98,31 @@ jobs:
 
       - name: Run iOS integration tests (XCTest)
         run: |
+          # Resolve a simulator that actually exists on the runner image instead of
+          # pinning a device name, which breaks whenever the image drops a model.
+          # simctl does not return runtimes in version order, so sort explicitly and
+          # take an iPhone from the newest iOS runtime. Name is a secondary sort key so
+          # ties within one runtime resolve the same way on every run.
+          DEVICE=$(xcrun simctl list devices available -j | jq -r '
+            [ .devices | to_entries[]
+              | select(.key | test("SimRuntime\\.iOS-"))
+              | (.key | capture("iOS-(?<maj>[0-9]+)-(?<min>[0-9]+)")
+                      | [(.maj | tonumber), (.min | tonumber)]) as $ver
+              | .value[]
+              | select(.name | startswith("iPhone"))
+              | {ver: $ver, udid: .udid, name: .name} ]
+            | sort_by(.ver, .name) | last | "\(.udid) \(.name)"')
+          UDID=${DEVICE%% *}
+          if [ -z "$UDID" ] || [ "$UDID" = "null" ]; then
+            echo "No available iPhone simulator found on this runner:"
+            xcrun simctl list devices available
+            exit 1
+          fi
+          echo "Using simulator: ${DEVICE#* } ($UDID)"
           xcodebuild test \
             -project iosApp/iosApp.xcodeproj \
             -scheme iosApp \
-            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
+            -destination "id=$UDID" \
             -only-testing:iosAppTests \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
