@@ -17,7 +17,7 @@ final class CommonUsageViewModel: ObservableObject {
     @Published var lastMessage: String?
 
     private var task: Task<Void, Never>?
-    private lazy var pov: any PrinceOfVersionsBase = IosPrinceOfVersionsKt.createPrinceOfVersions()
+    private lazy var pov: any PrinceOfVersionsBase = IosPrinceOfVersionsKt.makePrinceOfVersions()
 
     func check(slow: Bool) {
         cancel()
@@ -31,12 +31,12 @@ final class CommonUsageViewModel: ObservableObject {
                     try await Task.sleep(for: .seconds(5))
                 }
 
-                let result = try await IosPrinceOfVersionsKt.checkForUpdatesFromUrl(
+                let result = try await IosPrinceOfVersionsKt.checkForUpdates(
                     pov,
-                    url: Constants.commonUsageUrl,
+                    from: Constants.commonUsageUrl,
                     username: nil,
                     password: nil,
-                    networkTimeout: Int64(Constants.networkTimeout)
+                    timeout: Int64(Constants.networkTimeout)
                 )
                 self.show(message: self.format(result: result))
             } catch is CancellationError {

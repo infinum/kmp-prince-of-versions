@@ -1,5 +1,9 @@
+@file:OptIn(ExperimentalObjCName::class)
+
 package com.infinum.princeofversions
 
+import kotlin.experimental.ExperimentalObjCName
+import kotlin.native.ObjCName
 import platform.Foundation.NSUserDefaults
 
 /**
@@ -23,8 +27,9 @@ internal class IosStorage : Storage {
 }
 
 // iOS-visible convenience for Swift/ObjC to pass a custom Storage implementation.
+@ObjCName("makePrinceOfVersions")
 public fun princeOfVersionsWithCustomStorage(
-    storage: Storage,
+    @ObjCName("storage") storage: Storage,
 ): PrinceOfVersions {
     val components = PrinceOfVersionsComponents.Builder()
         .withStorage(storage)
