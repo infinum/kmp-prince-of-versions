@@ -35,7 +35,7 @@ android {
 }
 
 dependencies {
-    implementation(projects.sampleApp)
+    implementation(projects.sampleShared)
     implementation(projects.princeofversions)
 
     implementation(compose.runtime)

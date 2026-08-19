@@ -75,7 +75,7 @@ jobs:
         run: ./gradlew :androidApp:assembleDebug
 
       - name: Build desktop sample
-        run: ./gradlew :sampleApp:compileKotlinDesktop
+        run: ./gradlew :desktopApp:compileKotlin
 
 
   build-ios-framework-and-sample:
