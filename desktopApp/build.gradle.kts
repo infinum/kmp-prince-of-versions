@@ -12,6 +12,7 @@ dependencies {
     implementation(projects.princeofversions)
 
     implementation(compose.desktop.currentOs)
+    implementation(libs.compose.ui.tooling.preview)
     implementation(libs.json)
     implementation(libs.kotlinx.coroutinesSwing)
 }

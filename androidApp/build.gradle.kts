@@ -38,14 +38,14 @@ dependencies {
     implementation(projects.sampleShared)
     implementation(projects.princeofversions)
 
-    implementation(compose.runtime)
-    implementation(compose.foundation)
-    implementation(compose.ui)
-    implementation(compose.preview)
+    implementation(libs.compose.runtime)
+    implementation(libs.compose.foundation)
+    implementation(libs.compose.ui)
+    implementation(libs.compose.ui.tooling.preview)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtimeCompose)
     implementation(libs.kotlinx.coroutines.core)
 
-    debugImplementation(compose.uiTooling)
+    debugImplementation(libs.compose.ui.tooling)
 }

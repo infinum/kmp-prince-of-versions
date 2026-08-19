@@ -77,7 +77,7 @@ kotlin {
     explicitApi()
 }
 
-val groupId: String by project
+val groupId = providers.gradleProperty("groupId").get()
 
 mavenPublishing {
     coordinates(
