@@ -604,7 +604,7 @@ To support both legacy and current versions of Prince of Versions:
 
 The library requires the following tool versions:
 
-- **Android**: Minimum SDK level 24
+- **Android**: Minimum SDK level 24, compile SDK level 37 or newer
 - **iOS**: iOS 14.0+ / Xcode 15.0+
 - **JVM**: Java version 17+
 
