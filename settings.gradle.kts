@@ -34,3 +34,4 @@ plugins {
 
 include(":sampleApp")
 include(":princeofversions")
+include(":androidApp")
