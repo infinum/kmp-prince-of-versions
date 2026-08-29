@@ -20,6 +20,7 @@ fun App(
     onCustomCheckerClick: () -> Unit = {},
     onCustomStorageClick: () -> Unit = {},
     onCustomVersionLogicClick: () -> Unit = {},
+    onJavaUsageClick: () -> Unit = {},
 ) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background
@@ -38,6 +39,7 @@ fun App(
             AppButton("Custom Checker", onClick = onCustomCheckerClick)
             AppButton("Custom Storage", onClick = onCustomStorageClick)
             AppButton("Custom Version Logic", onClick = onCustomVersionLogicClick)
+            AppButton("Java Usage", onClick = onJavaUsageClick)
         }
     }
 }

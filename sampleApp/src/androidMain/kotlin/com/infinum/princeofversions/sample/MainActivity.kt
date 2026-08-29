@@ -23,6 +23,7 @@ class MainActivity : ComponentActivity() {
                 onCustomCheckerClick = ::onCustomCheckerClick,
                 onCustomStorageClick = ::onCustomStorageClick,
                 onCustomVersionLogicClick = ::onCustomVersionLogicClick,
+                onJavaUsageClick = ::onJavaUsageClick,
             )
         }
     }
@@ -49,5 +50,9 @@ class MainActivity : ComponentActivity() {
 
     private fun onCustomVersionLogicClick() {
         startActivity(Intent(this, CustomVersionLogicExample::class.java))
+    }
+
+    private fun onJavaUsageClick() {
+        startActivity(Intent(this, JavaUsageExample::class.java))
     }
 }
