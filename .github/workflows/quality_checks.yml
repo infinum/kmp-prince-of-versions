@@ -69,7 +69,13 @@ jobs:
           gradle-home-cache-cleanup: true
 
       - name: Build library
-        run: ./gradlew :princeofversions:assembleRelease
+        run: ./gradlew :princeofversions:assembleAndroidMain
+
+      - name: Build Android sample
+        run: ./gradlew :androidApp:assembleDebug
+
+      - name: Build desktop sample
+        run: ./gradlew :desktopApp:compileKotlin
 
 
   build-ios-framework-and-sample:
