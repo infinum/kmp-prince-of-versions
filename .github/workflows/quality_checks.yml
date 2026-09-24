@@ -16,14 +16,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
         with:
           distribution: 'temurin'
           java-version: ${{ env.JAVA_VERSION }}
 
       - name: Check Gradle wrapper
-        uses: gradle/actions/wrapper-validation@v4
+        uses: gradle/actions/wrapper-validation@v6
 
       - name: Check detekt
         run: ./gradlew :princeofversions:detekt
@@ -36,12 +36,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 120
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
         with:
           distribution: 'temurin'
           java-version: ${{ env.JAVA_VERSION }}
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v6
         continue-on-error: true
         timeout-minutes: 5
         with:
@@ -56,12 +56,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
         with:
           distribution: 'temurin'
           java-version: ${{ env.JAVA_VERSION }}
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v6
         continue-on-error: true
         timeout-minutes: 5
         with:
@@ -69,7 +69,13 @@ jobs:
           gradle-home-cache-cleanup: true
 
       - name: Build library
-        run: ./gradlew :princeofversions:assembleRelease
+        run: ./gradlew :princeofversions:assembleAndroidMain
+
+      - name: Build Android sample
+        run: ./gradlew :androidApp:assembleDebug
+
+      - name: Build desktop sample
+        run: ./gradlew :desktopApp:compileKotlin
 
 
   build-ios-framework-and-sample:
@@ -77,12 +83,12 @@ jobs:
     runs-on: macos-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
         with:
           distribution: 'temurin'
           java-version: ${{ env.JAVA_VERSION }}
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v6
         continue-on-error: true
         timeout-minutes: 5
         with:
@@ -98,10 +104,34 @@ jobs:
 
       - name: Run iOS integration tests (XCTest)
         run: |
+          # pipefail matters here: without it a failing xcrun is masked by a succeeding
+          # jq, and the step falls through to the misleading "no simulator" message.
+          set -eo pipefail
+          # Resolve a simulator that actually exists on the runner image instead of
+          # pinning a device name, which breaks whenever the image drops a model.
+          # simctl does not return runtimes in version order, so sort explicitly and
+          # take an iPhone from the newest iOS runtime. Name is a secondary sort key so
+          # ties within one runtime resolve the same way on every run.
+          DEVICE=$(xcrun simctl list devices available -j | jq -r '
+            [ .devices | to_entries[]
+              | select(.key | test("SimRuntime\\.iOS-"))
+              | (.key | capture("iOS-(?<maj>[0-9]+)-(?<min>[0-9]+)")
+                      | [(.maj | tonumber), (.min | tonumber)]) as $ver
+              | .value[]
+              | select(.name | startswith("iPhone"))
+              | {ver: $ver, udid: .udid, name: .name} ]
+            | sort_by(.ver, .name) | last | "\(.udid) \(.name)"')
+          UDID=${DEVICE%% *}
+          if [ -z "$UDID" ] || [ "$UDID" = "null" ]; then
+            echo "No available iPhone simulator found on this runner:"
+            xcrun simctl list devices available
+            exit 1
+          fi
+          echo "Using simulator: ${DEVICE#* } ($UDID)"
           xcodebuild test \
             -project iosApp/iosApp.xcodeproj \
             -scheme iosApp \
-            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
+            -destination "platform=iOS Simulator,id=$UDID" \
             -only-testing:iosAppTests \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \

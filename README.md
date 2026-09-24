@@ -150,7 +150,7 @@ The library provides platform-specific factory methods to create `PrinceOfVersio
 
 **Note**: You'll need to create an API endpoint on your server where the remote update configuration JSON will be hosted and made available for the library to fetch. If you need a more specific setup consult [Advanced Usage with Custom Components](#advanced-usage-with-custom-components)
 
-For complete working examples, see the sample apps: [Android/JVM sample app](sampleApp/) and [iOS sample app](iosApp/) which demonstrate usage across all platforms. Additional examples and edge cases can be found in the test suites: [common tests](princeofversions/src/commonTest/), [Android tests](princeofversions/src/androidUnitTest/), and [iOS tests](princeofversions/src/iosTest/).
+For complete working examples, see the sample apps: [Android sample app](androidApp/), [JVM sample app](desktopApp/) and [iOS sample app](iosApp/) which demonstrate usage across all platforms. Additional examples and edge cases can be found in the test suites: [common tests](princeofversions/src/commonTest/), [Android tests](princeofversions/src/androidHostTest/), and [iOS tests](princeofversions/src/iosTest/).
 
 #### Android
 
@@ -604,7 +604,7 @@ To support both legacy and current versions of Prince of Versions:
 
 The library requires the following tool versions:
 
-- **Android**: Minimum SDK level 24
+- **Android**: Minimum SDK level 24, compile SDK level 37 or newer
 - **iOS**: iOS 14.0+ / Xcode 15.0+
 - **JVM**: Java version 17+
 
