@@ -140,7 +140,20 @@ PrinceOfVersions.checkForUpdates(
 let result = try await IosPrinceOfVersionsKt.checkForUpdatesFromUrl(
     pov,
     url: urlString,
-    username: "user",       // Basic auth
+    headers: ["Authorization": "Bearer token"],
+    username: nil,
+    password: nil,
+    networkTimeout: 60_000
+)
+```
+
+For basic authentication, pass `username` and `password` instead:
+
+```swift
+let result = try await IosPrinceOfVersionsKt.checkForUpdatesFromUrl(
+    pov,
+    url: urlString,
+    username: "user",
     password: "password",
     networkTimeout: 60_000
 )

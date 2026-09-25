@@ -8,6 +8,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
+import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
@@ -95,6 +96,23 @@ class AndroidPrinceOfVersionsTest {
         assertFailsWith<IoException> {
             princeOfVersions.checkForUpdatesFromUrl(mockWebServer.url("/").toString())
         }
+    }
+
+    @Test
+    fun `checkForUpdatesFromUrl should send custom headers when headers are provided`() = runTest {
+        val components = createTestComponents()
+        val princeOfVersions = PrinceOfVersions(components)
+        val mockResponse = MockResponse()
+            .setResponseCode(200)
+            .setBody("""{"optional_version": "2.0.0", "notification_type": "ONCE"}""")
+        mockWebServer.enqueue(mockResponse)
+
+        princeOfVersions.checkForUpdatesFromUrl(
+            url = mockWebServer.url("/").toString(),
+            headers = mapOf("x-api-key" to "secret-key"),
+        )
+
+        assertEquals("secret-key", mockWebServer.takeRequest().getHeader("x-api-key"))
     }
 
     private fun createTestComponents(): PrinceOfVersionsComponents {
