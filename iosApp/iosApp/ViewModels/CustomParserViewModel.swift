@@ -16,7 +16,7 @@ final class CustomParserViewModel: ObservableObject {
     @Published var showAlert = false
     @Published var alertMessage = ""
 
-    private lazy var pov: any PrinceOfVersionsBase = IosDefaultVersionComparatorKt.princeOfVersionsWithCustomParser(parser: MinimalConfigParser())
+    private lazy var pov: any PrinceOfVersionsBase = IosDefaultVersionComparatorKt.makePrinceOfVersions(parser: MinimalConfigParser())
 
 
     func parseLocally() {
@@ -53,12 +53,12 @@ final class CustomParserViewModel: ObservableObject {
         resultText = ""
         Task {
             do {
-                let update = try await IosPrinceOfVersionsKt.checkForUpdatesFromUrl(
+                let update = try await IosPrinceOfVersionsKt.checkForUpdates(
                     pov,
-                    url: Constants.minimumUrl,
+                    from: Constants.minimumUrl,
                     username: nil,
                     password: nil,
-                    networkTimeout: Int64(Constants.networkTimeout)
+                    timeout: Int64(Constants.networkTimeout)
                 )
                 let status = String(describing: update.status)
                 let version = (update.version as String?) ?? "nil"

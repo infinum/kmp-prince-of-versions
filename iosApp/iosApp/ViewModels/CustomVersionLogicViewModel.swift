@@ -19,8 +19,8 @@ final class CustomVersionLogicViewModel: ObservableObject {
     private lazy var pov: any PrinceOfVersionsBase = {
         let provider = HardcodedVersionProvider()
         let comparator = DeveloperBuildVersionComparator()
-        return IosDefaultVersionComparatorKt.princeOfVersionsWithCustomVersionLogic(
-            provider: provider,
+        return IosDefaultVersionComparatorKt.makePrinceOfVersions(
+            versionProvider: provider,
             comparator: comparator
         )
     }()
@@ -36,12 +36,12 @@ final class CustomVersionLogicViewModel: ObservableObject {
             do {
                 if isSlow { try await Task.sleep(for: .seconds(5)) }
 
-                let update = try await IosPrinceOfVersionsKt.checkForUpdatesFromUrl(
+                let update = try await IosPrinceOfVersionsKt.checkForUpdates(
                     pov,
-                    url: Constants.updateUrl,
+                    from: Constants.updateUrl,
                     username: nil,
                     password: nil,
-                    networkTimeout: Int64(Constants.networkTimeout)
+                    timeout: Int64(Constants.networkTimeout)
                 )
 
                 let status = String(describing: update.status)
