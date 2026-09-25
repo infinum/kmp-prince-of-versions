@@ -118,3 +118,34 @@ public suspend fun PrinceOfVersions.checkForUpdatesFromUrl(
         networkTimeout = networkTimeout,
     ),
 )
+
+/**
+ * Starts a check for an update, sending [headers] with the configuration request.
+ *
+ * Use this to authenticate with an API key or bearer token without implementing a custom [Loader].
+ * If [username] and [password] are provided, their basic authentication `Authorization` header
+ * replaces any `Authorization` entry in [headers].
+ *
+ * @param url The network url from which to load the update configuration
+ * @param headers Additional HTTP headers sent with the request, e.g. `mapOf("x-api-key" to apiKey)`.
+ * @param username Optional username for basic authentication.
+ * @param password Optional password for basic authentication.
+ * @param networkTimeout Network timeout. Default is 60 seconds.
+ *
+ * @return An [UpdateResult] instance that contains the result of the update check.
+ */
+public suspend fun PrinceOfVersions.checkForUpdatesFromUrl(
+    url: String,
+    headers: Map<String, String>,
+    username: String? = null,
+    password: String? = null,
+    networkTimeout: Duration = DEFAULT_NETWORK_TIMEOUT,
+): UpdateResult = checkForUpdates(
+    source = provideDefaultLoader(
+        url = url,
+        username = username,
+        password = password,
+        networkTimeout = networkTimeout,
+        headers = headers,
+    ),
+)

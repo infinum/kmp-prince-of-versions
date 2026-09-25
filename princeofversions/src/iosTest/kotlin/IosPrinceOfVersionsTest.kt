@@ -33,6 +33,17 @@ class PrinceOfVersionsIosTest {
     }
 
     @Test
+    fun `invalid URL throws IoException via headers overload`() = runTest {
+        val pov = testPrinceOfVersionsWithInfo()
+        assertFailsWith<IoException> {
+            pov.checkForUpdatesFromUrl(
+                url = "not a url",
+                headers = mapOf("x-api-key" to "secret-key"),
+            )
+        }
+    }
+
+    @Test
     fun `both versions null throws IllegalStateException`() = runTest {
         val pov = testPrinceOfVersionsWithInfo()
         val json = """{ "ios2": { "meta": { "note": "no versions present" } } }"""

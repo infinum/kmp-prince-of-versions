@@ -67,6 +67,37 @@ public suspend fun PrinceOfVersions.checkForUpdatesFromUrl(
     @ObjCName("username") username: String? = null,
     @ObjCName("password") password: String? = null,
     @ObjCName("timeout") networkTimeout: Duration = DEFAULT_NETWORK_TIMEOUT,
+): UpdateResult = checkForUpdatesFromUrl(
+    url = url,
+    headers = emptyMap(),
+    username = username,
+    password = password,
+    networkTimeout = networkTimeout,
+)
+
+/**
+ * Starts a check for an update, sending [headers] with the configuration request (iOS actual).
+ *
+ * Use this to authenticate with an API key or bearer token without implementing a custom [Loader].
+ * If [username] and [password] are provided, their basic authentication `Authorization` header
+ * replaces any `Authorization` entry in [headers].
+ *
+ * This is a separate overload rather than a new parameter because Swift callers pass every
+ * argument explicitly, so a new parameter would break existing call sites.
+ */
+@ObjCName("checkForUpdates")
+@Throws(
+    IoException::class,
+    RequirementsNotSatisfiedException::class,
+    ConfigurationException::class,
+    CancellationException::class,
+)
+public suspend fun PrinceOfVersions.checkForUpdatesFromUrl(
+    @ObjCName("from") url: String,
+    @ObjCName("headers") headers: Map<String, String>,
+    @ObjCName("username") username: String? = null,
+    @ObjCName("password") password: String? = null,
+    @ObjCName("timeout") networkTimeout: Duration = DEFAULT_NETWORK_TIMEOUT,
 ): UpdateResult = try {
     checkForUpdates(
         source = provideDefaultLoader(
@@ -74,6 +105,7 @@ public suspend fun PrinceOfVersions.checkForUpdatesFromUrl(
             username = username,
             password = password,
             networkTimeout = networkTimeout,
+            headers = headers,
         ),
     )
 } catch (e: CancellationException) {
