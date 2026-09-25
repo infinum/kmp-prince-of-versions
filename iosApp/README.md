@@ -83,14 +83,14 @@ Basic update checking with async/await:
 ```swift
 import PrinceOfVersions
 
-let pov = IosPrinceOfVersionsKt.createPrinceOfVersions()
+let pov = IosPrinceOfVersionsKt.makePrinceOfVersions()
 
-let result = try await IosPrinceOfVersionsKt.checkForUpdatesFromUrl(
+let result = try await IosPrinceOfVersionsKt.checkForUpdates(
     pov,
-    url: "https://example.com/version.json",
+    from: "https://example.com/version.json",
     username: nil,
     password: nil,
-    networkTimeout: 60_000
+    timeout: 60_000
 )
 
 switch String(describing: result.status) {
@@ -120,15 +120,15 @@ Add custom validation logic:
 let checker = SystemVersionRequirementCheckerKt.makeSystemVersionRequirementChecker()
 
 // Create PrinceOfVersions with custom checker
-let pov = IosPrinceOfVersionsKt.princeOfVersionsWithCustomChecker(
-    key: "required_os_version",
+let pov = IosPrinceOfVersionsKt.makePrinceOfVersions(
+    checkerKey: "required_os_version",
     checker: checker,
     keepDefaultCheckers: true
 )
 
 // Use it
 do {
-    let result = try await IosPrinceOfVersionsKt.checkForUpdatesFromUrl(pov, ...)
+    let result = try await IosPrinceOfVersionsKt.checkForUpdates(pov, from: url, ...)
 } catch let error as RequirementsNotSatisfiedException {
     print("Requirements not met: \(error)")
 }
@@ -163,18 +163,18 @@ class MockVersionProvider: POVBaseApplicationVersionProvider {
 let provider = MockVersionProvider(version: "1.2.3")
 
 // Get default comparator
-let baseComparator = IosDefaultVersionComparatorKt.defaultIosVersionComparator()
+let baseComparator = IosDefaultVersionComparatorKt.makeDefaultVersionComparator()
 
 // Wrap with custom logic (e.g., treat "-0" builds as dev builds)
 let customComparator = DevBuildVersionComparator(delegate: baseComparator)
 
 // Create PrinceOfVersions with custom logic
-let pov = IosDefaultVersionComparatorKt.princeOfVersionsWithCustomVersionLogic(
-    provider: provider,
+let pov = IosDefaultVersionComparatorKt.makePrinceOfVersions(
+    versionProvider: provider,
     comparator: customComparator
 )
 
-let result = try await IosPrinceOfVersionsKt.checkForUpdatesFromUrl(pov, ...)
+let result = try await IosPrinceOfVersionsKt.checkForUpdates(pov, from: url, ...)
 ```
 
 **Key Points:**
@@ -199,7 +199,7 @@ class MyCustomParser: POVBaseConfigurationParser {
 }
 
 let parser = MyCustomParser()
-let pov = IosPrinceOfVersionsKt.princeOfVersionsWithCustomParser(parser: parser)
+let pov = IosDefaultVersionComparatorKt.makePrinceOfVersions(parser: parser)
 ```
 
 **Key Points:**
@@ -226,7 +226,7 @@ class MyCustomStorage: POVStorage {
 }
 
 let storage = MyCustomStorage()
-let pov = IosPrinceOfVersionsKt.princeOfVersionsWithCustomStorage(storage: storage)
+let pov = IosStorageKt.makePrinceOfVersions(storage: storage)
 ```
 
 **Key Points:**
@@ -240,7 +240,7 @@ The library throws specific Kotlin exceptions that can be caught in Swift:
 
 ```swift
 do {
-    let result = try await IosPrinceOfVersionsKt.checkForUpdatesFromUrl(...)
+    let result = try await IosPrinceOfVersionsKt.checkForUpdates(pov, from: url, ...)
 } catch let error as RequirementsNotSatisfiedException {
     // Device doesn't meet requirements (OS version, etc.)
     print("Requirements not satisfied: \(error.metadata)")
@@ -266,7 +266,7 @@ final class UpdateViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var message: String?
 
-    private let pov = IosPrinceOfVersionsKt.createPrinceOfVersions()
+    private let pov = IosPrinceOfVersionsKt.makePrinceOfVersions()
     private var task: Task<Void, Never>?
 
     func checkForUpdates(url: String) {
@@ -277,12 +277,12 @@ final class UpdateViewModel: ObservableObject {
             defer { self?.isLoading = false }
 
             do {
-                let result = try await IosPrinceOfVersionsKt.checkForUpdatesFromUrl(
+                let result = try await IosPrinceOfVersionsKt.checkForUpdates(
                     self!.pov,
-                    url: url,
+                    from: url,
                     username: nil,
                     password: nil,
-                    networkTimeout: 60_000
+                    timeout: 60_000
                 )
                 self?.message = self?.format(result: result)
             } catch {
@@ -354,16 +354,16 @@ final class VersionProviderHostTests: XCTestCase {
 @implementation VersionProviderObjcTests
 
 - (void)testInvalidURL_YieldsIoError {
-    id<POVPrinceOfVersionsBase> pov = [POVIosPrinceOfVersionsKt PrinceOfVersions];
+    id<POVPrinceOfVersionsBase> pov = [POVIosPrinceOfVersionsKt makePrinceOfVersions];
 
     XCTestExpectation *exp = [self expectationWithDescription:@"io-error"];
-    [POVIosPrinceOfVersionsKt checkForUpdatesFromUrl:pov
-                                                  url:@"not a url"
-                                             username:nil
-                                             password:nil
-                                      networkTimeout:3000
-                                    completionHandler:^(POVBaseUpdateResult<NSString *> *result,
-                                                        NSError *error) {
+    [POVIosPrinceOfVersionsKt checkForUpdates:pov
+                                         from:@"not a url"
+                                     username:nil
+                                     password:nil
+                                      timeout:3000
+                            completionHandler:^(POVBaseUpdateResult<NSString *> *result,
+                                                NSError *error) {
         XCTAssertNil(result);
         XCTAssertNotNil(error);
         [exp fulfill];
@@ -436,7 +436,7 @@ protocol UpdateCheckService {
 class PrinceOfVersionsService: UpdateCheckService {
     private let pov: any PrinceOfVersionsBase
 
-    init(pov: any PrinceOfVersionsBase = IosPrinceOfVersionsKt.createPrinceOfVersions()) {
+    init(pov: any PrinceOfVersionsBase = IosPrinceOfVersionsKt.makePrinceOfVersions()) {
         self.pov = pov
     }
 
@@ -474,7 +474,7 @@ func checkWithRetry(maxAttempts: Int = 3) async throws -> BaseUpdateResult<NSStr
 
     for attempt in 1...maxAttempts {
         do {
-            return try await IosPrinceOfVersionsKt.checkForUpdatesFromUrl(...)
+            return try await IosPrinceOfVersionsKt.checkForUpdates(pov, from: url, ...)
         } catch let error as IoException {
             lastError = error
             if attempt < maxAttempts {
