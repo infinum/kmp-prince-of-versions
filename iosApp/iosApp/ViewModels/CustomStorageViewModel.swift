@@ -16,7 +16,7 @@ final class CustomStorageViewModel: ObservableObject {
     @Published var alertMessage = ""
 
     private var task: Task<Void, Never>?
-    private lazy var pov = IosStorageKt.princeOfVersionsWithCustomStorage(storage: UserDefaultsStorage())
+    private lazy var pov = IosStorageKt.makePrinceOfVersions(storage: UserDefaultsStorage())
 
     func check(isSlow: Bool) {
         cancel()
@@ -28,12 +28,12 @@ final class CustomStorageViewModel: ObservableObject {
             do {
                 if isSlow { try await Task.sleep(for: .seconds(5)) }
 
-                let result = try await IosPrinceOfVersionsKt.checkForUpdatesFromUrl(
+                let result = try await IosPrinceOfVersionsKt.checkForUpdates(
                     pov,
-                    url: Constants.commonUsageUrl,
+                    from: Constants.commonUsageUrl,
                     username: nil,
                     password: nil,
-                    networkTimeout: Int64(Constants.networkTimeout)
+                    timeout: Int64(Constants.networkTimeout)
                 )
 
                 let status = String(describing: result.status)
