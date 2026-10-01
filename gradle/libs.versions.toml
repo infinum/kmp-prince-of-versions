@@ -1,23 +1,23 @@
 [versions]
-agp = "9.4.0"
+agp = "9.4.1"
 android-compileSdk = "37"
 android-minSdk = "24"
 android-targetSdk = "37"
 androidx-activity = "1.13.0"
-androidx-core = "1.19.0"
+androidx-core = "1.19.1"
 androidx-lifecycle = "2.11.0"
 composeHotReload = "1.2.0"
 composeMaterial3 = "1.9.0"
-composeMultiplatform = "1.12.0"
+composeMultiplatform = "1.12.1"
 datastorePreferences = "1.2.1"
 detekt = "1.23.8"
 gradle-maven-publish = "0.37.0"
 json = "20260814"
-kotlin = "2.4.10"
+kotlin = "2.4.20"
 kotlinx-coroutines = "1.11.0"
 okhttp3-mockwebserver = "5.5.0"
 prince-of-versions = "0.1.0"
-skie = "0.10.14"
+skie = "0.10.15"
 
 [libraries]
 compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "composeMultiplatform" }
