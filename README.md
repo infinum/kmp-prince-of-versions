@@ -45,6 +45,7 @@ Prince of Versions KMP is a Kotlin Multiplatform library that handles app update
     - [JVM/Desktop](#jvmdesktop-1)
   - [Advanced Usage with Custom Components](#advanced-usage-with-custom-components)
     - [Android with Custom Configuration](#android-with-custom-configuration)
+    - [Sending Custom Headers](#sending-custom-headers)
     - [Using Custom Loader](#using-custom-loader)
   - [Kotlin Multiplatform Projects](#kotlin-multiplatform-projects)
     - [Shared Code (commonMain)](#shared-code-commonmain)
@@ -129,14 +130,16 @@ For iOS projects, you can integrate the library using Swift Package Manager:
 ```swift
 // In your Package.swift
 dependencies: [
-    .package(url: "https://github.com/infinum/kmp-prince-of-versions.git", from: "0.1.0")
+    .package(url: "https://github.com/infinum/kmp-prince-of-versions.git", branch: "main")
 ]
 ```
 
 Or add it directly in Xcode:
 1. File → Add Package Dependencies
 2. Enter repository URL: `https://github.com/infinum/kmp-prince-of-versions.git`
-3. Select version `0.1.0` or later
+3. Under "Dependency Rule", select **Branch** and enter `main`
+
+> **Note**: Version-based dependency rules (e.g., "Up to Next Major Version") are not yet available. Use the `main` branch until a new tagged release with SPM support is published.
 
 #### iOS (XCFramework)
 
@@ -187,19 +190,19 @@ In iOS, you'll need to create the instance in your iOS-specific code:
 // In your iOS module
 import PrinceOfVersions
 
-let princeOfVersions = IosPrinceOfVersionsKt.createPrinceOfVersions()
+let princeOfVersions = IosPrinceOfVersionsKt.makePrinceOfVersions()
 
 // Use with async/await
 // Note: Kotlin extension functions are exposed as static methods in Swift
 // that take the instance as the first parameter
 Task {
     do {
-        let result = try await IosPrinceOfVersionsKt.checkForUpdatesFromUrl(
+        let result = try await IosPrinceOfVersionsKt.checkForUpdates(
             princeOfVersions,  // Instance passed as first parameter
-            url: "https://your-server.com/update-config.json",
+            from: "https://your-server.com/update-config.json",
             username: nil,
             password: nil,
-            networkTimeout: 60_000  // milliseconds
+            timeout: 60_000  // milliseconds
         )
 
         switch result.status {
@@ -292,6 +295,32 @@ val customPrinceOfVersions = PrinceOfVersions(context) {
     versionProvider = MyCustomVersionProvider()
 }
 ```
+
+#### Sending Custom Headers
+
+If your configuration endpoint needs an API key or a token, pass `headers` to `checkForUpdatesFromUrl` (`checkForUpdates(_:from:headers:...)` in Swift). No custom `Loader` is needed:
+
+```kotlin
+val result = princeOfVersions.checkForUpdatesFromUrl(
+    url = "https://your-server.com/update-config.json",
+    headers = mapOf("x-api-key" to apiKey),
+)
+```
+
+On iOS, use the overload that takes `headers`:
+
+```swift
+let result = try await IosPrinceOfVersionsKt.checkForUpdates(
+    princeOfVersions,
+    from: "https://your-server.com/update-config.json",
+    headers: ["x-api-key": apiKey],
+    username: nil,
+    password: nil,
+    timeout: 60_000  // milliseconds
+)
+```
+
+If you also pass `username` and `password`, their basic authentication `Authorization` header replaces any `Authorization` entry in `headers`.
 
 #### Using Custom Loader
 

@@ -17,8 +17,8 @@ final class CustomCheckerViewModel: ObservableObject {
 
     private var task: Task<Void, Never>?
     private lazy var pov: any PrinceOfVersionsBase = {
-        return IosPrinceOfVersionsKt.princeOfVersionsWithCustomChecker(
-            key: Constants.checkerKey,
+        return IosPrinceOfVersionsKt.makePrinceOfVersions(
+            checkerKey: Constants.checkerKey,
             checker: ExampleRequirementsChecker(),
             keepDefaultCheckers: true
         )
@@ -34,12 +34,12 @@ final class CustomCheckerViewModel: ObservableObject {
             do {
                 if isSlow { try await Task.sleep(for: .seconds(5)) }
 
-                let result = try await IosPrinceOfVersionsKt.checkForUpdatesFromUrl(
+                let result = try await IosPrinceOfVersionsKt.checkForUpdates(
                     pov,
-                    url: Constants.customCheckerUrl,
+                    from: Constants.customCheckerUrl,
                     username: nil,
                     password: nil,
-                    networkTimeout: Int64(Constants.networkTimeout)
+                    timeout: Int64(Constants.networkTimeout)
                 )
                 self.show(message: self.format(result: result))
             } catch is CancellationError {

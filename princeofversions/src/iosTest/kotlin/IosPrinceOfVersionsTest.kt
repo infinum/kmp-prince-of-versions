@@ -23,11 +23,22 @@ class PrinceOfVersionsIosTest {
     fun `invalid URL throws IoException via iOS loader`() = runTest {
         val pov = testPrinceOfVersionsWithInfo()
         assertFailsWith<IoException> {
-            pov.checkForUpdates(
+            pov.checkForUpdatesFromUrl(
                 url = "not a url",
                 username = null,
                 password = null,
-                networkTimeout = DEFAULT_NETWORK_TIMEOUT
+                networkTimeout = DEFAULT_NETWORK_TIMEOUT,
+            )
+        }
+    }
+
+    @Test
+    fun `invalid URL throws IoException via headers overload`() = runTest {
+        val pov = testPrinceOfVersionsWithInfo()
+        assertFailsWith<IoException> {
+            pov.checkForUpdatesFromUrl(
+                url = "not a url",
+                headers = mapOf("x-api-key" to "secret-key"),
             )
         }
     }

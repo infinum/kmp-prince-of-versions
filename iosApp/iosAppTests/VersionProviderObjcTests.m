@@ -38,7 +38,7 @@
 }
 
 - (void)test_checkForUpdates_shouldYieldIoError_whenInvalidURL {
-    id<POVPrinceOfVersionsBase> pov = [POVIosPrinceOfVersionsKt createPrinceOfVersions];
+    id<POVPrinceOfVersionsBase> pov = [POVIosPrinceOfVersionsKt makePrinceOfVersions];
 
     NSError *ioError = [NSError errorWithDomain:@"TestIOError"
                                            code:404
@@ -61,9 +61,9 @@
     ThresholdChecker *checker = [ThresholdChecker new];
 
     id<POVPrinceOfVersionsBase> pov =
-    [POVIosPrinceOfVersionsKt princeOfVersionsWithCustomCheckerKey:@"requiredNumberOfLetters"
-                                                           checker:checker
-                                               keepDefaultCheckers:YES];
+    [POVIosPrinceOfVersionsKt makePrinceOfVersionsCheckerKey:@"requiredNumberOfLetters"
+                                                        checker:checker
+                                            keepDefaultCheckers:YES];
 
     NSString *json = @"{\"ios2\":[{\"required_version\":\"999.0.0\",\"requirements\":{\"requiredNumberOfLetters\":\"3\"}}]}";
     POVTestStringLoader *loader = [[POVTestStringLoader alloc] initWithPayload:json];
@@ -82,7 +82,7 @@
 }
 
 - (void)test_checkForUpdates_shouldYieldConfigurationException_whenBadConfig {
-    id<POVPrinceOfVersionsBase> pov = [POVIosPrinceOfVersionsKt createPrinceOfVersions];
+    id<POVPrinceOfVersionsBase> pov = [POVIosPrinceOfVersionsKt makePrinceOfVersions];
 
     POVTestStringLoader *loader = [[POVTestStringLoader alloc] initWithPayload:@"{invalid json}"];
 
@@ -103,11 +103,11 @@
     POVTestVersionProvider *provider = [[POVTestVersionProvider alloc] initWithVersion:@"1.2.3"];
 
     id<POVBaseVersionComparator> comparator =
-        [POVIosDefaultVersionComparatorKt defaultIosVersionComparator];
+        [POVIosDefaultVersionComparatorKt makeDefaultVersionComparator];
 
     id<POVPrinceOfVersionsBase> pov =
-        [POVIosDefaultVersionComparatorKt princeOfVersionsWithCustomVersionLogicProvider:provider
-                                                                             comparator:comparator];
+        [POVIosDefaultVersionComparatorKt makePrinceOfVersionsVersionProvider:provider
+                                                                   comparator:comparator];
 
     NSString *json = @"{\"ios2\":[{\"required_version\":\"1.2.5\",\"last_version_available\":\"1.3.0\"}]}";
     POVTestStringLoader *loader = [[POVTestStringLoader alloc] initWithPayload:json];
@@ -127,7 +127,7 @@
 }
 
 - (void)test_checkForUpdates_shouldWorkWithDefaultInstance {
-    id<POVPrinceOfVersionsBase> pov = [POVIosPrinceOfVersionsKt createPrinceOfVersions];
+    id<POVPrinceOfVersionsBase> pov = [POVIosPrinceOfVersionsKt makePrinceOfVersions];
 
     POVTestStringLoader *loader = [[POVTestStringLoader alloc] initWithPayload:
         @"{\"ios2\":[{\"required_version\":\"1.0.0\"}]}"];

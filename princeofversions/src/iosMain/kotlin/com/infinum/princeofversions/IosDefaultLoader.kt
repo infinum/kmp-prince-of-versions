@@ -1,12 +1,12 @@
 package com.infinum.princeofversions
 
-import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.time.Duration
 import kotlinx.cinterop.BetaInteropApi
+import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.suspendCancellableCoroutine
 import platform.Foundation.NSData
 import platform.Foundation.NSError
@@ -29,28 +29,18 @@ internal class IosDefaultLoader(
     private val username: String?,
     private val password: String?,
     networkTimeout: Duration,
+    private val headers: Map<String, String> = emptyMap(),
 ) : Loader {
 
     private val timeoutSeconds: Double =
         (networkTimeout.inWholeMilliseconds.toDouble() / MILLIS_PER_SECOND).coerceAtLeast(MIN_TIMEOUT_SECONDS)
 
-    @OptIn(ExperimentalEncodingApi::class)
     override suspend fun load(): String = suspendCancellableCoroutine { cont ->
         val nsUrl = NSURL.URLWithString(url)
         if (nsUrl == null) {
             cont.resumeWithException(IoException("Invalid URL: $url"))
         } else {
-            val request = NSMutableURLRequest.requestWithURL(nsUrl).apply {
-                setHTTPMethod("GET")
-                setTimeoutInterval(timeoutSeconds)
-                // Bypass local cache for this request
-                setCachePolicy(NSURLRequestReloadIgnoringLocalCacheData)
-                if (username != null && password != null) {
-                    val creds = "$username:$password"
-                    val auth = "Basic " + Base64.encode(creds.encodeToByteArray())
-                    setValue(auth, forHTTPHeaderField = "Authorization")
-                }
-            }
+            val request = createRequest(nsUrl)
 
             val config = NSURLSessionConfiguration.defaultSessionConfiguration().apply {
                 timeoutIntervalForRequest = timeoutSeconds
@@ -72,30 +62,43 @@ internal class IosDefaultLoader(
         }
     }
 
+    @OptIn(ExperimentalEncodingApi::class)
+    internal fun createRequest(nsUrl: NSURL): NSMutableURLRequest =
+        NSMutableURLRequest.requestWithURL(nsUrl).apply {
+            setHTTPMethod("GET")
+            setTimeoutInterval(timeoutSeconds)
+            // Bypass local cache for this request
+            setCachePolicy(NSURLRequestReloadIgnoringLocalCacheData)
+            headers.forEach { (name, value) -> setValue(value, forHTTPHeaderField = name) }
+            // Applied after custom headers, so credentials take precedence over an `Authorization` entry.
+            if (username != null && password != null) {
+                val creds = "$username:$password"
+                val auth = "Basic " + Base64.encode(creds.encodeToByteArray())
+                setValue(auth, forHTTPHeaderField = "Authorization")
+            }
+        }
+
     private fun handleTaskCallback(
         data: NSData?,
         response: NSURLResponse?,
         error: NSError?,
-        cont: Continuation<String>,
+        cont: CancellableContinuation<String>,
         session: NSURLSession,
     ) {
-        fun cleanupSession(session: NSURLSession) {
-            session.finishTasksAndInvalidate()
+        // Check if continuation is still active before resuming and cleaning up the session.
+        // This prevents double invalidation when the coroutine was cancelled and the
+        // cancellation handler has already called session.invalidateAndCancel().
+        if (!cont.isActive) {
+            return
         }
-        fun fail(msg: String) {
-            cont.resumeWithException(IoException(msg))
-            cleanupSession(session)
-        }
-        fun succeed(body: String) {
-            cont.resume(body)
-            cleanupSession(session)
-        }
+
+        session.finishTasksAndInvalidate()
 
         val failure = buildFailureMessage(error, response)
         if (failure != null) {
-            fail(failure)
+            cont.resumeWithException(IoException(failure))
         } else {
-            succeed(decodeBody(data))
+            cont.resume(decodeBody(data))
         }
     }
 
@@ -139,9 +142,11 @@ internal actual fun provideDefaultLoader(
     username: String?,
     password: String?,
     networkTimeout: Duration,
+    headers: Map<String, String>,
 ): Loader = IosDefaultLoader(
     url = url,
     username = username,
     password = password,
     networkTimeout = networkTimeout,
+    headers = headers,
 )
