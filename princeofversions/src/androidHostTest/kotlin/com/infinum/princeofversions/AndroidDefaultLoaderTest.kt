@@ -148,6 +148,41 @@ class AndroidDefaultLoaderTest {
         }
     }
 
+    @Test
+    fun `androidDefaultLoader should send custom headers when headers are provided`() = runTest {
+        mockWebServer.enqueue(MockResponse().setResponseCode(200))
+
+        val androidLoader = AndroidDefaultLoader(
+            url = mockWebServer.url("/").toString(),
+            username = null,
+            password = null,
+            networkTimeout = 60.seconds,
+            headers = mapOf("x-api-key" to "secret-key", "X-Client" to "sample"),
+        )
+        androidLoader.load()
+
+        val request = mockWebServer.takeRequest()
+        assertEquals("secret-key", request.getHeader("x-api-key"))
+        assertEquals("sample", request.getHeader("X-Client"))
+    }
+
+    @Test
+    fun `androidDefaultLoader should prefer basic auth credentials over a custom Authorization header`() = runTest {
+        mockWebServer.enqueue(MockResponse().setResponseCode(200))
+
+        val androidLoader = AndroidDefaultLoader(
+            url = mockWebServer.url("/").toString(),
+            username = "testuser",
+            password = "testpass",
+            networkTimeout = 60.seconds,
+            headers = mapOf("Authorization" to "Bearer token"),
+        )
+        androidLoader.load()
+
+        val request = mockWebServer.takeRequest()
+        assertEquals("Basic dGVzdHVzZXI6dGVzdHBhc3M=", request.getHeader("Authorization"))
+    }
+
     private fun assertJsonEquals(actual: String, expected: String) {
         assertEquals(actual.replace("\n", ""), expected.replace("\n", ""))
     }

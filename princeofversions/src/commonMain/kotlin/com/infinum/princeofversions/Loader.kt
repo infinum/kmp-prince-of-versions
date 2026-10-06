@@ -24,4 +24,5 @@ internal expect fun provideDefaultLoader(
     username: String? = null,
     password: String? = null,
     networkTimeout: Duration = DEFAULT_NETWORK_TIMEOUT,
+    headers: Map<String, String> = emptyMap(),
 ): Loader

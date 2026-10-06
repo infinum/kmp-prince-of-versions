@@ -13,6 +13,7 @@ import kotlin.time.Duration
  * @param username Optional username for Basic authentication.
  * @param password Optional password for Basic authentication.
  * @param networkTimeout Custom network timeout duration.
+ * @param headers Additional HTTP headers sent with the request.
  */
 
 internal class AndroidDefaultLoader(
@@ -20,6 +21,7 @@ internal class AndroidDefaultLoader(
     private val username: String?,
     private val password: String?,
     networkTimeout: Duration,
+    private val headers: Map<String, String> = emptyMap(),
 ) : Loader {
 
     /**
@@ -34,6 +36,9 @@ internal class AndroidDefaultLoader(
                 connectTimeout = networkTimeoutMilliseconds
                 readTimeout = networkTimeoutMilliseconds
 
+                headers.forEach { (name, value) -> setRequestProperty(name, value) }
+
+                // Applied after custom headers, so credentials take precedence over an `Authorization` entry.
                 if (username != null && password != null) {
                     val auth = Base64.encode("$username:$password".encodeToByteArray())
                     setRequestProperty("Authorization", "Basic $auth")
@@ -56,9 +61,11 @@ internal actual fun provideDefaultLoader(
     username: String?,
     password: String?,
     networkTimeout: Duration,
+    headers: Map<String, String>,
 ): Loader = AndroidDefaultLoader(
     url = url,
     username = username,
     password = password,
     networkTimeout = networkTimeout,
+    headers = headers,
 )

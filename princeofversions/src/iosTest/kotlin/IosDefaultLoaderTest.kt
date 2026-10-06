@@ -7,6 +7,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
@@ -20,6 +21,7 @@ import platform.Foundation.NSURLResponse
 import platform.Foundation.NSUTF8StringEncoding
 import platform.Foundation.create
 import platform.Foundation.dataUsingEncoding
+import platform.Foundation.valueForHTTPHeaderField
 
 class IosDefaultLoaderTest {
 
@@ -96,6 +98,35 @@ class IosDefaultLoaderTest {
         yield()
         job.cancelAndJoin()
         // Reaching here without an IoException or crash confirms the fix is working.
+    }
+
+    @Test
+    fun createRequest_sets_custom_headers() {
+        val loader = IosDefaultLoader(
+            url = "https://example.com",
+            username = null,
+            password = null,
+            networkTimeout = 60.seconds,
+            headers = mapOf("x-api-key" to "secret-key", "X-Client" to "sample"),
+        )
+        val request = loader.createRequest(NSURL.URLWithString("https://example.com")!!)
+
+        assertEquals("secret-key", request.valueForHTTPHeaderField("x-api-key"))
+        assertEquals("sample", request.valueForHTTPHeaderField("X-Client"))
+    }
+
+    @Test
+    fun createRequest_prefers_basic_auth_over_custom_authorization_header() {
+        val loader = IosDefaultLoader(
+            url = "https://example.com",
+            username = "testuser",
+            password = "testpass",
+            networkTimeout = 60.seconds,
+            headers = mapOf("Authorization" to "Bearer token"),
+        )
+        val request = loader.createRequest(NSURL.URLWithString("https://example.com")!!)
+
+        assertEquals("Basic dGVzdHVzZXI6dGVzdHBhc3M=", request.valueForHTTPHeaderField("Authorization"))
     }
 
     // --- helpers ---
