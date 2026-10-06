@@ -13,6 +13,7 @@ import kotlin.time.Duration
  * @param username Optional username for Basic authentication.
  * @param password Optional password for Basic authentication.
  * @param networkTimeout The network timeout duration.
+ * @param headers Additional HTTP headers sent with the request.
  */
 
 internal class JvmDefaultLoader(
@@ -20,6 +21,7 @@ internal class JvmDefaultLoader(
     private val username: String?,
     private val password: String?,
     networkTimeout: Duration,
+    private val headers: Map<String, String> = emptyMap(),
 ) : Loader {
 
     /**
@@ -31,7 +33,10 @@ internal class JvmDefaultLoader(
     override suspend fun load(): String {
         val connection = URI(url).toURL().openConnection() as HttpURLConnection
         try {
-            // Apply Basic Authentication if credentials are provided
+            headers.forEach { (name, value) -> connection.setRequestProperty(name, value) }
+
+            // Apply Basic Authentication if credentials are provided. Applied after custom headers,
+            // so credentials take precedence over an `Authorization` entry.
             if (username != null && password != null) {
                 val credentials = "$username:$password"
                 val basicAuth = "Basic ${
@@ -55,9 +60,11 @@ internal actual fun provideDefaultLoader(
     username: String?,
     password: String?,
     networkTimeout: Duration,
+    headers: Map<String, String>,
 ): Loader = JvmDefaultLoader(
     url = url,
     username = username,
     password = password,
     networkTimeout = networkTimeout,
+    headers = headers,
 )

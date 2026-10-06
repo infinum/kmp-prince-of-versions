@@ -45,6 +45,7 @@ Prince of Versions KMP is a Kotlin Multiplatform library that handles app update
     - [JVM/Desktop](#jvmdesktop-1)
   - [Advanced Usage with Custom Components](#advanced-usage-with-custom-components)
     - [Android with Custom Configuration](#android-with-custom-configuration)
+    - [Sending Custom Headers](#sending-custom-headers)
     - [Using Custom Loader](#using-custom-loader)
   - [Kotlin Multiplatform Projects](#kotlin-multiplatform-projects)
     - [Shared Code (commonMain)](#shared-code-commonmain)
@@ -294,6 +295,32 @@ val customPrinceOfVersions = PrinceOfVersions(context) {
     versionProvider = MyCustomVersionProvider()
 }
 ```
+
+#### Sending Custom Headers
+
+If your configuration endpoint needs an API key or a token, pass `headers` to `checkForUpdatesFromUrl` (`checkForUpdates(_:from:headers:...)` in Swift). No custom `Loader` is needed:
+
+```kotlin
+val result = princeOfVersions.checkForUpdatesFromUrl(
+    url = "https://your-server.com/update-config.json",
+    headers = mapOf("x-api-key" to apiKey),
+)
+```
+
+On iOS, use the overload that takes `headers`:
+
+```swift
+let result = try await IosPrinceOfVersionsKt.checkForUpdates(
+    princeOfVersions,
+    from: "https://your-server.com/update-config.json",
+    headers: ["x-api-key": apiKey],
+    username: nil,
+    password: nil,
+    timeout: 60_000  // milliseconds
+)
+```
+
+If you also pass `username` and `password`, their basic authentication `Authorization` header replaces any `Authorization` entry in `headers`.
 
 #### Using Custom Loader
 
