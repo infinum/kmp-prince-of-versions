@@ -47,6 +47,7 @@ Prince of Versions KMP is a Kotlin Multiplatform library that handles app update
     - [Android with Custom Configuration](#android-with-custom-configuration)
     - [Sending Custom Headers](#sending-custom-headers)
     - [Using Custom Loader](#using-custom-loader)
+    - [Checking the App Store (iOS)](#checking-the-app-store-ios)
   - [Kotlin Multiplatform Projects](#kotlin-multiplatform-projects)
     - [Shared Code (commonMain)](#shared-code-commonmain)
     - [Android Implementation (androidMain)](#android-implementation-androidmain)
@@ -336,6 +337,74 @@ class MyCustomLoader : Loader {
 
 val result = princeOfVersions.checkForUpdates(MyCustomLoader())
 ```
+
+#### Checking the App Store (iOS)
+
+On iOS, you can check the App Store for a newer version without hosting a configuration JSON. `checkForUpdatesFromAppStore` looks up your app with the [iTunes Lookup API](https://performance-partners.apple.com/search-api) and compares the App Store version with the installed one. It mirrors `checkForUpdateFromAppStore` from the native [ios-prince-of-versions](https://github.com/infinum/ios-prince-of-versions) library.
+
+This check is available only on iOS.
+
+```swift
+Task {
+    do {
+        let result = try await IosPrinceOfVersionsKt.checkForUpdatesFromAppStore(
+            princeOfVersions,
+            trackPhaseRelease: true,
+            notificationFrequency: .always,
+            networkTimeout: 60_000,
+            bundleId: nil,  // nil uses Bundle.main.bundleIdentifier
+            country: nil    // nil checks the U.S. App Store
+        )
+
+        switch result.updateState {
+        case .optional:
+            if result.phaseReleaseInProgress {
+                // The update is still in its 7-day phased release
+                print("Update rolling out: \(result.updateVersion)")
+            } else {
+                print("Update available: \(result.updateVersion)")
+            }
+        default:
+            print("App is up to date")
+        }
+    } catch let error as ConfigurationException {
+        // Missing bundle ID, or an invalid App Store response
+        print("Configuration error: \(error.message ?? "Unknown error")")
+    } catch let error as IoException {
+        // Network error
+        print("Network error: \(error.message ?? "Connection failed")")
+    } catch {
+        print("Unexpected error: \(error.localizedDescription)")
+    }
+}
+```
+
+Parameters (Swift callers pass every argument; the defaults apply when calling from Kotlin):
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `trackPhaseRelease` | `true` | When `true`, `phaseReleaseInProgress` is `true` while the App Store version is less than 7 days old. When `false`, `phaseReleaseInProgress` is always `false`. The update is reported either way. |
+| `notificationFrequency` | `ALWAYS` | `ALWAYS` reports an available update on every check. `ONCE` reports each version only the first time. |
+| `networkTimeout` | 60 seconds | Timeout for the lookup request. |
+| `bundleId` | `null` | Bundle ID to look up. `null` uses the main bundle's identifier. |
+| `country` | `null` | Two-letter App Store region code. `null` checks the U.S. App Store. |
+
+The result is an `AppStoreUpdateResult`:
+
+| Property | Description |
+|----------|-------------|
+| `updateVersion` | The newest version available, or the installed version if the App Store has nothing newer. |
+| `updateState` | `OPTIONAL` if an update should be shown, otherwise `NO_UPDATE`. App Store updates are never `MANDATORY`. |
+| `phaseReleaseInProgress` | Whether the App Store version is still in its 7-day phased release. See `trackPhaseRelease`. |
+| `updateInfo.lastVersionAvailable` | The latest App Store version. |
+| `updateInfo.installedVersion` | The installed version, in the `CFBundleShortVersionString-CFBundleVersion` format. |
+| `updateInfo.releaseDate` | The release date of the latest App Store version. |
+
+Keep in mind:
+
+- The App Store does not report when a phased release finishes early, so `phaseReleaseInProgress` stays `true` for the full 7 days after the release date.
+- If the app is not found in the App Store region you check, for example before its first release, a `ConfigurationException` is thrown.
+- With `ONCE`, the last reported version is saved in `UserDefaults`.
 
 ### Kotlin Multiplatform Projects
 
