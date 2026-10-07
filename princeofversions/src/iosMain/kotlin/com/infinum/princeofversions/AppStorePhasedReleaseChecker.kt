@@ -11,19 +11,24 @@ internal object AppStorePhasedReleaseChecker {
     private val PHASED_RELEASE_DURATION = 7.days
 
     /**
-     * Returns true if the version is still within its 7-day phased rollout period
-     * (i.e., releaseDate + 7 days > now).
+     * Parses a release date from the iTunes Lookup API (e.g., `2024-03-20T10:15:00Z`).
      *
-     * Returns false (safe fallback, treat as fully released) if the date cannot be parsed.
+     * Returns null if the date cannot be parsed.
      */
-    fun isInPhasedRollout(releaseDateString: String): Boolean {
+    fun parseReleaseDate(releaseDateString: String): NSDate? {
         val formatter = NSDateFormatter().apply {
             dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
             locale = NSLocale(localeIdentifier = "en_US_POSIX")
         }
 
-        val releaseDate = formatter.dateFromString(releaseDateString) ?: return false
+        return formatter.dateFromString(releaseDateString)
+    }
 
+    /**
+     * Returns true if the version is still within its 7-day phased rollout period
+     * (i.e., releaseDate + 7 days > now).
+     */
+    fun isInPhasedRollout(releaseDate: NSDate): Boolean {
         val phasedEndTimestamp = releaseDate.timeIntervalSince1970 + PHASED_RELEASE_DURATION.inWholeSeconds
         val nowTimestamp = NSDate().timeIntervalSince1970
 

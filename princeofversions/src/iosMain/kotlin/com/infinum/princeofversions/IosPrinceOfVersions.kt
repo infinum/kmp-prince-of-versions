@@ -128,19 +128,23 @@ public class ConfigurationException(message: String, cause: Throwable? = null) :
  *
  * This is a zero-config check that reads the bundle ID from [NSBundle.mainBundle]
  * and queries the App Store for the latest version. App Store updates are never
- * mandatory, so the result status will be either [UpdateStatus.OPTIONAL] (update
+ * mandatory, so the result state will be either [UpdateStatus.OPTIONAL] (update
  * available) or [UpdateStatus.NO_UPDATE].
  *
- * @param trackPhaseRelease When true, versions still within their 7-day phased
- *   rollout window are treated as not yet available.
+ * @param trackPhaseRelease When true, [AppStoreUpdateResult.phaseReleaseInProgress] reports whether
+ *   the App Store version is still within its 7-day phased rollout window. When false,
+ *   [AppStoreUpdateResult.phaseReleaseInProgress] is always false. The update is reported either way.
  * @param notificationFrequency Controls whether a previously-notified version
- *   is reported again. [NotificationType.ONCE] (default) suppresses repeated
- *   notifications for the same version. [NotificationType.ALWAYS] always reports.
+ *   is reported again. [NotificationType.ALWAYS] (default) always reports.
+ *   [NotificationType.ONCE] suppresses repeated notifications for the same version.
  * @param networkTimeout The network timeout for the iTunes Lookup API request.
  * @param bundleId The bundle identifier to look up. When null (default), reads
  *   from [NSBundle.mainBundle.bundleIdentifier].
+ * @param country The two-letter code of the App Store region to check (e.g., `"mk"`).
+ *   When null (default), the iTunes Lookup API checks the U.S. App Store.
  *
- * @return An [UpdateResult] with status [UpdateStatus.OPTIONAL] or [UpdateStatus.NO_UPDATE].
+ * @return An [AppStoreUpdateResult] with state [UpdateStatus.OPTIONAL] or [UpdateStatus.NO_UPDATE].
+ * @throws ConfigurationException if the app is not found on the App Store, or the response is invalid.
  */
 @Throws(
     IoException::class,
@@ -148,29 +152,30 @@ public class ConfigurationException(message: String, cause: Throwable? = null) :
     CancellationException::class,
 )
 public suspend fun PrinceOfVersions.checkForUpdatesFromAppStore(
-    trackPhaseRelease: Boolean = false,
-    notificationFrequency: NotificationType = NotificationType.ONCE,
+    trackPhaseRelease: Boolean = true,
+    notificationFrequency: NotificationType = NotificationType.ALWAYS,
     networkTimeout: Duration = DEFAULT_NETWORK_TIMEOUT,
     bundleId: String? = null,
-): UpdateResult = try {
+    country: String? = null,
+): AppStoreUpdateResult = try {
     val resolvedBundleId = bundleId
         ?: NSBundle.mainBundle.bundleIdentifier
         ?: throw ConfigurationException("NSBundle.mainBundle.bundleIdentifier is null")
 
-    val url = "$ITUNES_LOOKUP_BASE_URL?bundleId=$resolvedBundleId"
+    val url = appStoreLookupUrl(bundleId = resolvedBundleId, country = country)
     val loader = provideDefaultLoader(url = url, networkTimeout = networkTimeout)
     val jsonResponse = loader.load()
 
     val appStoreInfo = AppStoreResponseParser.parse(jsonResponse)
+        ?: throw ConfigurationException("App not found on the App Store for bundle ID: $resolvedBundleId")
 
-    if (appStoreInfo == null) {
-        BaseUpdateResult(
-            version = installedVersionString(),
-            status = UpdateStatus.NO_UPDATE,
-        )
-    } else {
-        resolveAppStoreUpdate(appStoreInfo, trackPhaseRelease, notificationFrequency)
-    }
+    resolveAppStoreUpdate(
+        appStoreInfo = appStoreInfo,
+        installedVersion = IosApplicationVersionProvider().getVersion(),
+        trackPhaseRelease = trackPhaseRelease,
+        notificationFrequency = notificationFrequency,
+        storage = IosAppStoreStorage(),
+    )
 } catch (e: CancellationException) {
     throw e
 } catch (e: IoException) {
@@ -181,56 +186,52 @@ public suspend fun PrinceOfVersions.checkForUpdatesFromAppStore(
     throw ConfigurationException(t.message ?: "Unexpected error during App Store check", t)
 }
 
-private suspend fun resolveAppStoreUpdate(
-    appStoreInfo: AppStoreVersionInfo,
-    trackPhaseRelease: Boolean,
-    notificationFrequency: NotificationType,
-): UpdateResult {
-    if (trackPhaseRelease &&
-        AppStorePhasedReleaseChecker.isInPhasedRollout(appStoreInfo.currentVersionReleaseDate)
-    ) {
-        return BaseUpdateResult(
-            version = installedVersionString(),
-            status = UpdateStatus.NO_UPDATE,
-        )
-    }
-
-    val installedVersion = VersionParser.parseDots(installedVersionString())
-    val appStoreVersion = VersionParser.parseDots(appStoreInfo.version)
-
-    if (appStoreVersion <= installedVersion) {
-        return BaseUpdateResult(
-            version = installedVersionString(),
-            status = UpdateStatus.NO_UPDATE,
-        )
-    }
-
-    return applyAppStoreNotificationFrequency(appStoreInfo.version, notificationFrequency)
+internal fun appStoreLookupUrl(
+    bundleId: String,
+    country: String?,
+): String = buildString {
+    append("$ITUNES_LOOKUP_BASE_URL?bundleId=$bundleId")
+    if (country != null) append("&country=$country")
 }
 
-private suspend fun applyAppStoreNotificationFrequency(
-    appStoreVersion: String,
+internal suspend fun resolveAppStoreUpdate(
+    appStoreInfo: AppStoreVersionInfo,
+    installedVersion: String,
+    trackPhaseRelease: Boolean,
     notificationFrequency: NotificationType,
-): UpdateResult {
-    val storage = IosAppStoreStorage()
-    val lastNotified = storage.getLastSavedVersion()
-    val alreadyNotified = lastNotified == appStoreVersion
+    storage: Storage,
+): AppStoreUpdateResult {
+    val newerVersion = appStoreInfo.version
+        .takeIf { VersionParser.parseDots(it) > VersionParser.parseDots(installedVersion) }
+    val releaseDate = AppStorePhasedReleaseChecker.parseReleaseDate(appStoreInfo.currentVersionReleaseDate)
 
-    val status = if (!alreadyNotified || notificationFrequency == NotificationType.ALWAYS) {
-        storage.saveVersion(appStoreVersion)
-        UpdateStatus.OPTIONAL
-    } else {
-        UpdateStatus.NO_UPDATE
-    }
-
-    return BaseUpdateResult(
-        version = appStoreVersion,
-        status = status,
+    return AppStoreUpdateResult(
+        updateVersion = newerVersion ?: installedVersion,
+        updateState = resolveAppStoreUpdateState(newerVersion, notificationFrequency, storage),
+        phaseReleaseInProgress = trackPhaseRelease &&
+            releaseDate != null &&
+            AppStorePhasedReleaseChecker.isInPhasedRollout(releaseDate),
+        updateInfo = AppStoreUpdateInfo(
+            lastVersionAvailable = appStoreInfo.version,
+            installedVersion = installedVersion,
+            releaseDate = releaseDate,
+        ),
     )
 }
 
-private fun installedVersionString(): String =
-    IosApplicationVersionProvider().getVersion()
+private suspend fun resolveAppStoreUpdateState(
+    newerVersion: String?,
+    notificationFrequency: NotificationType,
+    storage: Storage,
+): UpdateStatus = when {
+    newerVersion == null -> UpdateStatus.NO_UPDATE
+    notificationFrequency == NotificationType.ONCE && storage.getLastSavedVersion() == newerVersion ->
+        UpdateStatus.NO_UPDATE
+    else -> {
+        storage.saveVersion(newerVersion)
+        UpdateStatus.OPTIONAL
+    }
+}
 
 private const val ITUNES_LOOKUP_BASE_URL = "https://itunes.apple.com/lookup"
 
