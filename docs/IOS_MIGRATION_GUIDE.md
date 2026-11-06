@@ -171,6 +171,27 @@ let result = try await IosPrinceOfVersionsKt.checkForUpdates(
 )
 ```
 
+#### With Certificate Pinning
+
+**Before:**
+```swift
+let options = PoVRequestOptions()
+options.shouldPinCertificates = true
+
+PrinceOfVersions.checkForUpdates(from: url, options: options) { response in ... }
+```
+
+**After:**
+
+Copy [`PinnedCertificateLoader.swift`](../iosApp/iosApp/Helpers/PinnedCertificateLoader.swift) from the sample app into your project and pass it as the source:
+
+```swift
+let loader = PinnedCertificateLoader(url: url)
+let result = try await pov.checkForUpdates(source: loader)
+```
+
+Keep your `.cer`, `.crt` or `.der` files in the app bundle, as before. One difference: the native library only compared public keys, while `PinnedCertificateLoader` also requires the certificate to pass the system's normal trust checks. A self-signed certificate that the device doesn't trust is now rejected.
+
 ### 4. Update Response Handling
 
 **Before:**
