@@ -1,0 +1,118 @@
+name: Release iOS
+
+# Builds the XCFramework, publishes it as a GitHub release, and tags a commit whose
+# Package.swift points at that release. SPM reads Package.swift from the tagged commit,
+# so the tag can only be created after the XCFramework's checksum is known. That's why
+# this runs from a button instead of a tag push. See docs/RELEASING.md.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-ios
+  cancel-in-progress: false
+
+env:
+  JAVA_VERSION: 17
+
+jobs:
+  release:
+    name: Release XCFramework
+    if: github.ref == 'refs/heads/main'
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Read version
+        id: version
+        run: |
+          version=$(sed -n 's/^prince-of-versions = "\(.*\)"$/\1/p' gradle/libs.versions.toml)
+          if [ -z "$version" ]; then
+            echo "::error::Couldn't read prince-of-versions from gradle/libs.versions.toml"
+            exit 1
+          fi
+          tag="v$version"
+          if git rev-parse -q --verify "refs/tags/$tag" > /dev/null; then
+            echo "::error::Tag $tag already exists. Bump prince-of-versions in gradle/libs.versions.toml first."
+            exit 1
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: 'temurin'
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - uses: gradle/actions/setup-gradle@v6
+
+      - name: Select latest Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Build XCFramework
+        run: ./gradlew :princeofversions:assemblePrinceofversionsReleaseXCFramework
+
+      - name: Zip XCFramework
+        id: zip
+        working-directory: princeofversions/build/XCFrameworks/release
+        run: |
+          ditto -c -k --keepParent princeofversions.xcframework PrinceOfVersions.xcframework.zip
+          echo "path=$PWD/PrinceOfVersions.xcframework.zip" >> "$GITHUB_OUTPUT"
+          echo "checksum=$(swift package compute-checksum PrinceOfVersions.xcframework.zip)" >> "$GITHUB_OUTPUT"
+
+      - name: Point Package.swift at the new release
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+          CHECKSUM: ${{ steps.zip.outputs.checksum }}
+        run: |
+          url="https://github.com/$GITHUB_REPOSITORY/releases/download/$TAG/PrinceOfVersions.xcframework.zip"
+          sed -i '' -E "s|url: \".*\"|url: \"$url\"|; s|checksum: \".*\"|checksum: \"$CHECKSUM\"|" Package.swift
+          if ! grep -q "$CHECKSUM" Package.swift; then
+            echo "::error::Couldn't update the checksum in Package.swift"
+            exit 1
+          fi
+          swift package dump-package > /dev/null
+          git diff Package.swift
+
+      - name: Push release branch
+        id: branch
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          branch="release/$TAG"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git commit -m "Release $TAG" Package.swift
+          git push origin "$branch"
+          echo "name=$branch" >> "$GITHUB_OUTPUT"
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      # The release is created as a draft first, so the tag only appears once the zip is uploaded.
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.version.outputs.tag }}
+          SHA: ${{ steps.branch.outputs.sha }}
+          ZIP: ${{ steps.zip.outputs.path }}
+        run: |
+          gh release create "$TAG" "$ZIP" --draft --target "$SHA" --title "$TAG" --generate-notes
+          gh release edit "$TAG" --draft=false
+
+      - name: Summary
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+          BRANCH: ${{ steps.branch.outputs.name }}
+        run: |
+          {
+            echo "### Released $TAG"
+            echo ""
+            echo "- Release: https://github.com/$GITHUB_REPOSITORY/releases/tag/$TAG"
+            echo "- Next: open a pull request from \`$BRANCH\` so \`Package.swift\` on \`main\` points at this release: https://github.com/$GITHUB_REPOSITORY/compare/main...$BRANCH?expand=1"
+          } >> "$GITHUB_STEP_SUMMARY"
