@@ -4,8 +4,7 @@ import PackageDescription
 let package = Package(
     name: "PrinceOfVersions",
     platforms: [
-        .iOS(.v16),
-        .macOS(.v14)
+        .iOS(.v15)
     ],
     products: [
         .library(
