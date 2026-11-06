@@ -47,6 +47,7 @@ Prince of Versions KMP is a Kotlin Multiplatform library that handles app update
     - [Android with Custom Configuration](#android-with-custom-configuration)
     - [Sending Custom Headers](#sending-custom-headers)
     - [Using Custom Loader](#using-custom-loader)
+    - [Certificate Pinning (iOS)](#certificate-pinning-ios)
   - [Kotlin Multiplatform Projects](#kotlin-multiplatform-projects)
     - [Shared Code (commonMain)](#shared-code-commonmain)
     - [Android Implementation (androidMain)](#android-implementation-androidmain)
@@ -336,6 +337,48 @@ class MyCustomLoader : Loader {
 
 val result = princeOfVersions.checkForUpdates(MyCustomLoader())
 ```
+
+#### Certificate Pinning (iOS)
+
+The library has no built-in certificate pinning. On iOS, use a custom `Loader` with its own `URLSession` delegate. The sample app has a complete implementation you can copy into your project: [`PinnedCertificateLoader.swift`](iosApp/iosApp/Helpers/PinnedCertificateLoader.swift).
+
+```swift
+let loader = PinnedCertificateLoader(
+    url: URL(string: "https://your-server.com/update-config.json")!
+)
+let result = try await princeOfVersions.checkForUpdates(source: loader)
+```
+
+It works like `shouldPinCertificates` in the native iOS library. It reads every `.cer`, `.crt` and `.der` file in the app bundle, and only accepts the server if its certificate has the same public key as one of them. Unlike the native library, the certificate must also pass the system's normal trust checks.
+
+The pinning happens in the session delegate:
+
+```swift
+func urlSession(
+    _ session: URLSession,
+    didReceive challenge: URLAuthenticationChallenge
+) async -> (URLSession.AuthChallengeDisposition, URLCredential?) {
+    guard
+        challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust,
+        let trust = challenge.protectionSpace.serverTrust
+    else {
+        return (.performDefaultHandling, nil)
+    }
+
+    guard
+        SecTrustEvaluateWithError(trust, nil),
+        let serverCertificate = (SecTrustCopyCertificateChain(trust) as? [SecCertificate])?.first,
+        let serverKey = PinnedCertificateLoader.publicKeyData(of: serverCertificate),
+        pinnedKeys.contains(serverKey)
+    else {
+        return (.cancelAuthenticationChallenge, nil)
+    }
+
+    return (.useCredential, URLCredential(trust: trust))
+}
+```
+
+If pinning fails, the check throws with `URLError.cancelled`.
 
 ### Kotlin Multiplatform Projects
 
