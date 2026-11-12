@@ -56,7 +56,7 @@ Task {
             from: url,
             username: nil,
             password: nil,
-            timeout: 60_000
+            networkTimeoutInterval: 60
         )
 
         switch String(describing: result.status) {
@@ -133,7 +133,7 @@ let result = try await IosPrinceOfVersionsKt.checkForUpdates(
     from: urlString,
     username: nil,
     password: nil,
-    timeout: 60_000  // milliseconds
+    networkTimeoutInterval: 60  // seconds
 )
 ```
 
@@ -155,7 +155,7 @@ let result = try await IosPrinceOfVersionsKt.checkForUpdates(
     headers: ["Authorization": "Bearer token"],
     username: nil,
     password: nil,
-    timeout: 60_000
+    networkTimeoutInterval: 60
 )
 ```
 
@@ -167,7 +167,7 @@ let result = try await IosPrinceOfVersionsKt.checkForUpdates(
     from: urlString,
     username: "user",
     password: "password",
-    timeout: 60_000
+    networkTimeoutInterval: 60
 )
 ```
 
@@ -275,12 +275,10 @@ let result = try await IosPrinceOfVersionsKt.checkForUpdates(pov, from: url, ...
 
 ### 2. Timeout Values
 
-```swift
-// Before: seconds (TimeInterval)
-timeout: 30
+Pass the network timeout in seconds, as a `TimeInterval`, like `URLRequest.timeoutInterval`:
 
-// After: milliseconds (Int64)
-networkTimeout: 30_000
+```swift
+networkTimeoutInterval: 30  // 30 seconds
 ```
 
 ### 3. Async Patterns
@@ -347,7 +345,7 @@ final class UpdateCheckViewModel: ObservableObject {
                 from: url,
                 username: nil,
                 password: nil,
-                timeout: 60_000
+                networkTimeoutInterval: 60
             )
 
             switch String(describing: result.status) {
@@ -476,18 +474,6 @@ if String(describing: result.status) == "MANDATORY" { }
 if result.status.ordinal == UpdateStatus.mandatory.ordinal { }
 ```
 
-### Issue 3: Timeout Confusion
-
-**Problem:**
-```swift
-networkTimeout: 30  // Too short! This is 30 milliseconds
-```
-
-**Solution:**
-```swift
-networkTimeout: 30_000  // 30 seconds in milliseconds
-```
-
 ## Best Practices
 
 1. **Create PrinceOfVersions instance once** - Reuse it across your app
@@ -515,7 +501,7 @@ struct UpdateResult {
 
 final class PrinceOfVersionsUpdateService: UpdateCheckService {
     private let pov = IosPrinceOfVersionsKt.makePrinceOfVersions()
-    private let timeout: Int64 = 60_000
+    private let networkTimeoutInterval: TimeInterval = 60
 
     func checkForUpdates(from url: String) async throws -> UpdateResult {
         let result = try await IosPrinceOfVersionsKt.checkForUpdates(
@@ -523,7 +509,7 @@ final class PrinceOfVersionsUpdateService: UpdateCheckService {
             from: url,
             username: nil,
             password: nil,
-            timeout: timeout
+            networkTimeoutInterval: networkTimeoutInterval
         )
 
         let status = String(describing: result.status)

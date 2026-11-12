@@ -202,7 +202,7 @@ Task {
             from: "https://your-server.com/update-config.json",
             username: nil,
             password: nil,
-            timeout: 60_000  // milliseconds
+            networkTimeoutInterval: 60  // seconds
         )
 
         switch result.status {
@@ -316,7 +316,7 @@ let result = try await IosPrinceOfVersionsKt.checkForUpdates(
     headers: ["x-api-key": apiKey],
     username: nil,
     password: nil,
-    timeout: 60_000  // milliseconds
+    networkTimeoutInterval: 60  // seconds
 )
 ```
 

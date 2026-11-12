@@ -1,5 +1,7 @@
 package com.infinum.princeofversions
 
+import kotlin.experimental.ExperimentalObjCRefinement
+import kotlin.native.HiddenFromObjC
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -24,6 +26,9 @@ public interface PrinceOfVersionsBase<T> {
     ): BaseUpdateResult<T>
 
     public companion object {
+        // A Duration reaches Swift and Objective-C as its internal raw value, so it's hidden there.
+        @OptIn(ExperimentalObjCRefinement::class)
+        @HiddenFromObjC
         public val DEFAULT_NETWORK_TIMEOUT: Duration = 60.seconds
     }
 }

@@ -1,11 +1,14 @@
-@file:OptIn(ExperimentalObjCName::class)
+@file:OptIn(ExperimentalObjCName::class, ExperimentalObjCRefinement::class)
 
 package com.infinum.princeofversions
 
 import com.infinum.princeofversions.PrinceOfVersionsBase.Companion.DEFAULT_NETWORK_TIMEOUT
 import kotlin.experimental.ExperimentalObjCName
+import kotlin.experimental.ExperimentalObjCRefinement
 import kotlin.native.ObjCName
+import kotlin.native.ShouldRefineInSwift
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CancellationException
 
 /**
@@ -54,8 +57,12 @@ internal fun createPrinceOfVersions(
 
 /**
  * Starts a check for an update, loading the configuration from a URL (iOS actual).
+ *
+ * In Swift, use `checkForUpdates(_:from:username:password:networkTimeoutInterval:)`, which takes
+ * the timeout in seconds.
  */
 @ObjCName("checkForUpdates")
+@ShouldRefineInSwift
 @Throws(
     IoException::class,
     RequirementsNotSatisfiedException::class,
@@ -84,8 +91,12 @@ public suspend fun PrinceOfVersions.checkForUpdatesFromUrl(
  *
  * This is a separate overload rather than a new parameter because Swift callers pass every
  * argument explicitly, so a new parameter would break existing call sites.
+ *
+ * In Swift, use `checkForUpdates(_:from:headers:username:password:networkTimeoutInterval:)`, which
+ * takes the timeout in seconds.
  */
 @ObjCName("checkForUpdates")
+@ShouldRefineInSwift
 @Throws(
     IoException::class,
     RequirementsNotSatisfiedException::class,
@@ -119,6 +130,17 @@ public suspend fun PrinceOfVersions.checkForUpdatesFromUrl(
 } catch (t: Throwable) {
     throw ConfigurationException(t.message ?: "Unexpected error", t)
 }
+
+/**
+ * Converts a timeout in seconds, like Swift's `TimeInterval`, to a [Duration].
+ *
+ * A [Duration] reaches Swift and Objective-C as its internal raw value, not as milliseconds or
+ * seconds, so those callers can't create one themselves. The Swift `checkForUpdates` functions
+ * use this, and Objective-C callers can pass its result as the `timeout`.
+ */
+@ObjCName("networkTimeout")
+@ShouldRefineInSwift
+public fun networkTimeoutFromSeconds(@ObjCName("seconds") seconds: Double): Duration = seconds.seconds
 
 public class ConfigurationException(message: String, cause: Throwable? = null) : Exception(message, cause)
 

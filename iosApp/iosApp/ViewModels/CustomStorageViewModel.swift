@@ -33,7 +33,7 @@ final class CustomStorageViewModel: ObservableObject {
                     from: Constants.commonUsageUrl,
                     username: nil,
                     password: nil,
-                    timeout: Int64(Constants.networkTimeout)
+                    networkTimeoutInterval: Constants.networkTimeoutInterval
                 )
 
                 let status = String(describing: result.status)
