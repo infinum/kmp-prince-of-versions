@@ -15,7 +15,7 @@ public enum Constants {
 
     static let checkerKey = "requiredNumberOfLetters"
     
-    static let networkTimeout: UInt64 = 5_000
+    static let networkTimeoutInterval: TimeInterval = 5
 }
 
 extension Constants {

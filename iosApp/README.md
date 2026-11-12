@@ -90,7 +90,7 @@ let result = try await IosPrinceOfVersionsKt.checkForUpdates(
     from: "https://example.com/version.json",
     username: nil,
     password: nil,
-    timeout: 60_000
+    networkTimeoutInterval: 60
 )
 
 switch String(describing: result.status) {
@@ -282,7 +282,7 @@ final class UpdateViewModel: ObservableObject {
                     from: url,
                     username: nil,
                     password: nil,
-                    timeout: 60_000
+                    networkTimeoutInterval: 60
                 )
                 self?.message = self?.format(result: result)
             } catch {
@@ -361,7 +361,7 @@ final class VersionProviderHostTests: XCTestCase {
                                          from:@"not a url"
                                      username:nil
                                      password:nil
-                                      timeout:3000
+                                      timeout:[POVIosPrinceOfVersionsKt networkTimeoutSeconds:3]
                             completionHandler:^(POVBaseUpdateResult<NSString *> *result,
                                                 NSError *error) {
         XCTAssertNil(result);

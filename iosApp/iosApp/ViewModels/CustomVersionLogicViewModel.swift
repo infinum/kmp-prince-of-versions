@@ -41,7 +41,7 @@ final class CustomVersionLogicViewModel: ObservableObject {
                     from: Constants.updateUrl,
                     username: nil,
                     password: nil,
-                    timeout: Int64(Constants.networkTimeout)
+                    networkTimeoutInterval: Constants.networkTimeoutInterval
                 )
 
                 let status = String(describing: update.status)

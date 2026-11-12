@@ -3,6 +3,8 @@ package com.infinum.princeofversions
 import com.infinum.princeofversions.PrinceOfVersionsBase.Companion.DEFAULT_NETWORK_TIMEOUT
 import kotlinx.coroutines.test.runTest
 import kotlin.test.*
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 class PrinceOfVersionsIosTest {
 
@@ -41,6 +43,12 @@ class PrinceOfVersionsIosTest {
                 headers = mapOf("x-api-key" to "secret-key"),
             )
         }
+    }
+
+    @Test
+    fun `networkTimeoutFromSeconds converts seconds to a Duration`() {
+        assertEquals(60.seconds, networkTimeoutFromSeconds(60.0))
+        assertEquals(1500.milliseconds, networkTimeoutFromSeconds(1.5))
     }
 
     @Test

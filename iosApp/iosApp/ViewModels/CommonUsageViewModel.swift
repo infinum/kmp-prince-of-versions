@@ -36,7 +36,7 @@ final class CommonUsageViewModel: ObservableObject {
                     from: Constants.commonUsageUrl,
                     username: nil,
                     password: nil,
-                    timeout: Int64(Constants.networkTimeout)
+                    networkTimeoutInterval: Constants.networkTimeoutInterval
                 )
                 self.show(message: self.format(result: result))
             } catch is CancellationError {

@@ -58,7 +58,7 @@ final class CustomParserViewModel: ObservableObject {
                     from: Constants.minimumUrl,
                     username: nil,
                     password: nil,
-                    timeout: Int64(Constants.networkTimeout)
+                    networkTimeoutInterval: Constants.networkTimeoutInterval
                 )
                 let status = String(describing: update.status)
                 let version = (update.version as String?) ?? "nil"

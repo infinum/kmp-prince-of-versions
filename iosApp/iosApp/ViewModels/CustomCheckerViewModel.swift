@@ -39,7 +39,7 @@ final class CustomCheckerViewModel: ObservableObject {
                     from: Constants.customCheckerUrl,
                     username: nil,
                     password: nil,
-                    timeout: Int64(Constants.networkTimeout)
+                    networkTimeoutInterval: Constants.networkTimeoutInterval
                 )
                 self.show(message: self.format(result: result))
             } catch is CancellationError {
